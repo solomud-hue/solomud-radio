@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090d18"><title>Solomud Radio — радио без границ</title>
+<style>
+:root{color-scheme:dark;--bg:#090d18;--panel:#111a2b;--muted:#91a0b8;--line:#243149;--accent:#8b7cff;--mint:#62e0bf}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% -10%,#292453 0,transparent 42%),radial-gradient(ellipse at 100% 20%,#123b43 0,transparent 32%),var(--bg);color:#f4f6ff;font:15px/1.5 Inter,system-ui,Segoe UI,sans-serif;min-height:100vh}
+.wrap{max-width:1120px;margin:auto;padding:28px 22px 150px}.top{display:flex;justify-content:space-between;align-items:center;gap:18px}.brand{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:800;letter-spacing:.3px}.logo{width:44px;height:44px;border-radius:15px;background:linear-gradient(135deg,#8c7dff,#4cd9bd);display:grid;place-items:center;color:#09111d;font-size:22px;box-shadow:0 8px 30px #7164e955}.live{color:var(--mint);font-size:12px;border:1px solid #285b54;background:#102a2b;padding:7px 12px;border-radius:99px}
+.hero{padding:55px 0 30px}.eyebrow{color:var(--mint);font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700}.hero h1{font-size:clamp(34px,6vw,58px);line-height:1.05;max-width:760px;margin:12px 0}.hero p{color:var(--muted);max-width:620px;margin:14px 0 0;font-size:16px}
+.countries{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0 26px}.country{border:1px solid var(--line);border-radius:20px;padding:18px;background:#111a2bcc;color:white;text-align:left;cursor:pointer;transition:.2s}.country:hover,.country.active{border-color:var(--accent);background:#211f40;transform:translateY(-2px)}.flag{font-size:30px}.country strong{display:block;font-size:17px;margin-top:7px}.country small{color:var(--muted)}
+.toolbar{display:flex;gap:12px;align-items:center;margin:18px 0;flex-wrap:wrap}.search{flex:1;min-width:220px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 15px;color:white;font:inherit;outline:none}.search:focus{border-color:var(--accent)}.select{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px;color:white;font:inherit}
+.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:25px 0 14px}.sectionhead h2{margin:0;font-size:21px}.count{color:var(--muted);font-size:13px}
+.stations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.station{display:flex;align-items:center;gap:13px;padding:14px;background:#111a2bdb;border:1px solid var(--line);border-radius:17px;min-width:0}.station.playing{border-color:var(--mint);background:#102a2b}.stationlogo{width:48px;height:48px;border-radius:13px;object-fit:cover;background:#26314a;flex:none}.stationlogo.fallback{display:grid;place-items:center;font-size:22px}.stationinfo{min-width:0;flex:1}.stationinfo strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stationinfo small{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.play,.fav{border:0;cursor:pointer;color:white}.play{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#8b7cff,#6559d9);font-size:16px;flex:none}.fav{background:transparent;color:#8390a9;font-size:21px;padding:5px}.fav.on{color:#ffcb70}
+.notice{border:1px solid var(--line);background:#111a2b;border-radius:15px;padding:17px;color:var(--muted);margin:18px 0}.notice strong{color:#f4f6ff}.empty{text-align:center;padding:42px;color:var(--muted);grid-column:1/-1}
+.player{position:fixed;bottom:0;left:0;right:0;background:#0c1322ed;backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:13px 22px;z-index:5}.playerinner{max-width:1120px;margin:auto;display:flex;align-items:center;gap:14px}.now{min-width:0;flex:1}.now strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.now small{color:var(--muted)}.mainplay{width:48px;height:48px;border:0;border-radius:50%;background:var(--mint);color:#061511;font-size:18px;cursor:pointer}.volume{width:100px;accent-color:var(--mint)}.status{font-size:12px;color:var(--muted);max-width:190px}
+footer{color:#71809a;text-align:center;font-size:12px;margin-top:35px}
+@media(max-width:650px){.wrap{padding:20px 14px 145px}.countries{gap:8px}.country{padding:12px}.country strong{font-size:14px}.country small{font-size:11px}.stations{grid-template-columns:1fr}.hero{padding-top:38px}.playerinner{gap:10px}.volume{width:70px}.status{display:none}}
+</style></head>
+<body><main class="wrap">
+<header class="top"><div class="brand"><div class="logo">♫</div>Solomud Radio</div><div class="live">● РАДИО ОНЛАЙН</div></header>
+<section class="hero"><div class="eyebrow">ТВОЯ МУЗЫКА. ТВОИ СТРАНЫ.</div><h1>Радио, которое<br>всегда с тобой.</h1><p>Выбирай страну, находи любимую станцию и слушай прямо в браузере. Бесплатно, без регистрации.</p></section>
+<section class="countries" aria-label="Выбрать страну">
+<button class="country active" data-country="Moldova"><span class="flag">🇲🇩</span><strong>Молдова</strong><small>Радиостанции страны</small></button>
+<button class="country" data-country="Russia"><span class="flag">🇷🇺</span><strong>Россия</strong><small>Радиостанции страны</small></button>
+<button class="country" data-country="Romania"><span class="flag">🇷🇴</span><strong>Румыния</strong><small>Радиостанции страны</small></button>
+</section>
+<div class="sectionhead"><h2 id="countryTitle">🇲🇩 Радио Молдовы</h2><span class="count" id="count">Загружаем станции…</span></div>
+<div class="toolbar"><input class="search" id="search" placeholder="Найти радиостанцию…" aria-label="Поиск станции"><select class="select" id="sort"><option value="votes">Популярные</option><option value="name">По названию</option><option value="bitrate">По качеству потока</option></select></div>
+<div class="stations" id="stations"><div class="empty">Подключаем каталог радиостанций…</div></div>
+<div class="notice"><strong>О качестве звука.</strong> Плеер воспроизводит качество, которое передаёт сама радиостанция. Если станция вещает в 320 кбит/с, вы услышите именно этот поток; повысить качество исходного эфира плеер не может.</div>
+<footer>Solomud Radio · Бесплатное интернет-радио · Каталог предоставляется Radio Browser</footer>
+</main>
+<div class="player"><div class="playerinner"><button class="mainplay" id="toggle" aria-label="Воспроизвести">▶</button><div class="now"><strong id="nowName">Выберите радиостанцию</strong><small id="nowMeta">Solomud Radio</small></div><div class="status" id="status">Готов к воспроизведению</div><input class="volume" id="volume" type="range" min="0" max="1" step=".01" value=".8" aria-label="Громкость"></div></div>
+<audio id="audio" preload="none"></audio>
+<script>
+const countries={Moldova:{flag:"🇲🇩",title:"Радио Молдовы"},Russia:{flag:"🇷🇺",title:"Радио России"},Romania:{flag:"🇷🇴",title:"Радио Румынии"}};
+let country="Moldova",all=[],current=null,playing=false;
+const $=id=>document.getElementById(id),audio=$("audio");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const favs=()=>{try{return JSON.parse(localStorage.getItem("solomud-favs")||"[]")}catch{return[]}};
+function saveFavs(a){localStorage.setItem("solomud-favs",JSON.stringify(a))}
+function stationId(s){return s.stationuuid||s.url_resolved||s.name}
+function render(){
+ const q=$("search").value.trim().toLowerCase(),sort=$("sort").value;
+ let list=all.filter(s=>(s.name+" "+(s.tags||"")+" "+(s.state||"")).toLowerCase().includes(q));
+ list.sort((a,b)=>sort==="name"?a.name.localeCompare(b.name):sort==="bitrate"?(b.bitrate||0)-(a.bitrate||0):(b.votes||0)-(a.votes||0));
+ $("count").textContent=list.length+" станций";
+ $("stations").innerHTML=list.length?list.map(s=>{const id=stationId(s),isFav=favs().includes(id),isPlaying=current&&stationId(current)===id&&playing;return '<article class="station '+(isPlaying?'playing':'')+'"><img class="stationlogo" src="'+esc(s.favicon||"")+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'" alt=""><div class="stationlogo fallback" style="display:none">'+countries[country].flag+'</div><div class="stationinfo"><strong>'+esc(s.name)+'</strong><small>'+esc((s.tags||"Радио") .split(",").slice(0,2).join(" · ")||"Радиостанция")+' · '+(s.bitrate?s.bitrate+" кбит/с":"качество не указано")+'</small></div><button class="fav '+(isFav?"on":"")+'" data-fav="'+esc(id)+'" title="Избранное">★</button><button class="play" data-play="'+esc(id)+'" title="Слушать">'+(isPlaying?"Ⅱ":"▶")+'</button></article>'}).join(""):'<div class="empty">Станции не найдены. Попробуйте изменить запрос.</div>';
+}
+async function load(){
+ $("stations").innerHTML='<div class="empty">Загружаем каталог радиостанций…</div>';$("count").textContent="Загрузка…";
+ const hosts=["https://de1.api.radio-browser.info","https://at1.api.radio-browser.info","https://nl1.api.radio-browser.info"];
+ let error;
+ for(const host of hosts){try{const url=host+"/json/stations/bycountryexact/"+encodeURIComponent(country)+"?hidebroken=true&order=votes&reverse=true&limit=1000";const res=await fetch(url,{headers:{Accept:"application/json"}});if(!res.ok)throw Error("HTTP "+res.status);const data=await res.json();all=data.filter(s=>s.url_resolved&&s.name).sort((a,b)=>(b.votes||0)-(a.votes||0));render();return}catch(e){error=e}}
+ $("count").textContent="Каталог недоступен";$("stations").innerHTML='<div class="empty">Не удалось загрузить каталог сейчас.<br>Проверьте интернет и нажмите на страну ещё раз.</div>';
+}
+function selectCountry(c){country=c;document.querySelectorAll(".country").forEach(b=>b.classList.toggle("active",b.dataset.country===c));$("countryTitle").textContent=countries[c].flag+" "+countries[c].title;load()}
+document.querySelectorAll(".country").forEach(b=>b.addEventListener("click",()=>selectCountry(b.dataset.country)));
+$("search").addEventListener("input",render);$("sort").addEventListener("change",render);
+$("stations").addEventListener("click",e=>{
+ const fav=e.target.closest("[data-fav]");if(fav){const id=fav.dataset.fav,a=favs();saveFavs(a.includes(id)?a.filter(x=>x!==id):[...a,id]);render();return}
+ const btn=e.target.closest("[data-play]");if(btn){const s=all.find(x=>stationId(x)===btn.dataset.play);if(s)playStation(s)}
+});
+async function playStation(s){
+ if(current&&stationId(current)===stationId(s)&&playing){audio.pause();playing=false;updatePlayer();render();return}
+ current=s;playing=false;$("nowName").textContent=s.name;$("nowMeta").textContent=(s.bitrate?s.bitrate+" кбит/с":"Качество зависит от станции");$("status").textContent="Подключаемся…";$("toggle").textContent="…";
+ audio.pause();audio.src=s.url_resolved;audio.load();
+ try{await audio.play();playing=true;$("status").textContent="В эфире";}catch(e){playing=false;$("status").textContent="Поток не запустился — попробуйте другую станцию";$("toggle").textContent="▶"}
+ updatePlayer();render()
+}
+function updatePlayer(){$("toggle").textContent=playing?"Ⅱ":"▶";if(!current)$("nowName").textContent="Выберите радиостанцию"}
+$("toggle").addEventListener("click",async()=>{if(!current){$("status").textContent="Сначала выберите станцию";return}if(playing){audio.pause();playing=false;$("status").textContent="Пауза"}else{try{await audio.play();playing=true;$("status").textContent="В эфире"}catch{$("status").textContent="Не удалось запустить поток"}}updatePlayer();render()});
+audio.addEventListener("playing",()=>{playing=true;$("status").textContent="В эфире";updatePlayer();render()});
+audio.addEventListener("pause",()=>{if(!audio.ended){playing=false;updatePlayer();render()}});
+audio.addEventListener("error",()=>{$("status").textContent="Ошибка потока. Выберите другую станцию";playing=false;updatePlayer();render()});
+$("volume").addEventListener("input",e=>audio.volume=Number(e.target.value));audio.volume=.8;
+selectCountry("Moldova");
+</script></body></html>
