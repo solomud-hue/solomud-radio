@@ -50,10 +50,23 @@ function render(){
 }
 async function load(){
  $("stations").innerHTML='<div class="empty">Загружаем каталог радиостанций…</div>';$("count").textContent="Загрузка…";
+ const codes={Moldova:"MD",Russia:"RU",Romania:"RO"};
  const hosts=["https://de1.api.radio-browser.info","https://at1.api.radio-browser.info","https://nl1.api.radio-browser.info"];
- let error;
- for(const host of hosts){try{const url=host+"/json/stations/bycountryexact/"+encodeURIComponent(country)+"?hidebroken=true&order=votes&reverse=true&limit=1000";const res=await fetch(url,{headers:{Accept:"application/json"}});if(!res.ok)throw Error("HTTP "+res.status);const data=await res.json();all=data.filter(s=>s.url_resolved&&s.name).sort((a,b)=>(b.votes||0)-(a.votes||0));render();return}catch(e){error=e}}
- $("count").textContent="Каталог недоступен";$("stations").innerHTML='<div class="empty">Не удалось загрузить каталог сейчас.<br>Проверьте интернет и нажмите на страну ещё раз.</div>';
+ let data=[],lastError=null;
+ for(const host of hosts){
+  try{
+   const res=await fetch(host+"/json/stations/bycountrycodeexact/"+codes[country]+"?hidebroken=false&order=clickcount&reverse=true&limit=1000",{headers:{Accept:"application/json"}});
+   if(!res.ok)throw Error("HTTP "+res.status);
+   const rows=await res.json();
+   if(!Array.isArray(rows))throw Error("Bad catalogue response");
+   data=rows;
+   if(data.length)break;
+  }catch(e){lastError=e}
+ }
+ all=data.filter(s=>(s.url_resolved||s.url)&&s.name).sort((x,y)=>(y.clickcount||y.votes||0)-(x.clickcount||x.votes||0));
+ if(all.length){render();return}
+ $("count").textContent=lastError?"Каталог недоступен":"0 станций";
+ $("stations").innerHTML='<div class="empty">Не удалось получить станции. Попробуйте обновить каталог чуть позже.</div>';
 }
 function selectCountry(c){country=c;document.querySelectorAll(".country").forEach(b=>b.classList.toggle("active",b.dataset.country===c));$("countryTitle").textContent=countries[c].flag+" "+countries[c].title;load()}
 document.querySelectorAll(".country").forEach(b=>b.addEventListener("click",()=>selectCountry(b.dataset.country)));
@@ -65,8 +78,13 @@ $("stations").addEventListener("click",e=>{
 async function playStation(s){
  if(current&&stationId(current)===stationId(s)&&playing){audio.pause();playing=false;updatePlayer();render();return}
  current=s;playing=false;$("nowName").textContent=s.name;$("nowMeta").textContent=(s.bitrate?s.bitrate+" кбит/с":"Качество зависит от станции");$("status").textContent="Подключаемся…";$("toggle").textContent="…";
- audio.pause();audio.src=s.url_resolved;audio.load();
- try{await audio.play();playing=true;$("status").textContent="В эфире";}catch(e){playing=false;$("status").textContent="Поток не запустился — попробуйте другую станцию";$("toggle").textContent="▶"}
+ const urls=[...new Set([s.url_resolved,s.url].filter(Boolean))];
+ audio.pause();let started=false;
+ for(const url of urls){
+  try{audio.src=url;audio.load();await audio.play();playing=true;started=true;$("status").textContent="В эфире";break}
+  catch(e){audio.pause()}
+ }
+ if(!started){playing=false;$("status").textContent="Поток не запустился — попробуйте другую станцию"}
  updatePlayer();render()
 }
 function updatePlayer(){$("toggle").textContent=playing?"Ⅱ":"▶";if(!current)$("nowName").textContent="Выберите радиостанцию"}
