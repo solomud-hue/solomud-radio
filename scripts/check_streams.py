@@ -89,7 +89,7 @@ def main():
         "generatedAt": checked_at,
         "checked": checked,
         "stations": statuses,
-    }, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     broken = sum(1 for item in statuses.values() if not item["working"])
     print(f"Checked {checked} stations; {broken} failed the stream probe.")
 
