@@ -131,21 +131,21 @@ async function playStation(s){
  audio.pause();audio.removeAttribute("src");audio.preload="auto";
  let started=false;
  for(const url of urls){
+  let timer;
   try{
    audio.src=url;audio.load();
-   let timer;
-   const attempt=audio.play();
    await Promise.race([
-    attempt,
+    audio.play(),
     new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error("Stream start timeout")),6000)})
    ]);
-   clearTimeout(timer);
-   playing=true;started=true;$("status").textContent="В эфире";break;
+   started=true;playing=true;$("status").textContent="В эфире";break;
   }catch(e){
    audio.pause();audio.removeAttribute("src");audio.load();
+  }finally{
+   if(timer)clearTimeout(timer);
   }
  }
- if(!started){playing=false;$("status").textContent="Поток долго не отвечает — выберите другую станцию"}
+ if(!started){playing=false;$("status").textContent="Не удалось быстро подключиться. Попробуйте другую станцию"}
  updatePlayer();render()
 }
 function updatePlayer(){$("toggle").textContent=playing?"Ⅱ":"▶";if(!current)$("nowName").textContent="Выберите радиостанцию"}
