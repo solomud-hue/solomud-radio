@@ -83,7 +83,7 @@ async function load(){
  let data=[],lastError=null;
  for(const host of hosts){
   try{
-   const res=await fetch(host+"/json/stations/bycountrycodeexact/"+codes[country]+"?hidebroken=false&order=clickcount&reverse=true&limit=1000",{headers:{Accept:"application/json"}});
+   const res=await fetch(host+"/json/stations/bycountrycodeexact/"+codes[country]+"?hidebroken=true&order=clickcount&reverse=true&limit=1000",{headers:{Accept:"application/json"}});
    if(!res.ok)throw Error("HTTP "+res.status);
    const rows=await res.json();
    if(!Array.isArray(rows))throw Error("Bad catalogue response");
