@@ -30,25 +30,28 @@ def get_json(url):
 
 
 def probe(url):
-    if not url:
-        return False
-    for attempt in range(2):
-        try:
-            req = urllib.request.Request(url, headers={
-                "User-Agent": "SolomudRadioStreamCheck/1.0",
-                "Range": "bytes=0-2047",
-                "Icy-MetaData": "0",
-            })
-            with urllib.request.urlopen(req, timeout=10) as response:
-                chunk = response.read(2048)
-                content_type = response.headers.get("Content-Type", "").lower()
-                # Radio streams may be endless; any non-empty response is a positive probe.
-                return response.status < 400 and (bool(chunk) or "audio" in content_type or "mpegurl" in content_type)
-        except Exception:
-            if attempt == 0:
-                time.sleep(1)
-    return False
-
+    """Return whether a browser-usable HTTPS stream responds quickly, plus latency."""
+    if not url or not url.lower().startswith("https://"):
+        return False, None, "https-required"
+    started = time.monotonic()
+    try:
+        req = urllib.request.Request(url, headers={
+            "User-Agent": "SolomudRadioStreamCheck/1.0",
+            "Range": "bytes=0-4095",
+            "Icy-MetaData": "0",
+        })
+        with urllib.request.urlopen(req, timeout=6) as response:
+            chunk = response.read(4096)
+            latency_ms = int((time.monotonic() - started) * 1000)
+            content_type = response.headers.get("Content-Type", "").lower()
+            ok = response.status < 400 and bool(chunk)
+            if not ok:
+                return False, latency_ms, "empty-response"
+            if latency_ms > 5500:
+                return False, latency_ms, "slow"
+            return True, latency_ms, "ok"
+    except Exception as exc:
+        return False, int((time.monotonic() - started) * 1000), type(exc).__name__
 
 def main():
     statuses = {}
@@ -60,29 +63,46 @@ def main():
         url = f"{API_HOSTS[0]}/json/stations/bycountrycodeexact/{code}?hidebroken=true&limit=1000"
         stations = get_json(url)
         for station in stations:
-            stream = station.get("url_resolved") or station.get("url")
             uuid = station.get("stationuuid")
-            if stream and uuid:
-                jobs.append((uuid, stream, station.get("name", ""), country))
+            if not uuid:
+                continue
+            candidates = list(dict.fromkeys(
+                item for item in [station.get("url_resolved"), station.get("url")]
+                if item and item.lower().startswith("https://")
+            ))
+            jobs.append((uuid, station.get("name", ""), country, candidates))
 
-    # Bounded concurrency keeps the daily job fast without flooding station hosts.
-    with ThreadPoolExecutor(max_workers=16) as pool:
-        futures = {
-            pool.submit(probe, stream): (uuid, name, country)
-            for uuid, stream, name, country in jobs
-        }
-        for future in as_completed(futures):
-            uuid, name, country = futures[future]
-            try:
-                working = future.result()
-            except Exception:
-                working = False
-            statuses[uuid] = {
-                "working": working,
-                "name": name,
-                "country": country,
+    def check_station(job):
+        uuid, name, country, candidates = job
+        if not candidates:
+            return uuid, {
+                "working": False, "latencyMs": None, "streamUrl": None,
+                "reason": "https-required", "name": name, "country": country,
                 "checkedAt": checked_at,
             }
+        best_latency = None
+        last_reason = "unavailable"
+        for candidate in candidates:
+            ok, latency_ms, reason = probe(candidate)
+            if ok:
+                return uuid, {
+                    "working": True, "latencyMs": latency_ms, "streamUrl": candidate,
+                    "reason": "ok", "name": name, "country": country,
+                    "checkedAt": checked_at,
+                }
+            best_latency = latency_ms if best_latency is None else min(best_latency, latency_ms or best_latency)
+            last_reason = reason
+        return uuid, {
+            "working": False, "latencyMs": best_latency, "streamUrl": None,
+            "reason": last_reason, "name": name, "country": country,
+            "checkedAt": checked_at,
+        }
+
+    with ThreadPoolExecutor(max_workers=24) as pool:
+        futures = [pool.submit(check_station, job) for job in jobs]
+        for future in as_completed(futures):
+            uuid, status = future.result()
+            statuses[uuid] = status
             checked += 1
 
     OUT.write_text(json.dumps({
@@ -90,8 +110,10 @@ def main():
         "checked": checked,
         "stations": statuses,
     }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    broken = sum(1 for item in statuses.values() if not item["working"])
-    print(f"Checked {checked} stations; {broken} failed the stream probe.")
+    working = sum(1 for item in statuses.values() if item["working"])
+    slow = sum(1 for item in statuses.values() if item["reason"] == "slow")
+    insecure = sum(1 for item in statuses.values() if item["reason"] == "https-required")
+    print(f"Checked {checked} stations: {working} fast HTTPS streams, {slow} slow, {insecure} HTTP-only.")
 
 if __name__ == "__main__":
     main()
