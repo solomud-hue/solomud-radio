@@ -4,6 +4,7 @@ import json
 import time
 import urllib.request
 import urllib.error
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 API_HOSTS = [
@@ -52,29 +53,45 @@ def probe(url):
 def main():
     statuses = {}
     checked = 0
+    jobs = []
+    checked_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
     for country, code in COUNTRIES.items():
         url = f"{API_HOSTS[0]}/json/stations/bycountrycodeexact/{code}?hidebroken=true&limit=1000"
         stations = get_json(url)
         for station in stations:
             stream = station.get("url_resolved") or station.get("url")
             uuid = station.get("stationuuid")
-            if not stream or not uuid:
-                continue
+            if stream and uuid:
+                jobs.append((uuid, stream, station.get("name", ""), country))
+
+    # Bounded concurrency keeps the daily job fast without flooding station hosts.
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        futures = {
+            pool.submit(probe, stream): (uuid, name, country)
+            for uuid, stream, name, country in jobs
+        }
+        for future in as_completed(futures):
+            uuid, name, country = futures[future]
+            try:
+                working = future.result()
+            except Exception:
+                working = False
             statuses[uuid] = {
-                "working": probe(stream),
-                "name": station.get("name", ""),
+                "working": working,
+                "name": name,
                 "country": country,
-                "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "checkedAt": checked_at,
             }
             checked += 1
+
     OUT.write_text(json.dumps({
-        "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "generatedAt": checked_at,
         "checked": checked,
         "stations": statuses,
-    }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    }, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
     broken = sum(1 for item in statuses.values() if not item["working"])
     print(f"Checked {checked} stations; {broken} failed the stream probe.")
-
 
 if __name__ == "__main__":
     main()
