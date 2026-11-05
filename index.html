@@ -125,13 +125,27 @@ $("stations").addEventListener("keydown",e=>{
 async function playStation(s){
  if(current&&stationId(current)===stationId(s)&&playing){audio.pause();playing=false;updatePlayer();render();return}
  current=s;playing=false;$("nowName").textContent=s.name;$("nowMeta").textContent=(s.bitrate?s.bitrate+" кбит/с":"Качество зависит от станции");$("status").textContent="Подключаемся…";$("toggle").textContent="…";
- const urls=[...new Set([s.url_resolved,s.url].filter(Boolean))];
- audio.pause();let started=false;
+ const isEuropa=/европа\s*плюс|europa\s*plus/i.test(s.name);
+ const preferred=isEuropa?["https://europaplus.hostingradio.ru:8030/ep128","https://ep256.hostingradio.ru:8052/europaplus256.mp3"]:[];
+ const urls=[...new Set([...preferred,s.url_resolved,s.url].filter(Boolean))];
+ audio.pause();audio.removeAttribute("src");audio.preload="auto";
+ let started=false;
  for(const url of urls){
-  try{audio.src=url;audio.load();await audio.play();playing=true;started=true;$("status").textContent="В эфире";break}
-  catch(e){audio.pause()}
+  try{
+   audio.src=url;audio.load();
+   let timer;
+   const attempt=audio.play();
+   await Promise.race([
+    attempt,
+    new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error("Stream start timeout")),6000)})
+   ]);
+   clearTimeout(timer);
+   playing=true;started=true;$("status").textContent="В эфире";break;
+  }catch(e){
+   audio.pause();audio.removeAttribute("src");audio.load();
+  }
  }
- if(!started){playing=false;$("status").textContent="Поток не запустился — попробуйте другую станцию"}
+ if(!started){playing=false;$("status").textContent="Поток долго не отвечает — выберите другую станцию"}
  updatePlayer();render()
 }
 function updatePlayer(){$("toggle").textContent=playing?"Ⅱ":"▶";if(!current)$("nowName").textContent="Выберите радиостанцию"}
