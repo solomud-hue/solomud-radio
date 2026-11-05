@@ -91,7 +91,7 @@ async function load(){
    if(data.length)break;
   }catch(e){lastError=e}
  }
- all=data.filter(s=>(s.url_resolved||s.url)&&s.name).sort((x,y)=>(y.clickcount||y.votes||0)-(x.clickcount||x.votes||0));
+ all=data.filter(s=>(s.url_resolved||s.url)&&s.name&&!/aquarelle/i.test(s.name)).sort((x,y)=>(y.clickcount||y.votes||0)-(x.clickcount||x.votes||0));
  if(all.length){render();return}
  $("count").textContent=lastError?"Каталог недоступен":"0 станций";
  $("stations").innerHTML='<div class="empty">Не удалось получить станции. Попробуйте обновить каталог чуть позже.</div>';
