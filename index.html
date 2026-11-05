@@ -80,7 +80,11 @@ async function load(){
  $("stations").innerHTML='<div class="empty">Загружаем каталог радиостанций…</div>';$("count").textContent="Загрузка…";
  const codes={Moldova:"MD",Russia:"RU",Romania:"RO"};
  const hosts=["https://de1.api.radio-browser.info","https://at1.api.radio-browser.info","https://nl1.api.radio-browser.info"];
- let data=[],lastError=null;
+ let data=[],lastError=null,health={};
+ try{
+  const hr=await fetch("./station-status.json?ts="+Date.now(),{cache:"no-store"});
+  if(hr.ok)health=await hr.json();
+ }catch(e){}
  for(const host of hosts){
   try{
    const res=await fetch(host+"/json/stations/bycountrycodeexact/"+codes[country]+"?hidebroken=true&order=clickcount&reverse=true&limit=1000",{headers:{Accept:"application/json"}});
@@ -91,7 +95,11 @@ async function load(){
    if(data.length)break;
   }catch(e){lastError=e}
  }
- all=data.filter(s=>(s.url_resolved||s.url)&&s.name&&!/aquarelle/i.test(s.name)).sort((x,y)=>(y.clickcount||y.votes||0)-(x.clickcount||x.votes||0));
+ all=data.filter(s=>{
+  const status=health.stations&&health.stations[s.stationuuid];
+  const nameOK=!/aquarelle/i.test(s.name)||(status&&status.working===true);
+  return (s.url_resolved||s.url)&&s.name&&nameOK&&(!status||status.working!==false);
+ }).sort((x,y)=>(y.clickcount||y.votes||0)-(x.clickcount||x.votes||0));
  if(all.length){render();return}
  $("count").textContent=lastError?"Каталог недоступен":"0 станций";
  $("stations").innerHTML='<div class="empty">Не удалось получить станции. Попробуйте обновить каталог чуть позже.</div>';
