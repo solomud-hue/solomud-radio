@@ -74,7 +74,7 @@ function render(){
  let list=all.filter(s=>(s.name+" "+(s.tags||"")+" "+(s.state||"")).toLowerCase().includes(q));
  list.sort((a,b)=>sort==="name"?a.name.localeCompare(b.name):sort==="bitrate"?(b.bitrate||0)-(a.bitrate||0):(b.votes||0)-(a.votes||0));
  $("count").textContent=list.length+" станций";
- $("stations").innerHTML=list.length?list.map(s=>{const id=stationId(s),isFav=favs().includes(id),isPlaying=current&&stationId(current)===id&&playing;return '<article class="station '+(isPlaying?'playing':'')+'"><img class="stationlogo" src="'+esc(s.favicon||"")+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'" alt=""><div class="stationlogo fallback" style="display:none">'+countries[country].flag+'</div><div class="stationinfo"><strong>'+esc(s.name)+'</strong><small>'+esc((s.tags||"Радио") .split(",").slice(0,2).join(" · ")||"Радиостанция")+' · '+(s.bitrate?s.bitrate+" кбит/с":"качество не указано")+'</small></div><button class="fav '+(isFav?"on":"")+'" data-fav="'+esc(id)+'" title="Избранное">★</button><button class="play" data-play="'+esc(id)+'" title="Слушать">'+(isPlaying?"Ⅱ":"▶")+'</button></article>'}).join(""):'<div class="empty">Станции не найдены. Попробуйте изменить запрос.</div>';
+ $("stations").innerHTML=list.length?list.map(s=>{const id=stationId(s),isFav=favs().includes(id),isPlaying=current&&stationId(current)===id&&playing;return '<article class="station '+(isPlaying?'playing':'')+'" data-station="'+esc(id)+'" role="button" tabindex="0" aria-label="Слушать '+esc(s.name)+'"><img class="stationlogo" src="'+esc(s.favicon||"")+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'" alt=""><div class="stationlogo fallback" style="display:none">'+countries[country].flag+'</div><div class="stationinfo"><strong>'+esc(s.name)+'</strong><small>'+esc((s.tags||"Радио") .split(",").slice(0,2).join(" · ")||"Радиостанция")+' · '+(s.bitrate?s.bitrate+" кбит/с":"качество не указано")+'</small></div><button class="fav '+(isFav?"on":"")+'" data-fav="'+esc(id)+'" title="Избранное">★</button><button class="play" data-play="'+esc(id)+'" title="Слушать">'+(isPlaying?"Ⅱ":"▶")+'</button></article>'}).join(""):'<div class="empty">Станции не найдены. Попробуйте изменить запрос.</div>';
 }
 async function load(){
  $("stations").innerHTML='<div class="empty">Загружаем каталог радиостанций…</div>';$("count").textContent="Загрузка…";
@@ -109,7 +109,18 @@ document.querySelectorAll(".country").forEach(b=>b.addEventListener("click",()=>
 $("search").addEventListener("input",render);$("sort").addEventListener("change",render);
 $("stations").addEventListener("click",e=>{
  const fav=e.target.closest("[data-fav]");if(fav){const id=fav.dataset.fav,a=favs();saveFavs(a.includes(id)?a.filter(x=>x!==id):[...a,id]);render();return}
- const btn=e.target.closest("[data-play]");if(btn){const s=all.find(x=>stationId(x)===btn.dataset.play);if(s)playStation(s)}
+ const target=e.target.closest("[data-play],[data-station]");
+ if(target){
+  const id=target.dataset.play||target.dataset.station;
+  const s=all.find(x=>stationId(x)===id);
+  if(s)playStation(s);
+ }
+});
+$("stations").addEventListener("keydown",e=>{
+ if((e.key==="Enter"||e.key===" ")&&!e.target.closest("button")){
+  const card=e.target.closest("[data-station]");
+  if(card){e.preventDefault();const s=all.find(x=>stationId(x)===card.dataset.station);if(s)playStation(s)}
+ }
 });
 async function playStation(s){
  if(current&&stationId(current)===stationId(s)&&playing){audio.pause();playing=false;updatePlayer();render();return}
