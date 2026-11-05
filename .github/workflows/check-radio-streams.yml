@@ -1,0 +1,34 @@
+name: Check radio streams
+
+on:
+  schedule:
+    - cron: "15 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check-streams:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Probe radio streams
+        run: python scripts/check_streams.py
+      - name: Commit updated status
+        run: |
+          if git diff --quiet -- station-status.json; then
+            echo "Stream status unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add station-status.json
+          git commit -m "Update radio stream health status"
+          git push
