@@ -18,6 +18,7 @@
 .flag.ru span:nth-child(1){background:#fff}
 .flag.ru span:nth-child(2){background:#0039a6}
 .flag.ru span:nth-child(3){background:#d52b1e}.country strong{display:block;font-size:17px;margin-top:7px}.country small{color:var(--muted)}
+.viewtabs{display:flex;gap:9px;margin:18px 0 10px;flex-wrap:wrap}.viewtab{border:1px solid var(--line);border-radius:12px;padding:10px 15px;background:var(--panel);color:var(--muted);font:inherit;cursor:pointer}.viewtab.active{color:white;border-color:var(--accent);background:#20304a}.viewtab span{display:inline-block;margin-left:5px;opacity:.8}
 .toolbar{display:flex;gap:12px;align-items:center;margin:18px 0;flex-wrap:wrap}.search{flex:1;min-width:220px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 15px;color:white;font:inherit;outline:none}.search:focus{border-color:var(--accent)}.select{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px;color:white;font:inherit}
 .sectionhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:25px 0 14px}.sectionhead h2{margin:0;font-size:21px}.count{color:var(--muted);font-size:13px}
 .stations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.station{display:flex;align-items:center;gap:13px;padding:14px;background:#111a2bdb;border:1px solid var(--line);border-radius:17px;min-width:0}.station.playing{border-color:var(--mint);background:#102a2b}.stationlogo{width:48px;height:48px;border-radius:13px;object-fit:cover;background:#26314a;flex:none}.stationlogo.fallback{display:grid;place-items:center;font-size:22px}.stationinfo{min-width:0;flex:1}.stationinfo strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stationinfo small{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.play,.fav{border:0;cursor:pointer;color:white}.play{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#8b7cff,#6559d9);font-size:16px;flex:none}.fav{background:transparent;color:#8390a9;font-size:21px;padding:5px}.fav.on{color:#ffcb70}
@@ -35,6 +36,7 @@ footer{color:#71809a;text-align:center;font-size:12px;margin-top:35px}
 <button class="country" data-country="Romania"><span class="flag ro" role="img" aria-label="Флаг Румынии"><span></span><span></span><span></span></span><strong>Румыния</strong><small>Радиостанции страны</small></button>
 </section>
 <div class="sectionhead"><h2 id="countryTitle">🇲🇩 Радио Молдовы</h2><span class="count" id="count">Загружаем станции…</span></div>
+<div class="viewtabs" role="group" aria-label="Каталог станций"><button class="viewtab active" id="allTab" type="button">Все станции</button><button class="viewtab" id="favTab" type="button">★ Избранное <span id="favCount">0</span></button></div>
 <div class="toolbar"><input class="search" id="search" placeholder="Найти радиостанцию…" aria-label="Поиск станции"><select class="select" id="sort"><option value="votes">Популярные</option><option value="name">По названию</option><option value="bitrate">По качеству потока</option></select></div>
 <div class="stations" id="stations"><div class="empty">Подключаем каталог радиостанций…</div></div>
 <div class="notice"><strong>О качестве звука.</strong> Плеер воспроизводит качество, которое передаёт сама радиостанция. Если станция вещает в 320 кбит/с, вы услышите именно этот поток; повысить качество исходного эфира плеер не может.</div>
@@ -47,7 +49,7 @@ footer{color:#71809a;text-align:center;font-size:12px;margin-top:35px}
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script>
 const countries={Moldova:{flag:"🇲🇩",title:"Радио Молдовы"},Russia:{flag:"🇷🇺",title:"Радио России"},Romania:{flag:"🇷🇴",title:"Радио Румынии"}};
-let country="Moldova",all=[],current=null,playing=false;
+let country="Moldova",all=[],current=null,playing=false,viewMode="all";
 const $=id=>document.getElementById(id),audio=$("audio");
 
 const firebaseConfig={apiKey:"AIzaSyAQbauuRrbCqFiBcYGJudI4dKFaq6olA5s",authDomain:"solomud-radio.firebaseapp.com",databaseURL:"https://solomud-radio-default-rtdb.europe-west1.firebasedatabase.app",projectId:"solomud-radio",storageBucket:"solomud-radio.firebasestorage.app",messagingSenderId:"819052556755",appId:"1:819052556755:web:1afd00e3f3a9614f0f3f26"};
@@ -71,10 +73,14 @@ function saveFavs(a){localStorage.setItem("solomud-favs",JSON.stringify(a))}
 function stationId(s){return s.stationuuid||s.url_resolved||s.name}
 function render(){
  const q=$("search").value.trim().toLowerCase(),sort=$("sort").value;
- let list=all.filter(s=>(s.name+" "+(s.tags||"")+" "+(s.state||"")).toLowerCase().includes(q));
+ const saved=(()=>{try{return JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{return{}}})();
+ let source=viewMode==="favorites"?Object.values(saved):all;
+ let list=source.filter(s=>(s.name+" "+(s.tags||"")+" "+(s.state||"")).toLowerCase().includes(q));
  list.sort((a,b)=>sort==="name"?a.name.localeCompare(b.name):sort==="bitrate"?(b.bitrate||0)-(a.bitrate||0):(b.votes||0)-(a.votes||0));
- $("count").textContent=list.length+" станций";
- $("stations").innerHTML=list.length?list.map(s=>{const id=stationId(s),isFav=favs().includes(id),isPlaying=current&&stationId(current)===id&&playing;return '<article class="station '+(isPlaying?'playing':'')+'" data-station="'+esc(id)+'" role="button" tabindex="0" aria-label="Слушать '+esc(s.name)+'"><img class="stationlogo" src="'+esc(s.favicon||"")+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'" alt=""><div class="stationlogo fallback" style="display:none">'+countries[country].flag+'</div><div class="stationinfo"><strong>'+esc(s.name)+'</strong><small>'+esc((s.tags||"Радио") .split(",").slice(0,2).join(" · ")||"Радиостанция")+' · '+(s.bitrate?s.bitrate+" кбит/с":"качество не указано")+'</small></div><button class="fav '+(isFav?"on":"")+'" data-fav="'+esc(id)+'" title="Избранное">★</button><button class="play" data-play="'+esc(id)+'" title="Слушать">'+(isPlaying?"Ⅱ":"▶")+'</button></article>'}).join(""):'<div class="empty">Станции не найдены. Попробуйте изменить запрос.</div>';
+ $("count").textContent=viewMode==="favorites"?"Избранное: "+list.length+" станций":list.length+" станций";
+ $("favCount").textContent=favs().length;
+ $("allTab").classList.toggle("active",viewMode==="all");$("favTab").classList.toggle("active",viewMode==="favorites");
+ $("stations").innerHTML=list.length?list.map(s=>{const id=stationId(s),isFav=favs().includes(id),isPlaying=current&&stationId(current)===id&&playing;return '<article class="station '+(isPlaying?'playing':'')+'" data-station="'+esc(id)+'" role="button" tabindex="0" aria-label="Слушать '+esc(s.name)+'"><img class="stationlogo" src="'+esc(s.favicon||"")+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'" alt=""><div class="stationlogo fallback" style="display:none">'+countries[country].flag+'</div><div class="stationinfo"><strong>'+esc(s.name)+'</strong><small>'+esc((s.tags||"Радио") .split(",").slice(0,2).join(" · ")||"Радиостанция")+' · '+(s.bitrate?s.bitrate+" кбит/с":"качество не указано")+'</small></div><button class="fav '+(isFav?"on":"")+'" data-fav="'+esc(id)+'" title="Избранное">★</button><button class="play" data-play="'+esc(id)+'" title="Слушать">'+(isPlaying?"Ⅱ":"▶")+'</button></article>'}).join(""):'<div class="empty">'+(viewMode==="favorites"?"Вы ещё не добавили станции в избранное. Нажмите ★ на карточке любой станции.":"Станции не найдены. Попробуйте изменить запрос.")+'</div>';
 }
 async function load(){
  $("stations").innerHTML='<div class="empty">Загружаем каталог радиостанций…</div>';$("count").textContent="Загрузка…";
@@ -107,8 +113,10 @@ async function load(){
 function selectCountry(c){country=c;document.querySelectorAll(".country").forEach(b=>b.classList.toggle("active",b.dataset.country===c));$("countryTitle").textContent=countries[c].flag+" "+countries[c].title;load()}
 document.querySelectorAll(".country").forEach(b=>b.addEventListener("click",()=>selectCountry(b.dataset.country)));
 $("search").addEventListener("input",render);$("sort").addEventListener("change",render);
+$("allTab").addEventListener("click",()=>{viewMode="all";render()});
+$("favTab").addEventListener("click",()=>{viewMode="favorites";render()});
 $("stations").addEventListener("click",e=>{
- const fav=e.target.closest("[data-fav]");if(fav){const id=fav.dataset.fav,a=favs();saveFavs(a.includes(id)?a.filter(x=>x!==id):[...a,id]);render();return}
+ const fav=e.target.closest("[data-fav]");if(fav){const id=fav.dataset.fav,a=favs(),station=all.find(x=>stationId(x)===id);const next=a.includes(id)?a.filter(x=>x!==id):[...a,id];saveFavs(next);let saved={};try{saved=JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{}if(next.includes(id)&&station)saved[id]=station;else delete saved[id];localStorage.setItem("solomud-fav-stations",JSON.stringify(saved));render();return}
  const target=e.target.closest("[data-play],[data-station]");
  if(target){
   const id=target.dataset.play||target.dataset.station;
