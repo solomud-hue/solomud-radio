@@ -155,6 +155,10 @@ async function load(){
   }catch(e){lastError=e}
  }
  all=data.filter(s=>(s.url_resolved||s.url)&&s.name&&!/aquarelle|radio\s*manele\s*premium/i.test(s.name)).sort((x,y)=>(y.clickcount||y.votes||0)-(x.clickcount||x.votes||0));
+  if(country==="Russia"){
+   all=all.filter(s=>!/\bdfm\b/i.test(s.name));
+   all.unshift({stationuuid:"solomud-dfm-moscow",name:"DFM Москва",url:"https://dfm.hostingradio.ru/dfm96.aacp",url_resolved:"https://dfm.hostingradio.ru/dfm96.aacp",country:"Russia",countrycode:"RU",tags:"Dance, Pop",bitrate:0,clickcount:999999});
+  }
  const stationLimit=country==="Moldova"?87:1000;
  all=all.slice(0,stationLimit).map((s,index)=>({...s,stationNo:index+1,stationCountry:country}));
  const savedNow=savedStations();all.forEach(s=>{const id=stationId(s);if(favs().includes(id))savedNow[id]=s});localStorage.setItem("solomud-fav-stations",JSON.stringify(savedNow));
