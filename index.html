@@ -214,28 +214,8 @@ $("stations").addEventListener("keydown",e=>{
   if(card){e.preventDefault();const s=findStation(card.dataset.station);if(s)playStation(s)}
  }
 });
-const russianOfficialStreams=[
- {match:/европа\s*плюс|europa\s*plus/i,urls:["https://hls-01-regions.emgsound.ru/11_msk/96/playlist.m3u8","https://hls-02-europaplus.emgsound.ru/11/112/playlist.m3u8"]},
- {match:/русское\s*радио|russkoe\s*radio|russian\s*radio/i,urls:["https://rusradio.hostingradio.ru/rusradio96.aacp"]},
- {match:/радио\s*ваня|радио\s*ва́ня|radio\s*vanya/i,urls:["https://icecast-radiovanya.cdnvideo.ru/radiovanya"]},
- {match:/relax\s*fm|релакс\s*фм/i,urls:["https://pub0201.101.ru/stream/trust/mp3/128/24?"]},
- {match:/спокойное\s*радио/i,urls:["https://listen9.myradio24.com/6262"]},
- {match:/dfm.*дискач\s*90|дискач\s*90/i,urls:["https://dfm-disc90.hostingradio.ru/disc9096.aacp"]},
- {match:/dfm.*russian\s*dance|russian\s*dance/i,urls:["https://dfm-dfmrusdance.hostingradio.ru/dfmrusdance96.aacp"]},
- {match:/anon\.?fm/i,urls:["https://icecast.anon.fm/radio"]},
- {match:/рок\s*фм|rock\s*fm/i,urls:["https://nashe1.hostingradio.ru/rock-128.mp3"]},
- {match:/вести\s*фм|vesti\s*fm/i,urls:["https://icecast.vgtrk.cdnvideo.ru/vestifm_mp3_192kbps"]},
- {match:/радио\s*книга|radio\s*kniga/i,urls:["https://bookradio.hostingradio.ru:8069/fm"]},
- {match:/радио\s*дача/i,urls:["https://listen13.vdfm.ru:8000/dacha"]},
- {match:/радио\s*комсомольская\s*правда|радио\s*кп/i,urls:["https://kpradio.hostingradio.ru:8000/russia.radiokp128.mp3"]},
- {match:/шансон\s*без\s*цензуры/i,urls:["https://chanson.hostingradio.ru:8041/chanson-uncensored256.mp3"]}
-];
 function streamCandidates(s){
  const out=[];
- if((s.stationCountry||country)==="Russia"){
-  const name=(s.name||"").trim();
-  for(const item of russianOfficialStreams)if(item.match.test(name))for(const url of item.urls)if(!out.includes(url))out.push(url);
- }
  const verified=runtimeStationHealth[stationId(s)]||storedStationHealth(s);
  if(verified&&verified.working===true&&verified.streamUrl)out.push(verified.streamUrl);
  // Prefer the broadcaster's official HTTPS stream for Radio Romania Actualitati.
@@ -271,7 +251,7 @@ async function tryStream(url){
   };
   const onPlaying=()=>finish(true);
   const onError=()=>finish(false,new Error("Ошибка аудиопотока"));
-  const timer=setTimeout(()=>finish(false,new Error("Тайм-аут запуска потока")),22000);
+  const timer=setTimeout(()=>finish(false,new Error("Тайм-аут запуска потока")),12000);
   audio.addEventListener("playing",onPlaying,{once:true});
   audio.addEventListener("error",onError,{once:true});
   try{
@@ -280,7 +260,7 @@ async function tryStream(url){
    if(!alreadyWarm){audio.removeAttribute("src");audio.load()}
    if(/\.m3u8(?:$|[?#])/i.test(url)&&window.Hls&&!audio.canPlayType("application/vnd.apple.mpegurl")){
     if(!Hls.isSupported())throw new Error("HLS не поддерживается браузером");
-    hlsPlayer=new Hls({enableWorker:true,lowLatencyMode:false,backBufferLength:30,manifestLoadingTimeOut:18000,fragLoadingTimeOut:22000,maxBufferLength:45});
+    hlsPlayer=new Hls({enableWorker:true,lowLatencyMode:true,backBufferLength:30});
     hlsPlayer.on(Hls.Events.ERROR,(event,data)=>{if(data.fatal)finish(false,new Error("Ошибка HLS-потока"))});
     hlsPlayer.on(Hls.Events.MANIFEST_PARSED,()=>audio.play().catch(finish.bind(null,false)));
     hlsPlayer.loadSource(url);hlsPlayer.attachMedia(audio);
