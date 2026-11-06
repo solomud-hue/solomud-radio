@@ -217,14 +217,18 @@ $("stations").addEventListener("keydown",e=>{
 });
 function streamCandidates(s){
  const out=[];
+ const name=(s.name||"").trim();
+ const mainDfm=/^dfm(?:\\s+(?:101[.,]?2(?:\\s*fm)?|москва))?$/i.test(name);
+ // The broadcaster publishes a browser-friendly MP3 alternative; prefer it for the main DFM channel.
+ if(mainDfm)out.push("https://dfm.hostingradio.ru/dfm128.mp3","https://dfm.hostingradio.ru/dfm64.mp3");
  const verified=runtimeStationHealth[stationId(s)]||storedStationHealth(s);
- if(verified&&verified.working===true&&verified.streamUrl)out.push(verified.streamUrl);
+ if(verified&&verified.working===true&&verified.streamUrl&&!out.includes(verified.streamUrl))out.push(verified.streamUrl);
  // Prefer the broadcaster's official HTTPS stream for Radio Romania Actualitati.
- if(/radio\s*rom[âa]nia\s*actualit[ăa]ți|radio\s*romania\s*actualitati/i.test(s.name||""))out.push("https://stream4.srr.ro:8443/romania-actualitati");
+ if(/radio\\s*rom[âa]nia\\s*actualit[ăa]ți|radio\\s*romania\\s*actualitati/i.test(name))out.push("https://stream4.srr.ro:8443/romania-actualitati");
  // ProFM stream listed by a current radio-stream directory; try before Radio Browser URLs.
- if(/pro\s*fm/i.test(s.name||""))out.push("https://edge126.rcs-rds.ro/profm/profm.mp3");
+ if(/pro\\s*fm/i.test(name))out.push("https://edge126.rcs-rds.ro/profm/profm.mp3");
  // Official Europa FM AAC HTTPS stream (64 kbps).
- if(/europa\s*fm/i.test(s.name||""))out.push("https://astreaming.edi.ro:8443/EuropaFM_aac");
+ if(/europa\\s*fm/i.test(name))out.push("https://astreaming.edi.ro:8443/EuropaFM_aac");
  const raw=[s.url_resolved,s.url].filter(Boolean);
  for(const value of raw){
   try{
@@ -241,29 +245,41 @@ function streamCandidates(s){
 }
 async function tryStream(url){
  return new Promise(async(resolve,reject)=>{
-  let settled=false;
+  let settled=false,progressTimer=null,startedAt=null;
   const finish=(ok,error)=>{
    if(settled)return;settled=true;
-   clearTimeout(timer);
+   clearTimeout(timer);clearTimeout(progressTimer);
    audio.removeEventListener("playing",onPlaying);
    audio.removeEventListener("error",onError);
+   audio.removeEventListener("pause",onPause);
    if(!ok&&hlsPlayer){hlsPlayer.destroy();hlsPlayer=null}
    ok?resolve(true):reject(error||new Error("Поток не запустился"));
   };
-  const onPlaying=()=>finish(true);
+  const onPlaying=()=>{
+   if(progressTimer)return;
+   startedAt=audio.currentTime;
+   // Do not call a station healthy just because the browser briefly fires "playing".
+   // Require real playback progress to continue for several seconds.
+   progressTimer=setTimeout(()=>{
+    if(!audio.paused&&audio.readyState>=2&&audio.currentTime-startedAt>=2)finish(true);
+    else finish(false,new Error("Поток остановился до начала устойчивого воспроизведения"));
+   },5000);
+  };
   const onError=()=>finish(false,new Error("Ошибка аудиопотока"));
-  const timer=setTimeout(()=>finish(false,new Error("Тайм-аут запуска потока")),12000);
-  audio.addEventListener("playing",onPlaying,{once:true});
-  audio.addEventListener("error",onError,{once:true});
+  const onPause=()=>{if(progressTimer)finish(false,new Error("Поток остановился во время проверки"))};
+  const timer=setTimeout(()=>finish(false,new Error("Тайм-аут запуска потока")),16000);
+  audio.addEventListener("playing",onPlaying);
+  audio.addEventListener("error",onError);
+  audio.addEventListener("pause",onPause);
   try{
    if(hlsPlayer){hlsPlayer.destroy();hlsPlayer=null}
    const alreadyWarm=audio.src===url&&audio.readyState>0;
    if(!alreadyWarm){audio.removeAttribute("src");audio.load()}
-   if(/\.m3u8(?:$|[?#])/i.test(url)&&window.Hls&&!audio.canPlayType("application/vnd.apple.mpegurl")){
+   if(/\\.m3u8(?:$|[?#])/i.test(url)&&window.Hls&&!audio.canPlayType("application/vnd.apple.mpegurl")){
     if(!Hls.isSupported())throw new Error("HLS не поддерживается браузером");
     hlsPlayer=new Hls({enableWorker:true,lowLatencyMode:true,backBufferLength:30});
     hlsPlayer.on(Hls.Events.ERROR,(event,data)=>{if(data.fatal)finish(false,new Error("Ошибка HLS-потока"))});
-    hlsPlayer.on(Hls.Events.MANIFEST_PARSED,()=>audio.play().catch(finish.bind(null,false)));
+    hlsPlayer.on(Hls.Events.MANIFEST_PARSED,()=>audio.play().catch(error=>finish(false,error)));
     hlsPlayer.loadSource(url);hlsPlayer.attachMedia(audio);
    }else{
     audio.src=url;audio.load();
