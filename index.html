@@ -121,7 +121,20 @@ function saveFavs(a){localStorage.setItem("solomud-favs",JSON.stringify(a))}
 function stationId(s){return s.stationuuid||s.url_resolved||s.name}
 function savedStations(){try{return JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{return{}}}
 function findStation(id){return all.find(x=>stationId(x)===id)||savedStations()[id]||null}
-function stationHealth(s){const h=healthStatus.stations&&healthStatus.stations[s.stationuuid];if(h&&h.working===true)return '<span class="station-health"><i class="health-dot ok"></i> Поток проверен</span>';if(h&&h.working===false)return '<span class="station-health"><i class="health-dot bad"></i> Не работает</span>';return '<span class="station-health"><i class="health-dot"></i> Статус не проверен</span>'}
+const runtimeStationHealth={};
+function storedStationHealth(s){
+ const map=healthStatus.stations||{},byId=map[s.stationuuid];
+ if(byId)return byId;
+ const urls=[s.url_resolved,s.url].filter(Boolean),countryName=({Moldova:"Moldova",Russia:"Russia",Romania:"Romania"})[s.stationCountry||country];
+ if(!urls.length)return null;
+ return Object.values(map).find(h=>h&&h.country===countryName&&h.streamUrl&&urls.includes(h.streamUrl))||null;
+}
+function stationHealth(s){
+ const h=runtimeStationHealth[stationId(s)]||storedStationHealth(s);
+ if(h&&h.working===true)return '<span class="station-health"><i class="health-dot ok"></i> Поток проверен</span>';
+ if(h&&h.working===false)return '<span class="station-health"><i class="health-dot bad"></i> Не работает</span>';
+ return '<span class="station-health"><i class="health-dot"></i> Проверим при запуске</span>';
+}
 function renderHealth(){const code={Moldova:"MD",Russia:"RU",Romania:"RO"}[country];const tested=healthStatus.countries&&healthStatus.countries[code];const ok=all.filter(x=>healthStatus.stations&&healthStatus.stations[x.stationuuid]&&healthStatus.stations[x.stationuuid].working===true).length;$("healthPanel").innerHTML='<span class="health-chip"><i class="health-dot ok"></i> Проверено: '+ok+'</span><span class="health-chip"><i class="health-dot"></i> Без проверки: '+(all.length-ok)+'</span><span class="health-chip">'+(tested&&tested.tested?"Контроль обновлён":"Контроль ожидает обновления")+'</span>'}
 function render(){
  const q=$("search").value.trim().toLowerCase(),sort=$("sort").value;
@@ -203,7 +216,7 @@ $("stations").addEventListener("keydown",e=>{
 });
 function streamCandidates(s){
  const out=[];
- const verified=healthStatus.stations&&healthStatus.stations[s.stationuuid];
+ const verified=runtimeStationHealth[stationId(s)]||storedStationHealth(s);
  if(verified&&verified.working===true&&verified.streamUrl)out.push(verified.streamUrl);
  // Prefer the broadcaster's official HTTPS stream for Radio Romania Actualitati.
  if(/radio\s*rom[âa]nia\s*actualit[ăa]ți|radio\s*romania\s*actualitati/i.test(s.name||""))out.push("https://stream4.srr.ro:8443/romania-actualitati");
@@ -263,13 +276,14 @@ async function playStation(s){
  const request=++streamRequest;switchingStream=true;clearTimeout(waitingTimer);current=s;updateListenerCount();playing=false;activeStreamUrl=null;
  $("nowName").textContent=s.name;$("nowMeta").textContent=(s.stationCountry?countries[s.stationCountry].flag+" · ":"")+(s.bitrate?s.bitrate+" кбит/с":"Качество зависит от станции");$("status").textContent="Проверяем подключение…";$("toggle").textContent="…";
  const urls=streamCandidates(s);audio.pause();audio.removeAttribute("src");audio.load();audio.preload="auto";let started=false,lastError=null;
- for(let i=0;i<urls.length;i++){if(request!==streamRequest)return;try{$("status").textContent="Проверяем поток "+(i+1)+" из "+urls.length+"…";await tryStream(urls[i]);if(request!==streamRequest)return;activeStreamUrl=urls[i];started=true;playing=true;$("status").textContent=i?"Подключено к резервному потоку":"В эфире";break}catch(error){lastError=error;audio.pause();audio.removeAttribute("src");audio.load()}}
+ for(let i=0;i<urls.length;i++){if(request!==streamRequest)return;try{$("status").textContent="Проверяем поток "+(i+1)+" из "+urls.length+"…";await tryStream(urls[i]);if(request!==streamRequest)return;activeStreamUrl=urls[i];runtimeStationHealth[stationId(s)]={working:true,streamUrl:urls[i]};started=true;playing=true;$("status").textContent=i?"Подключено к резервному потоку":"В эфире";break}catch(error){lastError=error;audio.pause();audio.removeAttribute("src");audio.load()}}
+ if(!started)runtimeStationHealth[stationId(s)]={working:false,streamUrl:null};
  switchingStream=false;if(!started){playing=false;$("status").textContent=urls.length?"Все потоки станции недоступны":"У станции нет доступной ссылки на поток";console.warn("Не удалось запустить станцию:",s.name,lastError)}updatePlayer();render();
 }
 async function recoverCurrentStream(reason){
  if(!current||!playing||switchingStream||audio.paused)return;switchingStream=true;clearTimeout(waitingTimer);
  const urls=streamCandidates(current).filter(url=>url!==activeStreamUrl);$("status").textContent="Поток прервался — ищем резервный…";
- for(let i=0;i<urls.length;i++){try{await tryStream(urls[i]);activeStreamUrl=urls[i];playing=true;switchingStream=false;$("status").textContent="Переключено на резервный поток";markListening();updatePlayer();render();return}catch(e){audio.pause();audio.removeAttribute("src");audio.load()}}
+ for(let i=0;i<urls.length;i++){try{await tryStream(urls[i]);activeStreamUrl=urls[i];runtimeStationHealth[stationId(current)]={working:true,streamUrl:urls[i]};playing=true;switchingStream=false;$("status").textContent="Переключено на резервный поток";markListening();updatePlayer();render();return}catch(e){audio.pause();audio.removeAttribute("src");audio.load()}}
  switchingStream=false;playing=false;stopListening();$("status").textContent="Не удалось восстановить эфир. Выберите другую станцию";console.warn("Автовосстановление не удалось:",reason);updatePlayer();render();
 }
 function updatePlayer(){$("toggle").textContent=playing?"Ⅱ":"▶";if(!current)$("nowName").textContent="Выберите радиостанцию"}
