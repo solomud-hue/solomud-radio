@@ -255,7 +255,7 @@ function render(){
  const saved=(()=>{try{return JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{return{}}})();
  let source=viewMode==="favorites"?Object.values(saved):all;
  let list=source.filter(s=>(s.name+" "+(s.tags||"")+" "+(s.state||"")).toLowerCase().includes(q));
- list.sort((a,b)=>sort==="name"?a.name.localeCompare(b.name):sort==="bitrate"?(b.bitrate||0)-(a.bitrate||0):(country==="Russia"&&viewMode==="all"?((b.stationuuid==="solomud-dfm-moscow")-(a.stationuuid==="solomud-dfm-moscow")):0)||(b.votes||0)-(a.votes||0));
+ list.sort((a,b)=>(country==="Russia"&&viewMode==="all"?((b.stationuuid==="solomud-svoe-fm")-(a.stationuuid==="solomud-svoe-fm")):0)||(sort==="name"?a.name.localeCompare(b.name):sort==="bitrate"?(b.bitrate||0)-(a.bitrate||0):(country==="Russia"&&viewMode==="all"?((b.stationuuid==="solomud-dfm-moscow")-(a.stationuuid==="solomud-dfm-moscow")):0)||(b.votes||0)-(a.votes||0)));
  $("count").textContent=viewMode==="favorites"?tr("Избранное: ")+list.length+(language==="en"?" stations":language==="ro"?" posturi":" станций"):list.length+(language==="en"?" stations":language==="ro"?" posturi":" станций");
  if(viewMode==="favorites")$("countryTitle").textContent=tr("★ Моё избранное");else $("countryTitle").textContent=countries[country].flag+" "+tr(countries[country].title);
  $("favCount").textContent=favs().length;
@@ -289,6 +289,7 @@ async function load(){
   if(country==="Russia"){
    all=all.filter(s=>!/\bdfm\b/i.test(s.name));
    all.unshift({stationuuid:"solomud-dfm-moscow",name:"DFM Москва",url:"https://dfm.hostingradio.ru/dfm96.aacp",url_resolved:"https://dfm.hostingradio.ru/dfm96.aacp",country:"Russia",countrycode:"RU",tags:"Dance, Pop",bitrate:0,clickcount:999999});
+   all.unshift({stationuuid:"solomud-svoe-fm",name:"Своё FM",url:"https://str.pcradio.ru/svoe_fm-hi",url_resolved:"https://r51-158-108-249.relay.radiotoolkit.com:30003/svoefm",country:"Russia",countrycode:"RU",tags:"Deep House, Dance, Electronic",bitrate:128,votes:999999,clickcount:999999});
   }
  const stationLimit=1000;
  all=all.slice(0,stationLimit).map((s,index)=>({...s,stationNo:index+1,stationCountry:country}));
