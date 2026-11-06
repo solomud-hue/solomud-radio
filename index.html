@@ -165,20 +165,6 @@ document.querySelectorAll(".country").forEach(b=>b.addEventListener("click",()=>
 $("search").addEventListener("input",render);$("sort").addEventListener("change",render);
 $("allTab").addEventListener("click",()=>{viewMode="all";render()});
 $("favTab").addEventListener("click",()=>{viewMode="favorites";render()});
-$("stations").addEventListener("pointerover",e=>{
- if(playing)return;
- const card=e.target.closest("[data-station]");
- if(!card)return;
- const id=card.dataset.station;
- if(warmedStationId===id)return;
- const station=all.find(x=>stationId(x)===id);
- if(!station)return;
- const url=streamCandidates(station)[0];
- if(!url||/\.m3u8(?:$|[?#])/i.test(url))return;
- if(hlsPlayer){hlsPlayer.destroy();hlsPlayer=null}
- audio.pause();audio.preload="auto";audio.src=url;audio.load();
- warmedStationId=id;
-});
 $("stations").addEventListener("click",e=>{
  const fav=e.target.closest("[data-fav]");if(fav){const id=fav.dataset.fav,a=favs(),station=findStation(id);const next=a.includes(id)?a.filter(x=>x!==id):[...a,id];saveFavs(next);let saved={};try{saved=JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{}if(next.includes(id)&&station)saved[id]={...station,stationCountry:station.stationCountry||country};else delete saved[id];localStorage.setItem("solomud-fav-stations",JSON.stringify(saved));render();return}
  const target=e.target.closest("[data-play],[data-station]");
@@ -217,16 +203,18 @@ async function tryStream(url){
   audio.addEventListener("error",onError,{once:true});
   try{
    if(hlsPlayer){hlsPlayer.destroy();hlsPlayer=null}
-   const alreadyWarm=audio.src===url&&audio.readyState>0;
-   if(!alreadyWarm){audio.removeAttribute("src");audio.load()}
-   if(/\.m3u8(?:$|[?#])/i.test(url)&&window.Hls&&!audio.canPlayType("application/vnd.apple.mpegurl")){
+   audio.pause();
+   audio.removeAttribute("src");
+   audio.load();
+   if(/\\.m3u8(?:$|[?#])/i.test(url)&&window.Hls&&!audio.canPlayType("application/vnd.apple.mpegurl")){
     if(!Hls.isSupported())throw new Error("HLS не поддерживается браузером");
     hlsPlayer=new Hls({enableWorker:true,lowLatencyMode:true,backBufferLength:30});
     hlsPlayer.on(Hls.Events.ERROR,(event,data)=>{if(data.fatal)finish(false,new Error("Ошибка HLS-потока"))});
-    hlsPlayer.on(Hls.Events.MANIFEST_PARSED,()=>audio.play().catch(finish.bind(null,false)));
+    hlsPlayer.on(Hls.Events.MANIFEST_PARSED,()=>audio.play().catch(error=>finish(false,error)));
     hlsPlayer.loadSource(url);hlsPlayer.attachMedia(audio);
    }else{
-    audio.src=url;audio.load();
+    audio.src=url;
+    audio.load();
     await audio.play();
    }
   }catch(error){finish(false,error)}
@@ -234,11 +222,28 @@ async function tryStream(url){
 }
 async function playStation(s){
  if(current&&stationId(current)===stationId(s)&&playing){audio.pause();playing=false;updatePlayer();render();return}
- const request=++streamRequest;current=s;updateListenerCount();playing=false;activeStreamUrl=null;
- $("nowName").textContent=s.name;$("nowMeta").textContent=(s.stationCountry?countries[s.stationCountry].flag+" · ":"")+(s.bitrate?s.bitrate+" кбит/с":"Качество зависит от станции");$("status").textContent="Подключаемся…";$("toggle").textContent="…";
- const urls=streamCandidates(s);audio.pause();audio.removeAttribute("src");audio.load();let started=false;
- for(const url of urls){if(request!==streamRequest)return;try{audio.src=url;audio.load();await audio.play();if(request!==streamRequest)return;activeStreamUrl=url;started=true;playing=true;$("status").textContent="В эфире";break}catch(error){audio.pause();audio.removeAttribute("src");audio.load()}}
- if(!started){playing=false;$("status").textContent="Поток не запустился — попробуйте другую станцию"}
+ const request=++streamRequest;
+ current=s;updateListenerCount();playing=false;activeStreamUrl=null;
+ $("nowName").textContent=s.name;
+ $("nowMeta").textContent=(s.stationCountry?countries[s.stationCountry].flag+" · ":"")+(s.bitrate?s.bitrate+" кбит/с":"Качество зависит от станции");
+ $("status").textContent="Запускаем эфир…";$("toggle").textContent="…";
+ audio.pause();audio.removeAttribute("src");audio.load();
+ let started=false;
+ for(const url of streamCandidates(s)){
+  if(request!==streamRequest)return;
+  try{
+   await tryStream(url);
+   if(request!==streamRequest)return;
+   activeStreamUrl=url;started=true;playing=true;$("status").textContent="В эфире";
+   markListening();break;
+  }catch(error){
+   if(request!==streamRequest)return;
+   console.warn("Не запустился поток:",s.name,url,error);
+   audio.pause();audio.removeAttribute("src");audio.load();
+  }
+ }
+ if(request!==streamRequest)return;
+ if(!started){playing=false;$("status").textContent="Поток недоступен — попробуйте другую станцию"}
  updatePlayer();render();
 }
 async function recoverCurrentStream(reason){
