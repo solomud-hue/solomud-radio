@@ -49,7 +49,7 @@ footer{color:#71809a;text-align:center;font-size:12px;margin-top:35px}
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script>
 const countries={Moldova:{flag:"🇲🇩",title:"Радио Молдовы"},Russia:{flag:"🇷🇺",title:"Радио России"},Romania:{flag:"🇷🇴",title:"Радио Румынии"}};
-let country="Moldova",all=[],current=null,playing=false,viewMode="all";
+let country="Moldova",all=[],current=null,playing=false,viewMode="all",healthStatus={stations:{},countries:{}};
 const $=id=>document.getElementById(id),audio=$("audio");
 
 const firebaseConfig={apiKey:"AIzaSyAQbauuRrbCqFiBcYGJudI4dKFaq6olA5s",authDomain:"solomud-radio.firebaseapp.com",databaseURL:"https://solomud-radio-default-rtdb.europe-west1.firebasedatabase.app",projectId:"solomud-radio",storageBucket:"solomud-radio.firebasestorage.app",messagingSenderId:"819052556755",appId:"1:819052556755:web:1afd00e3f3a9614f0f3f26"};
@@ -86,10 +86,10 @@ async function load(){
  $("stations").innerHTML='<div class="empty">Загружаем каталог радиостанций…</div>';$("count").textContent="Загрузка…";
  const codes={Moldova:"MD",Russia:"RU",Romania:"RO"};
  const hosts=["https://de1.api.radio-browser.info","https://at1.api.radio-browser.info","https://nl1.api.radio-browser.info"];
- let data=[],lastError=null,health={};
+ let data=[],lastError=null;
  try{
   const hr=await fetch("./station-status.json?ts="+Date.now(),{cache:"no-store"});
-  if(hr.ok)health=await hr.json();
+  if(hr.ok)healthStatus=await hr.json();
  }catch(e){}
  for(const host of hosts){
   try{
@@ -101,11 +101,11 @@ async function load(){
    if(data.length)break;
   }catch(e){lastError=e}
  }
- const hasCountryCheck=!!(health.countries&&health.countries[codes[country]]&&health.countries[codes[country]].tested>0);
+ const hasCountryCheck=!!(healthStatus.countries&&healthStatus.countries[codes[country]]&&healthStatus.countries[codes[country]].tested>0);
  all=data.filter(s=>{
-  const status=health.stations&&health.stations[s.stationuuid];
+  const status=healthStatus.stations&&healthStatus.stations[s.stationuuid];
   const nameOK=!/aquarelle|radio\\s*manele\\s*premium/i.test(s.name);
-  return (s.url_resolved||s.url)&&s.name&&nameOK&&(!hasCountryCheck||(status&&status.working===true));
+  return (s.url_resolved||s.url)&&s.name&&nameOK&&hasCountryCheck&&status&&status.working===true&&status.streamUrl;
  }).sort((x,y)=>(y.clickcount||y.votes||0)-(x.clickcount||x.votes||0));
  const stationLimit=country==="Moldova"?87:1000;
  all=all.slice(0,stationLimit).map((s,index)=>({...s,stationNo:index+1,stationCountry:country}));
@@ -135,6 +135,8 @@ $("stations").addEventListener("keydown",e=>{
 });
 function streamCandidates(s){
  const out=[];
+ const verified=healthStatus.stations&&healthStatus.stations[s.stationuuid];
+ if(verified&&verified.working===true&&verified.streamUrl)return [verified.streamUrl];
  // Prefer the broadcaster's official HTTPS stream for Radio Romania Actualitati.
  if(/radio\s*rom[âa]nia\s*actualit[ăa]ți|radio\s*romania\s*actualitati/i.test(s.name||""))out.push("https://stream4.srr.ro:8443/romania-actualitati");
  // ProFM stream listed by a current radio-stream directory; try before Radio Browser URLs.
