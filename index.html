@@ -164,7 +164,7 @@ async function load(){
  const stationLimit=1000;
  all=all.slice(0,stationLimit).map((s,index)=>({...s,stationNo:index+1,stationCountry:country}));
  const savedNow=savedStations();all.forEach(s=>{const id=stationId(s);if(favs().includes(id))savedNow[id]=s});localStorage.setItem("solomud-fav-stations",JSON.stringify(savedNow));
- if(all.length){render();return}
+ if(all.length){all.slice(0,2).forEach(preconnectStation);render();return}
  $("count").textContent=lastError?"Каталог недоступен":"0 станций";
  $("stations").innerHTML='<div class="empty">Не удалось получить станции. Попробуйте обновить каталог чуть позже.</div>';
 }
@@ -182,6 +182,8 @@ $("stations").addEventListener("click",e=>{
   if(s)playStation(s);
  }
 });
+$("stations").addEventListener("pointerover",e=>{const card=e.target.closest("[data-station]");if(card){const s=findStation(card.dataset.station);if(s)preconnectStation(s)}});
+$("stations").addEventListener("focusin",e=>{const card=e.target.closest("[data-station]");if(card){const s=findStation(card.dataset.station);if(s)preconnectStation(s)}});
 $("stations").addEventListener("keydown",e=>{
  if((e.key==="Enter"||e.key===" ")&&!e.target.closest("button")){
   const card=e.target.closest("[data-station]");
@@ -192,6 +194,20 @@ function streamCandidates(s){
  const out=[];
  for(const value of [s.url_resolved,s.url])if(value&&!out.includes(value))out.push(value);
  return out;
+}
+
+// Open the station server connection ahead of playback; this does not start audio.
+const preconnectedOrigins=new Set();
+function preconnectStation(s){
+ const url=streamCandidates(s).find(value=>/^https:\/\//i.test(value));
+ if(!url)return;
+ try{
+  const origin=new URL(url).origin;
+  if(preconnectedOrigins.has(origin)||preconnectedOrigins.size>=6)return;
+  preconnectedOrigins.add(origin);
+  const link=document.createElement("link");link.rel="preconnect";link.href=origin;link.crossOrigin="anonymous";
+  document.head.appendChild(link);
+ }catch{}
 }
 async function tryStream(url){
  return new Promise(async(resolve,reject)=>{
@@ -235,7 +251,6 @@ async function playStation(s){
  $("nowName").textContent=s.name;
  $("nowMeta").textContent=(s.stationCountry?countries[s.stationCountry].flag+" · ":"")+(s.bitrate?s.bitrate+" кбит/с":"Качество зависит от станции");
  $("status").textContent="Запускаем эфир…";$("toggle").textContent="…";
- audio.pause();audio.removeAttribute("src");audio.load();
  let started=false;
  for(const url of streamCandidates(s)){
   if(request!==streamRequest)return;
