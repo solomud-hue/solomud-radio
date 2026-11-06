@@ -1,6 +1,10 @@
 name: Check radio station streams
 
 on:
+  push:
+    paths:
+      - 'scripts/check-stations.mjs'
+      - '.github/workflows/check-stations.yml'
   workflow_dispatch:
   schedule:
     - cron: "17 */6 * * *"
