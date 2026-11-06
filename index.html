@@ -261,7 +261,7 @@ async function recoverCurrentStream(reason){
  switchingStream=false;playing=false;stopListening();$("status").textContent="Не удалось восстановить эфир. Выберите другую станцию";console.warn("Автовосстановление не удалось:",reason);updatePlayer();render();
 }
 function updatePlayer(){$("toggle").textContent=playing?"Ⅱ":"▶";if(!current)$("nowName").textContent="Выберите радиостанцию"}
-$("toggle").addEventListener("click",async()=>{if(!current){$("status").textContent="Сначала выберите станцию";return}if(playing){audio.pause();playing=false;$("status").textContent="Пауза"}else{try{await audio.play();playing=true;$("status").textContent="В эфире"}catch{$("status").textContent="Не удалось запустить поток"}}updatePlayer();render()});
+$("toggle").addEventListener("click",()=>{if(!current){$("status").textContent="Сначала выберите станцию";return}if(playing){audio.pause();playing=false;$("status").textContent="Пауза";updatePlayer();render();return}playStation(current)});
 audio.addEventListener("playing",()=>{clearTimeout(waitingTimer);warmedStationId=current?stationId(current):null;playing=true;if(!$("status").textContent.includes("резерв"))$("status").textContent="В эфире";markListening();updatePlayer();render()});
 audio.addEventListener("waiting",()=>{if(!playing||switchingStream)return;clearTimeout(waitingTimer);waitingTimer=setTimeout(()=>recoverCurrentStream("долгая остановка буфера"),12000)});
 audio.addEventListener("pause",()=>{stopListening();if(!audio.ended){playing=false;updatePlayer();render()}});
