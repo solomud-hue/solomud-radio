@@ -97,16 +97,17 @@ let country="Moldova",all=[],current=null,playing=false,viewMode="all",healthSta
 const $=id=>document.getElementById(id),audio=$("audio");
 
 const firebaseConfig={apiKey:"AIzaSyAQbauuRrbCqFiBcYGJudI4dKFaq6olA5s",authDomain:"solomud-radio.firebaseapp.com",databaseURL:"https://solomud-radio-default-rtdb.europe-west1.firebasedatabase.app",projectId:"solomud-radio",storageBucket:"solomud-radio.firebasestorage.app",messagingSenderId:"819052556755",appId:"1:819052556755:web:1afd00e3f3a9614f0f3f26"};
-let presenceDb=null,presenceRef=null,presenceUid=null,presenceReady=false;
+let presenceDb=null,presenceRef=null,presenceUid=null,presenceReady=false,activeListenersSnapshot=null;
 try{
  firebase.initializeApp(firebaseConfig);
  presenceDb=firebase.database();
- presenceDb.ref("listeners").on("value",snap=>{$("listenerCount").textContent="👥 Сейчас слушают: "+snap.numChildren();$("listenerCount").title="Активные подключения с включённым воспроизведением"});
+ presenceDb.ref("listeners").on("value",snap=>{activeListenersSnapshot=snap;updateListenerCount()});
  firebase.auth().signInAnonymously().then(cred=>{presenceUid=cred.user.uid;presenceRef=presenceDb.ref("listeners/"+presenceUid);presenceReady=true;if(!audio.paused&&!audio.ended)markListening()}).catch(err=>{$("listenerCount").textContent="👥 Счётчик временно недоступен";console.warn("Firebase auth:",err)});
 }catch(err){$("listenerCount").textContent="👥 Счётчик временно недоступен";console.warn("Firebase init:",err)}
+function updateListenerCount(){if(!activeListenersSnapshot)return;let total=activeListenersSnapshot.numChildren(),stationTotal=0;if(current){activeListenersSnapshot.forEach(child=>{if(child.val()&&child.val().stationId===stationId(current))stationTotal++})}$("listenerCount").textContent="👥 Сейчас слушают: "+total+(current?" · эту станцию: "+stationTotal:"");$("listenerCount").title="Только активные подключения, передающие статус воспроизведения"}
 function markListening(){
  if(!presenceReady||!presenceRef||audio.paused||audio.ended)return;
- presenceRef.onDisconnect().remove().then(()=>presenceRef.set({station:current?.name||"Radio",since:firebase.database.ServerValue.TIMESTAMP})).catch(err=>console.warn("Presence:",err));
+ presenceRef.onDisconnect().remove().then(()=>presenceRef.set({station:current?.name||"Radio",stationId:current?stationId(current):"",since:firebase.database.ServerValue.TIMESTAMP})).catch(err=>{$("listenerCount").textContent="👥 Счётчик временно недоступен";console.warn("Presence:",err)});
 }
 function stopListening(){if(presenceRef)presenceRef.remove().catch(()=>{});}
 window.addEventListener("pagehide",stopListening);
@@ -256,7 +257,7 @@ async function tryStream(url){
 }
 async function playStation(s){
  if(current&&stationId(current)===stationId(s)&&playing){audio.pause();playing=false;updatePlayer();render();return}
- const request=++streamRequest;switchingStream=true;clearTimeout(waitingTimer);current=s;playing=false;activeStreamUrl=null;
+ const request=++streamRequest;switchingStream=true;clearTimeout(waitingTimer);current=s;updateListenerCount();playing=false;activeStreamUrl=null;
  $("nowName").textContent=s.name;$("nowMeta").textContent=(s.stationCountry?countries[s.stationCountry].flag+" · ":"")+(s.bitrate?s.bitrate+" кбит/с":"Качество зависит от станции");$("status").textContent="Проверяем подключение…";$("toggle").textContent="…";
  const urls=streamCandidates(s);audio.pause();audio.removeAttribute("src");audio.load();audio.preload="auto";let started=false,lastError=null;
  for(let i=0;i<urls.length;i++){if(request!==streamRequest)return;try{$("status").textContent="Проверяем поток "+(i+1)+" из "+urls.length+"…";await tryStream(urls[i]);if(request!==streamRequest)return;activeStreamUrl=urls[i];started=true;playing=true;$("status").textContent=i?"Подключено к резервному потоку":"В эфире";break}catch(error){lastError=error;audio.pause();audio.removeAttribute("src");audio.load()}}
