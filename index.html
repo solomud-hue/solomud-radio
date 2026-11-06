@@ -50,7 +50,7 @@ footer{color:#71809a;text-align:center;font-size:12px;margin-top:35px}
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
 <script>
 const countries={Moldova:{flag:"🇲🇩",title:"Радио Молдовы"},Russia:{flag:"🇷🇺",title:"Радио России"},Romania:{flag:"🇷🇴",title:"Радио Румынии"}};
-let country="Moldova",all=[],current=null,playing=false,viewMode="all",healthStatus={stations:{},countries:{}},hlsPlayer=null;
+let country="Moldova",all=[],current=null,playing=false,viewMode="all",healthStatus={stations:{},countries:{}},hlsPlayer=null,warmedStationId=null;
 const $=id=>document.getElementById(id),audio=$("audio");
 
 const firebaseConfig={apiKey:"AIzaSyAQbauuRrbCqFiBcYGJudI4dKFaq6olA5s",authDomain:"solomud-radio.firebaseapp.com",databaseURL:"https://solomud-radio-default-rtdb.europe-west1.firebasedatabase.app",projectId:"solomud-radio",storageBucket:"solomud-radio.firebasestorage.app",messagingSenderId:"819052556755",appId:"1:819052556755:web:1afd00e3f3a9614f0f3f26"};
@@ -119,6 +119,20 @@ document.querySelectorAll(".country").forEach(b=>b.addEventListener("click",()=>
 $("search").addEventListener("input",render);$("sort").addEventListener("change",render);
 $("allTab").addEventListener("click",()=>{viewMode="all";render()});
 $("favTab").addEventListener("click",()=>{viewMode="favorites";render()});
+$("stations").addEventListener("pointerover",e=>{
+ if(playing)return;
+ const card=e.target.closest("[data-station]");
+ if(!card)return;
+ const id=card.dataset.station;
+ if(warmedStationId===id)return;
+ const station=all.find(x=>stationId(x)===id);
+ if(!station)return;
+ const url=streamCandidates(station)[0];
+ if(!url||/\\.m3u8(?:$|[?#])/i.test(url))return;
+ if(hlsPlayer){hlsPlayer.destroy();hlsPlayer=null}
+ audio.pause();audio.preload="auto";audio.src=url;audio.load();
+ warmedStationId=id;
+});
 $("stations").addEventListener("click",e=>{
  const fav=e.target.closest("[data-fav]");if(fav){const id=fav.dataset.fav,a=favs(),station=all.find(x=>stationId(x)===id);const next=a.includes(id)?a.filter(x=>x!==id):[...a,id];saveFavs(next);let saved={};try{saved=JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{}if(next.includes(id)&&station)saved[id]=station;else delete saved[id];localStorage.setItem("solomud-fav-stations",JSON.stringify(saved));render();return}
  const target=e.target.closest("[data-play],[data-station]");
@@ -176,7 +190,8 @@ async function tryStream(url){
   audio.addEventListener("error",onError,{once:true});
   try{
    if(hlsPlayer){hlsPlayer.destroy();hlsPlayer=null}
-   audio.removeAttribute("src");audio.load();
+   const alreadyWarm=audio.src===url&&audio.readyState>0;
+   if(!alreadyWarm){audio.removeAttribute("src");audio.load()}
    if(/\\.m3u8(?:$|[?#])/i.test(url)&&window.Hls&&!audio.canPlayType("application/vnd.apple.mpegurl")){
     if(!Hls.isSupported())throw new Error("HLS не поддерживается браузером");
     hlsPlayer=new Hls({enableWorker:true,lowLatencyMode:true,backBufferLength:30});
@@ -193,8 +208,10 @@ async function tryStream(url){
 async function playStation(s){
  if(current&&stationId(current)===stationId(s)&&playing){audio.pause();playing=false;updatePlayer();render();return}
  current=s;playing=false;$( "nowName" ).textContent=s.name;$( "nowMeta" ).textContent=(s.bitrate?s.bitrate+" кбит/с":"Качество зависит от станции");$( "status" ).textContent="Проверяем подключение…";$( "toggle" ).textContent="…";
- audio.pause();audio.removeAttribute("src");audio.preload="auto";
  const urls=streamCandidates(s);
+ const isWarmed=warmedStationId===stationId(s)&&urls.length&&audio.src===urls[0]&&audio.readyState>0;
+ if(!isWarmed){audio.pause();audio.removeAttribute("src")}
+ audio.preload="auto";
  let started=false,lastError=null;
  for(const url of urls){
   try{
@@ -214,7 +231,7 @@ async function playStation(s){
 }
 function updatePlayer(){$("toggle").textContent=playing?"Ⅱ":"▶";if(!current)$("nowName").textContent="Выберите радиостанцию"}
 $("toggle").addEventListener("click",async()=>{if(!current){$("status").textContent="Сначала выберите станцию";return}if(playing){audio.pause();playing=false;$("status").textContent="Пауза"}else{try{await audio.play();playing=true;$("status").textContent="В эфире"}catch{$("status").textContent="Не удалось запустить поток"}}updatePlayer();render()});
-audio.addEventListener("playing",()=>{playing=true;$("status").textContent="В эфире";markListening();updatePlayer();render()});
+audio.addEventListener("playing",()=>{warmedStationId=current?stationId(current):null;playing=true;$("status").textContent="В эфире";markListening();updatePlayer();render()});
 audio.addEventListener("pause",()=>{stopListening();if(!audio.ended){playing=false;updatePlayer();render()}});
 audio.addEventListener("error",()=>{stopListening();$("status").textContent="Ошибка потока. Выберите другую станцию";playing=false;updatePlayer();render()});
 audio.addEventListener("ended",stopListening);
