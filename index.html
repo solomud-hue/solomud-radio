@@ -289,7 +289,6 @@ async function load(){
   if(country==="Russia"){
    all=all.filter(s=>!/\bdfm\b/i.test(s.name));
    all.unshift({stationuuid:"solomud-dfm-moscow",name:"DFM Москва",url:"https://dfm.hostingradio.ru/dfm96.aacp",url_resolved:"https://dfm.hostingradio.ru/dfm96.aacp",country:"Russia",countrycode:"RU",tags:"Dance, Pop",bitrate:0,clickcount:999999});
-   all.unshift({stationuuid:"solomud-svoe-fm",name:"Своё FM",url:"https://getradio.me/svoefm",url_resolved:"https://getradio.me/svoefm",country:"Russia",countrycode:"RU",tags:"Deep House, Dance, Electronic",bitrate:128,votes:999999,clickcount:999999});
   }
  const stationLimit=1000;
  all=all.slice(0,stationLimit).map((s,index)=>({...s,stationNo:index+1,stationCountry:country}));
