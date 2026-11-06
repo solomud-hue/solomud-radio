@@ -62,6 +62,25 @@ body{background:radial-gradient(ellipse at 8% 0%,#5424a955 0,transparent 36%),ra
 .mainplay{background:linear-gradient(135deg,#57f2d0,#67bfff 55%,#b58aff);box-shadow:0 0 22px #57f2d044;transition:transform .18s}
 .mainplay:hover{transform:scale(1.07)}
 .track-nav:active{transform:scale(.94)}
+/* Full-screen station player */
+.station-screen{position:fixed;inset:0;z-index:20;display:none;overflow:auto;background:radial-gradient(ellipse at 50% 12%,#6336a866 0,transparent 42%),radial-gradient(ellipse at 90% 85%,#087b8666 0,transparent 38%),#080b19;padding:22px;align-items:center;justify-content:center}
+.station-screen.open{display:flex}
+.station-screen-inner{width:min(100%,620px);min-height:min(100%,720px);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:52px 28px 34px;border:1px solid #ffffff20;border-radius:30px;background:linear-gradient(145deg,#171a35ed,#101b2fed);box-shadow:0 25px 90px #0009}
+.station-screen-close{position:absolute;right:18px;top:18px;width:42px;height:42px;border:1px solid #ffffff2a;border-radius:50%;background:#ffffff0d;color:#fff;font-size:25px;cursor:pointer}
+.station-screen-logo{width:clamp(150px,32vw,230px);height:clamp(150px,32vw,230px);object-fit:cover;border-radius:28px;background:linear-gradient(135deg,#713de0,#176f88);box-shadow:0 15px 55px #0008,0 0 0 5px #ffffff13;margin:10px 0 28px}
+.station-screen-logo-fallback{display:grid;place-items:center;color:white;font-size:76px}
+.station-screen-country{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#58e9d0;font-weight:800}
+.station-screen-name{font-size:clamp(26px,6vw,42px);line-height:1.12;margin:10px 0 7px;overflow-wrap:anywhere}
+.station-screen-meta{color:#aab3d1;font-size:13px}
+.track-card{width:min(100%,430px);margin:28px 0 24px;padding:18px 20px;border:1px solid #8e75ff55;border-radius:18px;background:linear-gradient(120deg,#211d40,#102d38);text-align:left}
+.track-card-label{color:#55e8d0;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;font-weight:800;margin-bottom:8px}
+.track-card-title{font-size:19px;font-weight:800;line-height:1.3;overflow-wrap:anywhere}
+.track-card-artist{color:#b8c2dc;font-size:14px;margin-top:5px;overflow-wrap:anywhere}
+.station-screen-controls{display:flex;align-items:center;justify-content:center;gap:18px;margin:6px 0 16px}
+.station-screen-controls .mainplay{width:62px;height:62px;font-size:23px}
+.station-screen-controls .track-nav{width:48px;height:48px;font-size:27px}
+.station-screen-hint{color:#8792b1;font-size:12px;max-width:420px}
+@media(max-width:650px){.station-screen{padding:10px}.station-screen-inner{min-height:calc(100dvh - 20px);padding:55px 18px 24px;border-radius:24px}.station-screen-logo{width:clamp(145px,45vw,205px);height:clamp(145px,45vw,205px);margin:8px 0 24px}.track-card{margin:24px 0 20px}.station-screen-controls{gap:15px}}
 .volume{accent-color:#a66bff}
 footer{color:#9b9bbd}
 @media(prefers-reduced-motion:reduce){.station,.play,.mainplay{transition:none}}
@@ -94,6 +113,26 @@ footer{color:#9b9bbd}
 </main>
 <div class="player"><div class="playerinner"><button class="track-nav" id="previousStation" type="button" aria-label="Предыдущая радиостанция" title="Предыдущая радиостанция">‹</button><button class="mainplay" id="toggle" aria-label="Воспроизвести">▶</button><button class="track-nav" id="nextStation" type="button" aria-label="Следующая радиостанция" title="Следующая радиостанция">›</button><div class="now"><strong id="nowName">Выберите радиостанцию</strong><small id="nowMeta"><span class="brand-solomud">Solomud</span> <span class="brand-web">Web</span> <span class="brand-radio">Radio</span></small></div><div class="status" id="status">Готов к воспроизведению</div><input class="volume" id="volume" type="range" min="0" max="1" step=".01" value=".8" aria-label="Громкость"></div></div>
 <audio id="audio" preload="none"></audio>
+<section class="station-screen" id="stationScreen" aria-hidden="true" aria-label="Плеер радиостанции">
+ <div class="station-screen-inner">
+  <button class="station-screen-close" id="closeStationScreen" type="button" aria-label="Закрыть плеер" title="Закрыть">×</button>
+  <img class="station-screen-logo" id="stationScreenLogo" alt="Логотип радиостанции">
+  <div class="station-screen-country" id="stationScreenCountry">РАДИО ОНЛАЙН</div>
+  <h2 class="station-screen-name" id="stationScreenName">Выберите радиостанцию</h2>
+  <div class="station-screen-meta" id="stationScreenMeta">Solomud Web Radio</div>
+  <div class="track-card">
+   <div class="track-card-label">Сейчас играет</div>
+   <div class="track-card-title" id="trackTitle">Ожидаем информацию о песне…</div>
+   <div class="track-card-artist" id="trackArtist">Название композиции появится, если радиостанция передаёт эти данные</div>
+  </div>
+  <div class="station-screen-controls">
+   <button class="track-nav" id="screenPrevious" type="button" aria-label="Предыдущая радиостанция">‹</button>
+   <button class="mainplay" id="screenToggle" type="button" aria-label="Воспроизвести">▶</button>
+   <button class="track-nav" id="screenNext" type="button" aria-label="Следующая радиостанция">›</button>
+  </div>
+  <div class="station-screen-hint" id="stationScreenHint">Выбирай любимые станции и слушай музыку</div>
+ </div>
+</section>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
@@ -237,6 +276,7 @@ async function tryStream(url){
    if(/\\.m3u8(?:$|[?#])/i.test(url)&&window.Hls&&!audio.canPlayType("application/vnd.apple.mpegurl")){
     if(!Hls.isSupported())throw new Error("HLS не поддерживается браузером");
     hlsPlayer=new Hls({enableWorker:true,lowLatencyMode:true,backBufferLength:30});
+    hlsPlayer.on(Hls.Events.FRAG_PARSING_METADATA,(event,data)=>{for(const sample of (data.samples||[])){if(sample.data)decodeId3Text(sample.data)}});
     hlsPlayer.on(Hls.Events.ERROR,(event,data)=>{if(data.fatal)finish(false,new Error("Ошибка HLS-потока"))});
     hlsPlayer.on(Hls.Events.MANIFEST_PARSED,()=>audio.play().catch(error=>finish(false,error)));
     hlsPlayer.loadSource(url);hlsPlayer.attachMedia(audio);
@@ -253,7 +293,9 @@ async function playStation(s){
  const request=++streamRequest;
  current=s;updateListenerCount();playing=false;activeStreamUrl=null;
  $("nowName").textContent=s.name;
+ openStationScreen(s);
  $("nowMeta").textContent=(s.stationCountry?countries[s.stationCountry].flag+" · ":"")+(s.bitrate?s.bitrate+" кбит/с":"Качество зависит от станции");
+ resetTrackInfo();
  $("status").textContent="Запускаем эфир…";$("toggle").textContent="…";
  let started=false;
  for(const url of streamCandidates(s)){
@@ -279,7 +321,55 @@ async function recoverCurrentStream(reason){
  for(let i=0;i<urls.length;i++){try{await tryStream(urls[i]);activeStreamUrl=urls[i];playing=true;switchingStream=false;$("status").textContent="Переключено на резервный поток";markListening();updatePlayer();render();return}catch(e){audio.pause();audio.removeAttribute("src");audio.load()}}
  switchingStream=false;playing=false;stopListening();$("status").textContent="Не удалось восстановить эфир. Выберите другую станцию";console.warn("Автовосстановление не удалось:",reason);updatePlayer();render();
 }
-function updatePlayer(){$("toggle").textContent=playing?"Ⅱ":"▶";if(!current)$("nowName").textContent="Выберите радиостанцию"}
+function updatePlayer(){$("toggle").textContent=playing?"Ⅱ":"▶";$("screenToggle").textContent=playing?"Ⅱ":"▶";if(!current)$("nowName").textContent="Выберите радиостанцию"}
+function openStationScreen(s){
+ $("stationScreen").classList.add("open");$("stationScreen").setAttribute("aria-hidden","false");
+ $("stationScreenName").textContent=s.name;
+ $("stationScreenCountry").textContent=(s.stationCountry?countries[s.stationCountry].flag+" ":"📻 ")+(s.stationCountry||country);
+ $("stationScreenMeta").textContent=(s.bitrate?s.bitrate+" кбит/с":"Качество зависит от станции")+" · Solomud Web Radio";
+ const logo=$("stationScreenLogo"),fallback=countries[s.stationCountry||country]?.flag||"📻";
+ logo.onerror=()=>{logo.onerror=null;logo.style.display="none";const old=$("stationScreenLogoFallback");if(old)old.remove();const el=document.createElement("div");el.id="stationScreenLogoFallback";el.className="station-screen-logo station-screen-logo-fallback";el.textContent=fallback;logo.insertAdjacentElement("afterend",el)};
+ logo.style.display="block";const old=$("stationScreenLogoFallback");if(old)old.remove();logo.src=s.favicon||"";
+ $("stationScreenHint").textContent="Загрузка эфира…";
+}
+function closeStationScreen(){$("stationScreen").classList.remove("open");$("stationScreen").setAttribute("aria-hidden","true")}
+function resetTrackInfo(){
+ $("trackTitle").textContent="Ожидаем информацию о песне…";
+ $("trackArtist").textContent="Если станция передаёт название композиции, оно появится здесь";
+}
+function updateTrackInfo(title,artist){
+ if(!title&&!artist)return;
+ $("trackTitle").textContent=title||artist||"Сейчас в эфире";
+ $("trackArtist").textContent=artist&&title&&artist!==title?artist:(title?"Информация от радиостанции":"");
+ $("stationScreenHint").textContent="Информация о композиции от радиостанции";
+}
+function decodeId3Text(data){
+ if(!data||data.length<10)return;
+ const bytes=data instanceof Uint8Array?data:new Uint8Array(data);
+ if(bytes[0]!==73||bytes[1]!==68||bytes[2]!==51)return;
+ const size=((bytes[6]&127)<<21)|((bytes[7]&127)<<14)|((bytes[8]&127)<<7)|(bytes[9]&127);
+ let pos=10,end=Math.min(bytes.length,10+size),title="",artist="";
+ while(pos+10<=end){
+  const id=String.fromCharCode(bytes[pos],bytes[pos+1],bytes[pos+2],bytes[pos+3]);
+  const frameSize=((bytes[pos+4]<<24)|(bytes[pos+5]<<16)|(bytes[pos+6]<<8)|bytes[pos+7])>>>0;
+  if(!id.trim()||frameSize<=0||pos+10+frameSize>end)break;
+  if(id==="TIT2"||id==="TPE1"||id==="TXXX"){
+   const frame=bytes.slice(pos+10,pos+10+frameSize),encoding=frame[0],payload=frame.slice(1);
+   let value="";
+   try{value=encoding===0?new TextDecoder("windows-1252").decode(payload):encoding===3?new TextDecoder("utf-8").decode(payload):encoding===1||encoding===2?new TextDecoder(encoding===1?"utf-16":"utf-16be").decode(payload):new TextDecoder().decode(payload)}catch{}
+   value=value.replace(/\0/g,"").trim();
+   if(id==="TIT2")title=value;if(id==="TPE1")artist=value;
+  }
+  pos+=10+frameSize;
+ }
+ if(title||artist)updateTrackInfo(title,artist);
+}
+$("closeStationScreen").addEventListener("click",closeStationScreen);
+$("stationScreen").addEventListener("click",e=>{if(e.target===$("stationScreen"))closeStationScreen()});
+$("screenPrevious").addEventListener("click",()=>changeStation(-1));
+$("screenNext").addEventListener("click",()=>changeStation(1));
+$("screenToggle").addEventListener("click",()=>$("toggle").click());
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeStationScreen()});
 function changeStation(direction){
  const cards=[...document.querySelectorAll("#stations [data-station]")];
  if(!cards.length){$("status").textContent="Сначала выберите страну и дождитесь загрузки станций";return}
@@ -293,7 +383,7 @@ function changeStation(direction){
 $("previousStation").addEventListener("click",()=>changeStation(-1));
 $("nextStation").addEventListener("click",()=>changeStation(1));
 $("toggle").addEventListener("click",()=>{if(!current){$("status").textContent="Сначала выберите станцию";return}if(playing){audio.pause();playing=false;$("status").textContent="Пауза";updatePlayer();render();return}playStation(current)});
-audio.addEventListener("playing",()=>{clearTimeout(waitingTimer);warmedStationId=current?stationId(current):null;playing=true;if(!$("status").textContent.includes("резерв"))$("status").textContent="В эфире";markListening();updatePlayer();render()});
+audio.addEventListener("playing",()=>{clearTimeout(waitingTimer);$("stationScreenHint").textContent="Эфир играет";warmedStationId=current?stationId(current):null;playing=true;if(!$("status").textContent.includes("резерв"))$("status").textContent="В эфире";markListening();updatePlayer();render()});
 audio.addEventListener("waiting",()=>{if(!playing||switchingStream)return;clearTimeout(waitingTimer);waitingTimer=setTimeout(()=>recoverCurrentStream("долгая остановка буфера"),12000)});
 audio.addEventListener("pause",()=>{stopListening();if(!audio.ended){playing=false;updatePlayer();render()}});
 audio.addEventListener("error",()=>{stopListening();if(playing&&!switchingStream){recoverCurrentStream("ошибка аудиопотока");return}if(!switchingStream){$("status").textContent="Ошибка потока. Выберите другую станцию";playing=false;updatePlayer();render()}});
