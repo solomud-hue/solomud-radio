@@ -3,6 +3,7 @@
 import json
 import time
 import urllib.request
+import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -34,7 +35,7 @@ def get_stations(code):
 
 
 def probe(url):
-    """A stream is accepted only if HTTPS returns bytes with an audio/playlist MIME type."""
+    """Accept only HTTPS streams that FFmpeg can actually decode as audio."""
     if not url or not url.lower().startswith("https://"):
         return False, None, "https-required"
     started = time.monotonic()
@@ -57,11 +58,26 @@ def probe(url):
                 return False, latency_ms, "empty-response"
             if not audio_mime:
                 return False, latency_ms, "not-audio"
-            if latency_ms > 6000:
-                return False, latency_ms, "slow"
-            return True, latency_ms, "ok"
     except Exception as exc:
         return False, int((time.monotonic() - started) * 1000), type(exc).__name__
+
+    try:
+        result = subprocess.run(
+            ["ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error",
+             "-rw_timeout", "7000000", "-i", url, "-map", "0:a:0",
+             "-t", "2", "-f", "null", "-"],
+            capture_output=True, text=True, timeout=10,
+        )
+        latency_ms = int((time.monotonic() - started) * 1000)
+        if result.returncode != 0:
+            return False, latency_ms, "decode-failed"
+        if latency_ms > 9000:
+            return False, latency_ms, "slow"
+        return True, latency_ms, "decoded"
+    except subprocess.TimeoutExpired:
+        return False, int((time.monotonic() - started) * 1000), "decode-timeout"
+    except Exception as exc:
+        return False, int((time.monotonic() - started) * 1000), "decode-" + type(exc).__name__
 
 
 def main():
@@ -92,7 +108,7 @@ def main():
             if ok:
                 return uuid, {
                     "working": True, "latencyMs": latency, "streamUrl": candidate,
-                    "reason": "ok", "name": name, "country": country,
+                    "reason": "decoded", "name": name, "country": country,
                     "checkedAt": checked_at,
                 }
             last_reason = reason
@@ -103,7 +119,7 @@ def main():
         }
 
     statuses = {}
-    with ThreadPoolExecutor(max_workers=32) as pool:
+    with ThreadPoolExecutor(max_workers=24) as pool:
         futures = [pool.submit(check, job) for job in jobs]
         for future in as_completed(futures):
             uuid, result = future.result()
