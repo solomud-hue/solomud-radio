@@ -132,7 +132,7 @@ function storedStationHealth(s){
 function stationHealth(s){
  const h=runtimeStationHealth[stationId(s)]||storedStationHealth(s);
  if(runtimeStationHealth[stationId(s)]&&runtimeStationHealth[stationId(s)].working===true)return '<span class="station-health"><i class="health-dot ok"></i> Запустился в браузере</span>';
- if(h&&h.working===true)return '<span class="station-health"><i class="health-dot ok"></i> Проверен сервером</span>';
+ if(h&&h.working===true)return '<span class="station-health"><i class="health-dot"></i> Серверный тест пройден</span>';
  if(h&&h.working===false)return '<span class="station-health"><i class="health-dot bad"></i> Не работает</span>';
  return '<span class="station-health"><i class="health-dot"></i> Проверим при запуске</span>';
 }
@@ -251,7 +251,6 @@ async function tryStream(url){
    clearTimeout(timer);clearTimeout(progressTimer);
    audio.removeEventListener("playing",onPlaying);
    audio.removeEventListener("error",onError);
-   audio.removeEventListener("pause",onPause);
    if(!ok&&hlsPlayer){hlsPlayer.destroy();hlsPlayer=null}
    ok?resolve(true):reject(error||new Error("Поток не запустился"));
   };
@@ -266,11 +265,9 @@ async function tryStream(url){
    },5000);
   };
   const onError=()=>finish(false,new Error("Ошибка аудиопотока"));
-  const onPause=()=>{if(progressTimer)finish(false,new Error("Поток остановился во время проверки"))};
   const timer=setTimeout(()=>finish(false,new Error("Тайм-аут запуска потока")),16000);
   audio.addEventListener("playing",onPlaying);
   audio.addEventListener("error",onError);
-  audio.addEventListener("pause",onPause);
   try{
    if(hlsPlayer){hlsPlayer.destroy();hlsPlayer=null}
    const alreadyWarm=audio.src===url&&audio.readyState>0;
@@ -295,7 +292,7 @@ async function playStation(s){
  const urls=streamCandidates(s);audio.pause();audio.removeAttribute("src");audio.load();audio.preload="auto";let started=false,lastError=null;
  for(let i=0;i<urls.length;i++){if(request!==streamRequest)return;try{$("status").textContent="Проверяем поток "+(i+1)+" из "+urls.length+"…";await tryStream(urls[i]);if(request!==streamRequest)return;activeStreamUrl=urls[i];runtimeStationHealth[stationId(s)]={working:true,streamUrl:urls[i]};started=true;playing=true;$("status").textContent=i?"Подключено к резервному потоку":"В эфире";break}catch(error){lastError=error;audio.pause();audio.removeAttribute("src");audio.load()}}
  if(!started)runtimeStationHealth[stationId(s)]={working:false,streamUrl:null};
- switchingStream=false;if(!started){playing=false;$("status").textContent=urls.length?"Все потоки станции недоступны":"У станции нет доступной ссылки на поток";console.warn("Не удалось запустить станцию:",s.name,lastError)}updatePlayer();render();
+ switchingStream=false;if(!started){playing=false;const mediaError=audio.error?(" MediaError "+audio.error.code):"";$("status").textContent=urls.length?("Не удалось запустить: "+(lastError&&lastError.message?lastError.message:"ошибка потока")+mediaError):"У станции нет доступной ссылки на поток";console.warn("Не удалось запустить станцию:",s.name,lastError,audio.error)}updatePlayer();render();
 }
 async function recoverCurrentStream(reason){
  if(!current||!playing||switchingStream)return;switchingStream=true;clearTimeout(waitingTimer);
