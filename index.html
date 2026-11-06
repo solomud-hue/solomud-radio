@@ -176,8 +176,8 @@ let language=(()=>{try{return localStorage.getItem("solomud-language")||"ru"}cat
 function tr(value){const s=String(value??"");if(language==="ru")return s;const keys=Object.keys(translations.en);for(const key of keys){if(s===key||s===translations.en[key]||s===translations.ro[key])return translations[language]?.[key]||key;}return translations[language]?.[s]||s;}
 function setLanguage(code){if(!["ru","en","ro"].includes(code))return;language=code;try{localStorage.setItem("solomud-language",code)}catch{}document.documentElement.lang=code;document.querySelectorAll(".lang-btn").forEach(b=>b.classList.toggle("active",b.dataset.lang===code));translatePage();render();updateListenerCount();}
 function translatePage(){
- const set=(sel,val)=>{const el=$(sel);if(el)el.textContent=tr(val)};
- const setHtml=(sel,val)=>{const el=$(sel);if(el)el.innerHTML=tr(val)};
+ const set=(sel,val)=>{const el=document.querySelector(sel);if(el)el.textContent=tr(val)};
+ const setHtml=(sel,val)=>{const el=document.querySelector(sel);if(el)el.innerHTML=tr(val)};
  const heroText={ru:{eyebrow:"ТВОЯ МУЗЫКА. ТВОИ СТРАНЫ.",title:"Радио, которое<br>всегда с тобой.",description:"Выбирай страну, находи любимую станцию и слушай прямо в браузере. Бесплатно, без регистрации.",all:"Все станции"},en:{eyebrow:"YOUR MUSIC. YOUR COUNTRIES.",title:"Radio that<br>stays with you.",description:"Choose a country, find your favourite station and listen in your browser. Free, no registration.",all:"All stations"},ro:{eyebrow:"MUZICA TA. ȚĂRILE TALE.",title:"Radioul care<br>este mereu cu tine.",description:"Alege țara, găsește postul preferat și ascultă direct în browser. Gratuit, fără înregistrare.",all:"Toate posturile"}}[language];
  const heroEyebrow=document.querySelector(".hero .eyebrow"),heroTitle=document.querySelector(".hero h1"),heroDescription=document.querySelector(".hero p");if(heroEyebrow)heroEyebrow.innerHTML=heroText.eyebrow;if(heroTitle)heroTitle.innerHTML=heroText.title;if(heroDescription)heroDescription.textContent=heroText.description;
  set(".live","● РАДИО ОНЛАЙН");set("#allTab",heroText.all);
