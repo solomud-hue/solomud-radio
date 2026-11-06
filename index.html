@@ -179,9 +179,9 @@ function translatePage(){
  const set=(sel,val)=>{const el=$(sel);if(el)el.textContent=tr(val)};
  const setHtml=(sel,val)=>{const el=$(sel);if(el)el.innerHTML=tr(val)};
  const heroText={ru:{eyebrow:"ТВОЯ МУЗЫКА. ТВОИ СТРАНЫ.",title:"Радио, которое<br>всегда с тобой.",description:"Выбирай страну, находи любимую станцию и слушай прямо в браузере. Бесплатно, без регистрации.",all:"Все станции"},en:{eyebrow:"YOUR MUSIC. YOUR COUNTRIES.",title:"Radio that<br>stays with you.",description:"Choose a country, find your favourite station and listen in your browser. Free, no registration.",all:"All stations"},ro:{eyebrow:"MUZICA TA. ȚĂRILE TALE.",title:"Radioul care<br>este mereu cu tine.",description:"Alege țara, găsește postul preferat și ascultă direct în browser. Gratuit, fără înregistrare.",all:"Toate posturile"}}[language];
- setHtml(".hero .eyebrow",heroText.eyebrow);setHtml(".hero h1",heroText.title);set(".hero p",heroText.description);
+ const heroEyebrow=document.querySelector(".hero .eyebrow"),heroTitle=document.querySelector(".hero h1"),heroDescription=document.querySelector(".hero p");if(heroEyebrow)heroEyebrow.innerHTML=heroText.eyebrow;if(heroTitle)heroTitle.innerHTML=heroText.title;if(heroDescription)heroDescription.textContent=heroText.description;
  set(".live","● РАДИО ОНЛАЙН");set("#allTab",heroText.all);
- const fav=$("favTab");if(fav)fav.childNodes[0].textContent=tr("★ Избранное ");
+ const fav=$("favTab");if(fav){const count=$("favCount")?.textContent||"0";fav.innerHTML=tr("★ Избранное")+" <span id=\"favCount\">"+count+"</span>";}
  const search=$("search");if(search){search.placeholder=tr("Найти радиостанцию…");search.setAttribute("aria-label",tr("Поиск станции"));}
  const sort=$("sort");if(sort)[...sort.options].forEach(o=>o.textContent=tr(({votes:"Популярные",name:"По названию",bitrate:"По качеству потока"})[o.value]));
  const notice=$(".notice");if(notice){const strong=notice.querySelector("strong");if(strong)strong.textContent=tr("О качестве звука.");if(notice.childNodes[1])notice.childNodes[1].textContent=" "+tr("Плеер воспроизводит качество, которое передаёт сама радиостанция. Если станция вещает в 320 кбит/с, вы услышите именно этот поток; повысить качество исходного эфира плеер не может.");}
