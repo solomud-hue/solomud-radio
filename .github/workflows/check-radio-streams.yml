@@ -1,6 +1,10 @@
 name: Check radio streams
 
 on:
+  push:
+    paths:
+      - "scripts/check_streams.py"
+      - ".github/workflows/check-radio-streams.yml"
   schedule:
     - cron: "15 4 * * *"
   workflow_dispatch:
