@@ -186,20 +186,6 @@ document.querySelectorAll(".country").forEach(b=>b.addEventListener("click",()=>
 $("search").addEventListener("input",render);$("sort").addEventListener("change",render);
 $("allTab").addEventListener("click",()=>{viewMode="all";render()});
 $("favTab").addEventListener("click",()=>{viewMode="favorites";render()});
-$("stations").addEventListener("pointerover",e=>{
- if(playing)return;
- const card=e.target.closest("[data-station]");
- if(!card)return;
- const id=card.dataset.station;
- if(warmedStationId===id)return;
- const station=all.find(x=>stationId(x)===id);
- if(!station)return;
- const url=streamCandidates(station)[0];
- if(!url||/\.m3u8(?:$|[?#])/i.test(url))return;
- if(hlsPlayer){hlsPlayer.destroy();hlsPlayer=null}
- audio.pause();audio.preload="auto";audio.src=url;audio.load();
- warmedStationId=id;
-});
 $("stations").addEventListener("click",e=>{
  const fav=e.target.closest("[data-fav]");if(fav){const id=fav.dataset.fav,a=favs(),station=findStation(id);const next=a.includes(id)?a.filter(x=>x!==id):[...a,id];saveFavs(next);let saved={};try{saved=JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{}if(next.includes(id)&&station)saved[id]={...station,stationCountry:station.stationCountry||country};else delete saved[id];localStorage.setItem("solomud-fav-stations",JSON.stringify(saved));render();return}
  const target=e.target.closest("[data-play],[data-station]");
@@ -218,17 +204,17 @@ $("stations").addEventListener("keydown",e=>{
 function streamCandidates(s){
  const out=[];
  const name=(s.name||"").trim();
- const mainDfm=/^dfm(?:\\s+(?:101[.,]?2(?:\\s*fm)?|москва))?$/i.test(name);
+ const mainDfm=/^dfm(?:\s+(?:101[.,]?2(?:\s*fm)?|москва))?$/i.test(name);
  // The broadcaster publishes a browser-friendly MP3 alternative; prefer it for the main DFM channel.
  if(mainDfm)out.push("https://dfm.hostingradio.ru/dfm128.mp3","https://dfm.hostingradio.ru/dfm64.mp3");
  const verified=runtimeStationHealth[stationId(s)]||storedStationHealth(s);
  if(verified&&verified.working===true&&verified.streamUrl&&!out.includes(verified.streamUrl))out.push(verified.streamUrl);
  // Prefer the broadcaster's official HTTPS stream for Radio Romania Actualitati.
- if(/radio\\s*rom[âa]nia\\s*actualit[ăa]ți|radio\\s*romania\\s*actualitati/i.test(name))out.push("https://stream4.srr.ro:8443/romania-actualitati");
+ if(/radio\s*rom[âa]nia\s*actualit[ăa]ți|radio\s*romania\s*actualitati/i.test(name))out.push("https://stream4.srr.ro:8443/romania-actualitati");
  // ProFM stream listed by a current radio-stream directory; try before Radio Browser URLs.
- if(/pro\\s*fm/i.test(name))out.push("https://edge126.rcs-rds.ro/profm/profm.mp3");
+ if(/pro\s*fm/i.test(name))out.push("https://edge126.rcs-rds.ro/profm/profm.mp3");
  // Official Europa FM AAC HTTPS stream (64 kbps).
- if(/europa\\s*fm/i.test(name))out.push("https://astreaming.edi.ro:8443/EuropaFM_aac");
+ if(/europa\s*fm/i.test(name))out.push("https://astreaming.edi.ro:8443/EuropaFM_aac");
  const raw=[s.url_resolved,s.url].filter(Boolean);
  for(const value of raw){
   try{
@@ -272,7 +258,7 @@ async function tryStream(url){
    if(hlsPlayer){hlsPlayer.destroy();hlsPlayer=null}
    const alreadyWarm=audio.src===url&&audio.readyState>0;
    if(!alreadyWarm){audio.removeAttribute("src");audio.load()}
-   if(/\\.m3u8(?:$|[?#])/i.test(url)&&window.Hls&&!audio.canPlayType("application/vnd.apple.mpegurl")){
+   if(/\.m3u8(?:$|[?#])/i.test(url)&&window.Hls&&!audio.canPlayType("application/vnd.apple.mpegurl")){
     if(!Hls.isSupported())throw new Error("HLS не поддерживается браузером");
     hlsPlayer=new Hls({enableWorker:true,lowLatencyMode:true,backBufferLength:30});
     hlsPlayer.on(Hls.Events.ERROR,(event,data)=>{if(data.fatal)finish(false,new Error("Ошибка HLS-потока"))});
@@ -302,7 +288,7 @@ async function recoverCurrentStream(reason){
 }
 function updatePlayer(){$("toggle").textContent=playing?"Ⅱ":"▶";if(!current)$("nowName").textContent="Выберите радиостанцию"}
 $("toggle").addEventListener("click",async()=>{if(!current){$("status").textContent="Сначала выберите станцию";return}if(playing){audio.pause();playing=false;$("status").textContent="Пауза"}else{try{await audio.play();playing=true;$("status").textContent="В эфире"}catch{$("status").textContent="Не удалось запустить поток"}}updatePlayer();render()});
-audio.addEventListener("playing",()=>{clearTimeout(waitingTimer);warmedStationId=current?stationId(current):null;playing=true;if(!$("status").textContent.includes("резерв"))$("status").textContent="В эфире";markListening();updatePlayer();render()});
+audio.addEventListener("playing",()=>{if(switchingStream)return;clearTimeout(waitingTimer);warmedStationId=current?stationId(current):null;playing=true;if(! $("status").textContent.includes("резерв"))$("status").textContent="В эфире";markListening();updatePlayer();render()});
 audio.addEventListener("waiting",()=>{if(!playing||switchingStream)return;clearTimeout(waitingTimer);waitingTimer=setTimeout(()=>recoverCurrentStream("долгая остановка буфера"),12000)});
 audio.addEventListener("pause",()=>{stopListening();if(audio.ended||switchingStream)return;if(playing&&current){recoverCurrentStream("поток неожиданно остановился");return}playing=false;updatePlayer();render()});
 audio.addEventListener("error",()=>{stopListening();if(playing&&!switchingStream){recoverCurrentStream("ошибка аудиопотока");return}if(!switchingStream){$("status").textContent="Ошибка потока. Выберите другую станцию";playing=false;updatePlayer();render()}});
