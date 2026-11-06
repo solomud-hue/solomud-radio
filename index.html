@@ -128,7 +128,7 @@ function render(){
  const saved=(()=>{try{return JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{return{}}})();
  let source=viewMode==="favorites"?Object.values(saved):all;
  let list=source.filter(s=>(s.name+" "+(s.tags||"")+" "+(s.state||"")).toLowerCase().includes(q));
- list.sort((a,b)=>sort==="name"?a.name.localeCompare(b.name):sort==="bitrate"?(b.bitrate||0)-(a.bitrate||0):(b.votes||0)-(a.votes||0));
+ list.sort((a,b)=>sort==="name"?a.name.localeCompare(b.name):sort==="bitrate"?(b.bitrate||0)-(a.bitrate||0):(country==="Russia"&&viewMode==="all"?((b.stationuuid==="solomud-dfm-moscow")-(a.stationuuid==="solomud-dfm-moscow")):0)||(b.votes||0)-(a.votes||0));
  $("count").textContent=viewMode==="favorites"?"Избранное: "+list.length+" станций":list.length+" станций";
  if(viewMode==="favorites")$("countryTitle").textContent="★ Моё избранное";else $("countryTitle").textContent=countries[country].flag+" "+countries[country].title;
  $("favCount").textContent=favs().length;
