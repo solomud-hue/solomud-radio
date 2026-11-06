@@ -204,9 +204,10 @@ $("stations").addEventListener("keydown",e=>{
 function streamCandidates(s){
  const out=[];
  const name=(s.name||"").trim();
- const mainDfm=/^dfm(?:\s+(?:101[.,]?2(?:\s*fm)?|москва))?$/i.test(name);
- // The broadcaster publishes a browser-friendly MP3 alternative; prefer it for the main DFM channel.
- if(mainDfm)out.push("https://dfm.hostingradio.ru/dfm128.mp3","https://dfm.hostingradio.ru/dfm64.mp3");
+ const isDfm=/^dfm\b/i.test(name);
+ // DFM thematic channels have separate stream hosts; use the exact channel stream first.
+ if(/дискач\s*90|disc\s*90/i.test(name))out.push("https://dfm-disc90.hostingradio.ru/disc9096.aacp");
+ else if(isDfm)out.push("https://dfm.hostingradio.ru/dfm96.aacp");
  const verified=runtimeStationHealth[stationId(s)]||storedStationHealth(s);
  if(verified&&verified.working===true&&verified.streamUrl&&!out.includes(verified.streamUrl))out.push(verified.streamUrl);
  // Prefer the broadcaster's official HTTPS stream for Radio Romania Actualitati.
