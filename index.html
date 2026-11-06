@@ -145,10 +145,9 @@ footer{color:#9b9bbd}
 .country .flag{position:relative;left:auto;top:auto;z-index:auto;display:inline-flex;flex:none;width:56px;height:42px;border-radius:6px;overflow:hidden;box-shadow:0 0 0 2px #ffffff18,0 5px 16px #0007}
 .country strong{position:static;display:block;margin:0;font-size:19px;line-height:1.25;color:#fff;text-shadow:none}
 .country small{position:static;display:block;margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.3;text-shadow:none}
-.flag.md span:nth-child(2){position:relative}
-.flag.md .md-coat{position:absolute;left:50%;top:50%;width:25px;height:32px;transform:translate(-50%,-50%);display:block;overflow:visible}
-@media(max-width:650px){.countries{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:16px 0 20px}.country{min-height:94px;padding:12px 8px;border-radius:15px}.country-identity{flex-direction:column;align-items:flex-start;gap:8px}.country .flag{width:43px;height:32px}.country strong{font-size:14px}.country small{font-size:10px;margin-top:3px}}
-@media(max-width:380px){.country{padding:9px 6px}.country .flag{width:38px;height:28px}.country strong{font-size:12px}.country small{font-size:9px}}
+.flag-map{display:block;flex:none;width:58px;height:72px;object-fit:contain;border-radius:8px;background:#f7f7f7;box-shadow:0 3px 12px #0005}
+@media(max-width:650px){.countries{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:16px 0 20px}.country{min-height:94px;padding:12px 8px;border-radius:15px}.country-identity{flex-direction:column;align-items:flex-start;gap:8px}.country .flag{width:43px;height:32px}.country .flag-map{width:48px;height:60px}.country strong{font-size:14px}.country small{font-size:10px;margin-top:3px}}
+@media(max-width:380px){.country{padding:9px 6px}.country .flag{width:38px;height:28px}.country .flag-map{width:42px;height:52px}.country strong{font-size:12px}.country small{font-size:9px}}
 
 </style></head>
 <body><main class="wrap">
@@ -157,7 +156,7 @@ footer{color:#9b9bbd}
 <section class="countries" aria-label="Выбрать страну">
  <button class="country active" data-country="Moldova">
   <span class="country-identity">
-   <span class="flag md" role="img" aria-label="Флаг Молдовы с государственным гербом"><span></span><span><svg class="md-coat" viewBox="0 0 64 80" aria-hidden="true"><path d="M32 3 37 13 50 8 46 22 59 29 47 37 51 50 38 47 32 62 26 47 13 50 17 37 5 29 18 22 14 8 27 13Z" fill="#f5d12d" stroke="#8a1717" stroke-width="2"/><path d="M32 16 22 22 15 18 7 8 9 25 19 31 20 42 25 53 32 61 39 53 44 42 45 31 55 25 57 8 49 18 42 22Z" fill="#f5d12d" stroke="#8a1717" stroke-width="2" stroke-linejoin="round"/><path d="M22 25Q32 19 42 25L40 43Q37 52 32 56Q27 52 24 43Z" fill="#c91f32" stroke="#8a1717" stroke-width="1.5"/><path d="M23 31 28 27 32 31 36 27 41 31 39 39 32 47 25 39Z" fill="#f5d12d"/><path d="M24 33 19 36M40 33 45 36M32 27V21" fill="none" stroke="#8a1717" stroke-width="1.5" stroke-linecap="round"/><path d="M27 38 30 40M37 38 34 40" stroke="#8a1717" stroke-width="1.7" stroke-linecap="round"/><path d="M32 40 29 45 35 45Z" fill="#f5d12d"/><path d="M27 50Q32 53 37 50" fill="none" stroke="#f5d12d" stroke-width="1.5"/></svg></span><span></span></span>
+   <img class="flag-map" src="./moldova-map.png" alt="Карта Молдовы в цветах флага с государственным гербом"/>
    <span class="country-info"><strong>Молдова</strong><small>33 радиостанции</small></span>
   </span>
  </button>
