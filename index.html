@@ -343,12 +343,12 @@ async function tryStream(url){
   }catch(error){finish(false,error)}
  });
 }
-async function playStation(s){
+async function playStation(s,options={}){
  if(current&&stationId(current)===stationId(s)&&playing){audio.pause();playing=false;updatePlayer();render();return}
  const request=++streamRequest;
  current=s;updateListenerCount();playing=false;activeStreamUrl=null;
  $("nowName").textContent=s.name;
- openStationScreen(s);
+ if(!options.preserveClosedScreen||$("stationScreen").classList.contains("open"))openStationScreen(s);
  $("nowMeta").textContent=(s.stationCountry?countries[s.stationCountry].flag+" · ":"")+(s.bitrate?s.bitrate+" "+tr("кбит/с"):tr("Качество зависит от станции"));
  resetTrackInfo();
  $("status").textContent=tr("Запускаем эфир…");$("toggle").textContent="…";
@@ -433,7 +433,7 @@ function changeStation(direction){
  const index=ids.indexOf(currentId);
  const nextIndex=index<0?(direction>0?0:ids.length-1):(index+direction+ids.length)%ids.length;
  const station=findStation(ids[nextIndex]);
- if(station)playStation(station);
+ if(station)playStation(station,{preserveClosedScreen:true});
 }
 $("previousStation").addEventListener("click",()=>changeStation(-1));
 $("nextStation").addEventListener("click",()=>changeStation(1));
