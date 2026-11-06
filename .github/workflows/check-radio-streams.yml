@@ -11,6 +11,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   check-streams:
@@ -36,3 +38,15 @@ jobs:
           fi
           git commit -m "Update radio stream health status"
           git push
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - name: Upload site with verified station list
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - name: Publish site and station list
+        id: deployment
+        uses: actions/deploy-pages@v4
