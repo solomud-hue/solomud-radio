@@ -31,7 +31,7 @@ async function testStream(station) {
   for (const candidate of candidates) {
     try {
       const url = new URL(candidate);
-      if (!["http:", "https:"].includes(url.protocol)) continue;
+      if (url.protocol !== "https:") continue; // The site is HTTPS; HTTP audio is blocked as mixed content.
       const response = await fetchWithTimeout(url, {
         headers: {
           "User-Agent": "SolomudRadioHealthCheck/1.0",
