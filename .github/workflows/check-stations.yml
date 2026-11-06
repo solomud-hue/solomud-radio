@@ -1,0 +1,37 @@
+name: Check radio station streams
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  check-streams:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Test Moldova, Romania and Russia streams
+        run: node scripts/check-stations.mjs > station-status.json
+
+      - name: Save updated station status
+        run: |
+          if ! git diff --quiet -- station-status.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add station-status.json
+            git commit -m "Update radio station health status"
+            git push
+          else
+            echo "Station status has not changed."
+          fi
