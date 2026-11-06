@@ -27,12 +27,12 @@ jobs:
         run: python scripts/check_streams.py
       - name: Commit updated status
         run: |
-          if git diff --quiet -- station-status.json; then
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f station-status.json
+          if git diff --cached --quiet -- station-status.json; then
             echo "Stream status unchanged."
             exit 0
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add station-status.json
           git commit -m "Update radio stream health status"
           git push
