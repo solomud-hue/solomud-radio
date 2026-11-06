@@ -131,7 +131,8 @@ function storedStationHealth(s){
 }
 function stationHealth(s){
  const h=runtimeStationHealth[stationId(s)]||storedStationHealth(s);
- if(h&&h.working===true)return '<span class="station-health"><i class="health-dot ok"></i> Поток проверен</span>';
+ if(runtimeStationHealth[stationId(s)]&&runtimeStationHealth[stationId(s)].working===true)return '<span class="station-health"><i class="health-dot ok"></i> Запустился в браузере</span>';
+ if(h&&h.working===true)return '<span class="station-health"><i class="health-dot ok"></i> Проверен сервером</span>';
  if(h&&h.working===false)return '<span class="station-health"><i class="health-dot bad"></i> Не работает</span>';
  return '<span class="station-health"><i class="health-dot"></i> Проверим при запуске</span>';
 }
@@ -281,7 +282,7 @@ async function playStation(s){
  switchingStream=false;if(!started){playing=false;$("status").textContent=urls.length?"Все потоки станции недоступны":"У станции нет доступной ссылки на поток";console.warn("Не удалось запустить станцию:",s.name,lastError)}updatePlayer();render();
 }
 async function recoverCurrentStream(reason){
- if(!current||!playing||switchingStream||audio.paused)return;switchingStream=true;clearTimeout(waitingTimer);
+ if(!current||!playing||switchingStream)return;switchingStream=true;clearTimeout(waitingTimer);
  const urls=streamCandidates(current).filter(url=>url!==activeStreamUrl);$("status").textContent="Поток прервался — ищем резервный…";
  for(let i=0;i<urls.length;i++){try{await tryStream(urls[i]);activeStreamUrl=urls[i];runtimeStationHealth[stationId(current)]={working:true,streamUrl:urls[i]};playing=true;switchingStream=false;$("status").textContent="Переключено на резервный поток";markListening();updatePlayer();render();return}catch(e){audio.pause();audio.removeAttribute("src");audio.load()}}
  switchingStream=false;playing=false;stopListening();$("status").textContent="Не удалось восстановить эфир. Выберите другую станцию";console.warn("Автовосстановление не удалось:",reason);updatePlayer();render();
@@ -290,7 +291,7 @@ function updatePlayer(){$("toggle").textContent=playing?"Ⅱ":"▶";if(!current)
 $("toggle").addEventListener("click",async()=>{if(!current){$("status").textContent="Сначала выберите станцию";return}if(playing){audio.pause();playing=false;$("status").textContent="Пауза"}else{try{await audio.play();playing=true;$("status").textContent="В эфире"}catch{$("status").textContent="Не удалось запустить поток"}}updatePlayer();render()});
 audio.addEventListener("playing",()=>{clearTimeout(waitingTimer);warmedStationId=current?stationId(current):null;playing=true;if(!$("status").textContent.includes("резерв"))$("status").textContent="В эфире";markListening();updatePlayer();render()});
 audio.addEventListener("waiting",()=>{if(!playing||switchingStream)return;clearTimeout(waitingTimer);waitingTimer=setTimeout(()=>recoverCurrentStream("долгая остановка буфера"),12000)});
-audio.addEventListener("pause",()=>{stopListening();if(!audio.ended){playing=false;updatePlayer();render()}});
+audio.addEventListener("pause",()=>{stopListening();if(audio.ended||switchingStream)return;if(playing&&current){recoverCurrentStream("поток неожиданно остановился");return}playing=false;updatePlayer();render()});
 audio.addEventListener("error",()=>{stopListening();if(playing&&!switchingStream){recoverCurrentStream("ошибка аудиопотока");return}if(!switchingStream){$("status").textContent="Ошибка потока. Выберите другую станцию";playing=false;updatePlayer();render()}});
 audio.addEventListener("ended",()=>{stopListening();if(playing&&!switchingStream)recoverCurrentStream("эфир завершился")});
 audio.addEventListener("emptied",stopListening);
