@@ -47,9 +47,10 @@ footer{color:#71809a;text-align:center;font-size:12px;margin-top:35px}
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
 <script>
 const countries={Moldova:{flag:"🇲🇩",title:"Радио Молдовы"},Russia:{flag:"🇷🇺",title:"Радио России"},Romania:{flag:"🇷🇴",title:"Радио Румынии"}};
-let country="Moldova",all=[],current=null,playing=false,viewMode="all",healthStatus={stations:{},countries:{}};
+let country="Moldova",all=[],current=null,playing=false,viewMode="all",healthStatus={stations:{},countries:{}},hlsPlayer=null;
 const $=id=>document.getElementById(id),audio=$("audio");
 
 const firebaseConfig={apiKey:"AIzaSyAQbauuRrbCqFiBcYGJudI4dKFaq6olA5s",authDomain:"solomud-radio.firebaseapp.com",databaseURL:"https://solomud-radio-default-rtdb.europe-west1.firebasedatabase.app",projectId:"solomud-radio",storageBucket:"solomud-radio.firebasestorage.app",messagingSenderId:"819052556755",appId:"1:819052556755:web:1afd00e3f3a9614f0f3f26"};
@@ -165,6 +166,7 @@ async function tryStream(url){
    clearTimeout(timer);
    audio.removeEventListener("playing",onPlaying);
    audio.removeEventListener("error",onError);
+   if(!ok&&hlsPlayer){hlsPlayer.destroy();hlsPlayer=null}
    ok?resolve(true):reject(error||new Error("Поток не запустился"));
   };
   const onPlaying=()=>finish(true);
@@ -173,8 +175,18 @@ async function tryStream(url){
   audio.addEventListener("playing",onPlaying,{once:true});
   audio.addEventListener("error",onError,{once:true});
   try{
-   audio.src=url;audio.load();
-   await audio.play();
+   if(hlsPlayer){hlsPlayer.destroy();hlsPlayer=null}
+   audio.removeAttribute("src");audio.load();
+   if(/\\.m3u8(?:$|[?#])/i.test(url)&&window.Hls&&!audio.canPlayType("application/vnd.apple.mpegurl")){
+    if(!Hls.isSupported())throw new Error("HLS не поддерживается браузером");
+    hlsPlayer=new Hls({enableWorker:true,lowLatencyMode:true,backBufferLength:30});
+    hlsPlayer.on(Hls.Events.ERROR,(event,data)=>{if(data.fatal)finish(false,new Error("Ошибка HLS-потока"))});
+    hlsPlayer.on(Hls.Events.MANIFEST_PARSED,()=>audio.play().catch(finish.bind(null,false)));
+    hlsPlayer.loadSource(url);hlsPlayer.attachMedia(audio);
+   }else{
+    audio.src=url;audio.load();
+    await audio.play();
+   }
   }catch(error){finish(false,error)}
  });
 }
