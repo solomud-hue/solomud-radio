@@ -137,6 +137,8 @@ function streamCandidates(s){
  const out=[];
  // Prefer the broadcaster's official HTTPS stream for Radio Romania Actualitati.
  if(/radio\s*rom[âa]nia\s*actualit[ăa]ți|radio\s*romania\s*actualitati/i.test(s.name||""))out.push("https://stream4.srr.ro:8443/romania-actualitati");
+ // ProFM stream listed by a current radio-stream directory; try before Radio Browser URLs.
+ if(/pro\\s*fm/i.test(s.name||""))out.push("https://edge126.rcs-rds.ro/profm/profm.mp3");
  // Official Europa FM AAC HTTPS stream (64 kbps).
  if(/europa\s*fm/i.test(s.name||""))out.push("https://astreaming.edi.ro:8443/EuropaFM_aac");
  const raw=[s.url_resolved,s.url].filter(Boolean);
