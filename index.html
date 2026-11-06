@@ -140,7 +140,7 @@ async function load(){
  const hasCountryCheck=!!(healthStatus.countries&&healthStatus.countries[codes[country]]&&healthStatus.countries[codes[country]].tested>0);
  all=data.filter(s=>{
   const status=healthStatus.stations&&healthStatus.stations[s.stationuuid];
-  const nameOK=!/aquarelle|radio\\s*manele\\s*premium/i.test(s.name);
+  const nameOK=!/aquarelle|radio\s*manele\s*premium/i.test(s.name);
   return (s.url_resolved||s.url)&&s.name&&nameOK&&hasCountryCheck&&status&&status.working===true&&status.streamUrl;
  }).sort((x,y)=>(y.clickcount||y.votes||0)-(x.clickcount||x.votes||0));
  const stationLimit=country==="Moldova"?87:1000;
@@ -163,7 +163,7 @@ $("stations").addEventListener("pointerover",e=>{
  const station=all.find(x=>stationId(x)===id);
  if(!station)return;
  const url=streamCandidates(station)[0];
- if(!url||/\\.m3u8(?:$|[?#])/i.test(url))return;
+ if(!url||/\.m3u8(?:$|[?#])/i.test(url))return;
  if(hlsPlayer){hlsPlayer.destroy();hlsPlayer=null}
  audio.pause();audio.preload="auto";audio.src=url;audio.load();
  warmedStationId=id;
@@ -186,7 +186,7 @@ $("stations").addEventListener("keydown",e=>{
 function streamCandidates(s){
  const out=[];
  const verified=healthStatus.stations&&healthStatus.stations[s.stationuuid];
- if(verified&&verified.working===true&&verified.streamUrl)return [verified.streamUrl];
+ if(verified&&verified.working===true&&verified.streamUrl)out.push(verified.streamUrl);
  // Prefer the broadcaster's official HTTPS stream for Radio Romania Actualitati.
  if(/radio\s*rom[âa]nia\s*actualit[ăa]ți|radio\s*romania\s*actualitati/i.test(s.name||""))out.push("https://stream4.srr.ro:8443/romania-actualitati");
  // ProFM stream listed by a current radio-stream directory; try before Radio Browser URLs.
@@ -227,7 +227,7 @@ async function tryStream(url){
    if(hlsPlayer){hlsPlayer.destroy();hlsPlayer=null}
    const alreadyWarm=audio.src===url&&audio.readyState>0;
    if(!alreadyWarm){audio.removeAttribute("src");audio.load()}
-   if(/\\.m3u8(?:$|[?#])/i.test(url)&&window.Hls&&!audio.canPlayType("application/vnd.apple.mpegurl")){
+   if(/\.m3u8(?:$|[?#])/i.test(url)&&window.Hls&&!audio.canPlayType("application/vnd.apple.mpegurl")){
     if(!Hls.isSupported())throw new Error("HLS не поддерживается браузером");
     hlsPlayer=new Hls({enableWorker:true,lowLatencyMode:true,backBufferLength:30});
     hlsPlayer.on(Hls.Events.ERROR,(event,data)=>{if(data.fatal)finish(false,new Error("Ошибка HLS-потока"))});
