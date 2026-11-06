@@ -140,7 +140,8 @@ async function load(){
  let data=[],lastError=null;
  for(const host of hosts){
   try{
-   const res=await fetch(host+"/json/stations/bycountrycodeexact/"+codes[country]+"?hidebroken=true&order=clickcount&reverse=true&limit=1000",{headers:{Accept:"application/json"}});
+   const params=new URLSearchParams({countrycode:codes[country],hidebroken:"true",bitrateMin:"128",order:"clickcount",reverse:"true",limit:"1000"});
+   const res=await fetch(host+"/json/stations/search?"+params.toString(),{headers:{Accept:"application/json","User-Agent":"SolomudRadio/1.0"}});
    if(!res.ok)throw Error("HTTP "+res.status);
    const rows=await res.json();
    if(!Array.isArray(rows))throw Error("Bad catalogue response");
@@ -148,12 +149,19 @@ async function load(){
    if(data.length)break;
   }catch(e){lastError=e}
  }
- all=data.filter(s=>(s.url_resolved||s.url)&&s.name&&!/aquarelle|radio\s*manele\s*premium/i.test(s.name)).sort((x,y)=>(y.clickcount||y.votes||0)-(x.clickcount||x.votes||0));
+ const seenStreams=new Set();
+ all=data.filter(s=>{
+  const url=String(s.url_resolved||s.url||"").trim();
+  if(!s.name||!url||!/^https:\/\//i.test(url)||Number(s.bitrate||0)<128||s.lastcheckok===0||/aquarelle|radio\s*manele\s*premium/i.test(s.name))return false;
+  const key=url.toLowerCase().replace(/\/$/,"");
+  if(seenStreams.has(key))return false;
+  seenStreams.add(key);return true;
+ }).sort((x,y)=>(y.clickcount||y.votes||0)-(x.clickcount||x.votes||0));
   if(country==="Russia"){
    all=all.filter(s=>!/\bdfm\b/i.test(s.name));
    all.unshift({stationuuid:"solomud-dfm-moscow",name:"DFM Москва",url:"https://dfm.hostingradio.ru/dfm96.aacp",url_resolved:"https://dfm.hostingradio.ru/dfm96.aacp",country:"Russia",countrycode:"RU",tags:"Dance, Pop",bitrate:0,clickcount:999999});
   }
- const stationLimit=country==="Moldova"?87:1000;
+ const stationLimit=1000;
  all=all.slice(0,stationLimit).map((s,index)=>({...s,stationNo:index+1,stationCountry:country}));
  const savedNow=savedStations();all.forEach(s=>{const id=stationId(s);if(favs().includes(id))savedNow[id]=s});localStorage.setItem("solomud-fav-stations",JSON.stringify(savedNow));
  if(all.length){render();return}
