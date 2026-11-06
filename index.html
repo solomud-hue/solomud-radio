@@ -68,7 +68,7 @@ footer{color:#9b9bbd}
 @media(max-width:380px){.powered,.made{font-size:8px}.country small{display:none}.station{gap:7px}.stationlogo{width:36px;height:36px}}
 @media(hover:none){.station:hover,.country:hover,.play:hover,.mainplay:hover{transform:none}}
 
-.health-panel{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}.health-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid #ffffff20;border-radius:12px;background:#151a31;color:#cbd4ef;font-size:12px}.health-dot{width:8px;height:8px;border-radius:50%;background:#ffd36a;display:inline-block}.health-dot.ok{background:#42f5cf;box-shadow:0 0 8px #42f5cf88}.station-health{font-size:10px!important;display:block!important;color:#aab3d1!important;margin-top:3px}.station-health .health-dot{width:6px;height:6px;margin-right:4px}
+
 
 /* Station numbers: clear bright blue */
 .station-number{color:#258cff!important;border-color:#258cff!important;background:linear-gradient(145deg,#102b50,#25204b)!important;text-shadow:0 0 12px #258cffcc!important;}
@@ -81,7 +81,7 @@ footer{color:#9b9bbd}
 <button class="country" data-country="Russia"><span class="flag ru" role="img" aria-label="Флаг России"><span></span><span></span><span></span></span><strong>Россия</strong><small>Радиостанции страны</small></button>
 <button class="country" data-country="Romania"><span class="flag ro" role="img" aria-label="Флаг Румынии"><span></span><span></span><span></span></span><strong>Румыния</strong><small>Радиостанции страны</small></button>
 </section>
-<div class="sectionhead"><h2 id="countryTitle">🇲🇩 Радио Молдовы</h2><span class="count" id="count">Загружаем станции…</span></div><div class="health-panel" id="healthPanel" aria-live="polite"></div>
+<div class="sectionhead"><h2 id="countryTitle">🇲🇩 Радио Молдовы</h2><span class="count" id="count">Загружаем станции…</span></div>
 <div class="viewtabs" role="group" aria-label="Каталог станций"><button class="viewtab active" id="allTab" type="button">Все станции</button><button class="viewtab" id="favTab" type="button">★ Избранное <span id="favCount">0</span></button></div>
 <div class="toolbar"><input class="search" id="search" placeholder="Найти радиостанцию…" aria-label="Поиск станции"><select class="select" id="sort"><option value="votes">Популярные</option><option value="name">По названию</option><option value="bitrate">По качеству потока</option></select></div>
 <div class="stations" id="stations"><div class="empty">Подключаем каталог радиостанций…</div></div>
@@ -96,7 +96,7 @@ footer{color:#9b9bbd}
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
 <script>
 const countries={Moldova:{flag:"🇲🇩",title:"Радио Молдовы"},Russia:{flag:"🇷🇺",title:"Радио России"},Romania:{flag:"🇷🇴",title:"Радио Румынии"}};
-let country="Moldova",all=[],current=null,playing=false,viewMode="all",healthStatus={stations:{},countries:{}},hlsPlayer=null,warmedStationId=null,activeStreamUrl=null,switchingStream=false,waitingTimer=null,streamRequest=0;
+let country="Moldova",all=[],current=null,playing=false,viewMode="all",hlsPlayer=null,warmedStationId=null,activeStreamUrl=null,switchingStream=false,waitingTimer=null,streamRequest=0;
 const $=id=>document.getElementById(id),audio=$("audio");
 
 const firebaseConfig={apiKey:"AIzaSyAQbauuRrbCqFiBcYGJudI4dKFaq6olA5s",authDomain:"solomud-radio.firebaseapp.com",databaseURL:"https://solomud-radio-default-rtdb.europe-west1.firebasedatabase.app",projectId:"solomud-radio",storageBucket:"solomud-radio.firebasestorage.app",messagingSenderId:"819052556755",appId:"1:819052556755:web:1afd00e3f3a9614f0f3f26"};
@@ -121,8 +121,6 @@ function saveFavs(a){localStorage.setItem("solomud-favs",JSON.stringify(a))}
 function stationId(s){return s.stationuuid||s.url_resolved||s.name}
 function savedStations(){try{return JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{return{}}}
 function findStation(id){return all.find(x=>stationId(x)===id)||savedStations()[id]||null}
-function stationHealth(s){const h=healthStatus.stations&&healthStatus.stations[s.stationuuid];if(h&&h.working===true)return '<span class="station-health"><i class="health-dot ok"></i> Поток проверен</span>';if(h&&h.working===false)return '<span class="station-health"><i class="health-dot bad"></i> Не работает</span>';return '<span class="station-health"><i class="health-dot"></i> Статус не проверен</span>'}
-function renderHealth(){const code={Moldova:"MD",Russia:"RU",Romania:"RO"}[country];const tested=healthStatus.countries&&healthStatus.countries[code];const ok=all.filter(x=>healthStatus.stations&&healthStatus.stations[x.stationuuid]&&healthStatus.stations[x.stationuuid].working===true).length;$("healthPanel").innerHTML='<span class="health-chip"><i class="health-dot ok"></i> Проверено: '+ok+'</span><span class="health-chip"><i class="health-dot"></i> Без проверки: '+(all.length-ok)+'</span><span class="health-chip">'+(tested&&tested.tested?"Контроль обновлён":"Контроль ожидает обновления")+'</span>'}
 function render(){
  const q=$("search").value.trim().toLowerCase(),sort=$("sort").value;
  const saved=(()=>{try{return JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{return{}}})();
@@ -133,17 +131,13 @@ function render(){
  if(viewMode==="favorites")$("countryTitle").textContent="★ Моё избранное";else $("countryTitle").textContent=countries[country].flag+" "+countries[country].title;
  $("favCount").textContent=favs().length;
  $("allTab").classList.toggle("active",viewMode==="all");$("favTab").classList.toggle("active",viewMode==="favorites");
- $("stations").innerHTML=list.length?list.map((s,index)=>{const id=stationId(s),isFav=favs().includes(id),isPlaying=current&&stationId(current)===id&&playing,stationFlag=countries[s.stationCountry||country]?.flag||"📻";return '<article class="station '+(isPlaying?'playing':'')+'" data-station="'+esc(id)+'" role="button" tabindex="0" aria-label="Слушать '+esc(s.name)+'"><span class="station-number" title="Номер станции">'+(index+1)+'</span><img class="stationlogo" src="'+esc(s.favicon||"")+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'" alt=""><div class="stationlogo fallback" style="display:none">'+stationFlag+'</div><div class="stationinfo"><strong>'+esc(s.name)+'</strong><small>'+esc((s.tags||"Радио") .split(",").slice(0,2).join(" · ")||"Радиостанция")+' · '+(s.bitrate?s.bitrate+" кбит/с":"качество не указано")+'</small>'+stationHealth(s)+'</div>'+(isPlaying?'<span class="equalizer" title="Сейчас играет" aria-label="Сейчас играет"><i></i><i></i><i></i><i></i></span>':'')+'<button class="fav '+(isFav?"on":"")+'" data-fav="'+esc(id)+'" title="Избранное">★</button><button class="play" data-play="'+esc(id)+'" title="Слушать">'+(isPlaying?"Ⅱ":"▶")+'</button></article>'}).join(""):'<div class="empty">'+(viewMode==="favorites"?"Вы ещё не добавили станции в избранное. Нажмите ★ на карточке любой станции.":"Станции не найдены. Попробуйте изменить запрос.")+'</div>';
+ $("stations").innerHTML=list.length?list.map((s,index)=>{const id=stationId(s),isFav=favs().includes(id),isPlaying=current&&stationId(current)===id&&playing,stationFlag=countries[s.stationCountry||country]?.flag||"📻";return '<article class="station '+(isPlaying?'playing':'')+'" data-station="'+esc(id)+'" role="button" tabindex="0" aria-label="Слушать '+esc(s.name)+'"><span class="station-number" title="Номер станции">'+(index+1)+'</span><img class="stationlogo" src="'+esc(s.favicon||"")+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'" alt=""><div class="stationlogo fallback" style="display:none">'+stationFlag+'</div><div class="stationinfo"><strong>'+esc(s.name)+'</strong><small>'+esc((s.tags||"Радио") .split(",").slice(0,2).join(" · ")||"Радиостанция")+' · '+(s.bitrate?s.bitrate+" кбит/с":"качество не указано")+'</small>'+'</div>'+(isPlaying?'<span class="equalizer" title="Сейчас играет" aria-label="Сейчас играет"><i></i><i></i><i></i><i></i></span>':'')+'<button class="fav '+(isFav?"on":"")+'" data-fav="'+esc(id)+'" title="Избранное">★</button><button class="play" data-play="'+esc(id)+'" title="Слушать">'+(isPlaying?"Ⅱ":"▶")+'</button></article>'}).join(""):'<div class="empty">'+(viewMode==="favorites"?"Вы ещё не добавили станции в избранное. Нажмите ★ на карточке любой станции.":"Станции не найдены. Попробуйте изменить запрос.")+'</div>';
 }
 async function load(){
  $("stations").innerHTML='<div class="empty">Загружаем каталог радиостанций…</div>';$("count").textContent="Загрузка…";
  const codes={Moldova:"MD",Russia:"RU",Romania:"RO"};
  const hosts=["https://de1.api.radio-browser.info","https://at1.api.radio-browser.info","https://nl1.api.radio-browser.info"];
  let data=[],lastError=null;
- try{
-  const hr=await fetch("./station-status.json?ts="+Date.now(),{cache:"no-store"});
-  if(hr.ok)healthStatus=await hr.json();
- }catch(e){}
  for(const host of hosts){
   try{
    const res=await fetch(host+"/json/stations/bycountrycodeexact/"+codes[country]+"?hidebroken=true&order=clickcount&reverse=true&limit=1000",{headers:{Accept:"application/json"}});
@@ -162,7 +156,7 @@ async function load(){
  const stationLimit=country==="Moldova"?87:1000;
  all=all.slice(0,stationLimit).map((s,index)=>({...s,stationNo:index+1,stationCountry:country}));
  const savedNow=savedStations();all.forEach(s=>{const id=stationId(s);if(favs().includes(id))savedNow[id]=s});localStorage.setItem("solomud-fav-stations",JSON.stringify(savedNow));
- if(all.length){renderHealth();render();return}
+ if(all.length){render();return}
  $("count").textContent=lastError?"Каталог недоступен":"0 станций";
  $("stations").innerHTML='<div class="empty">Не удалось получить станции. Попробуйте обновить каталог чуть позже.</div>';
 }
