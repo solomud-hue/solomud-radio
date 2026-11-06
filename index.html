@@ -104,7 +104,7 @@ async function load(){
  all=data.filter(s=>{
   const status=health.stations&&health.stations[s.stationuuid];
   const nameOK=!/aquarelle/i.test(s.name)||(status&&status.working===true);
-  return (s.url_resolved||s.url)&&s.name&&nameOK&&(!status||status.working!==false);
+  return (s.url_resolved||s.url)&&s.name&&nameOK&&status&&status.working===true;
  }).sort((x,y)=>(y.clickcount||y.votes||0)-(x.clickcount||x.votes||0));
  const stationLimit=country==="Moldova"?87:1000;
  all=all.slice(0,stationLimit).map((s,index)=>({...s,stationNo:index+1,stationCountry:country}));
