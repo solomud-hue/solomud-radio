@@ -154,12 +154,7 @@ async function load(){
    if(data.length)break;
   }catch(e){lastError=e}
  }
- const hasCountryCheck=!!(healthStatus.countries&&healthStatus.countries[codes[country]]&&healthStatus.countries[codes[country]].tested>0);
- all=data.filter(s=>{
-  const status=healthStatus.stations&&healthStatus.stations[s.stationuuid];
-  const nameOK=!/aquarelle|radio\s*manele\s*premium/i.test(s.name);
-  return (s.url_resolved||s.url)&&s.name&&nameOK&&hasCountryCheck&&(!status||status.working!==false);
- }).sort((x,y)=>(y.clickcount||y.votes||0)-(x.clickcount||x.votes||0));
+ all=data.filter(s=>(s.url_resolved||s.url)&&s.name&&!/aquarelle|radio\s*manele\s*premium/i.test(s.name)).sort((x,y)=>(y.clickcount||y.votes||0)-(x.clickcount||x.votes||0));
  const stationLimit=country==="Moldova"?87:1000;
  all=all.slice(0,stationLimit).map((s,index)=>({...s,stationNo:index+1,stationCountry:country}));
  const savedNow=savedStations();all.forEach(s=>{const id=stationId(s);if(favs().includes(id))savedNow[id]=s});localStorage.setItem("solomud-fav-stations",JSON.stringify(savedNow));
@@ -203,26 +198,7 @@ $("stations").addEventListener("keydown",e=>{
 });
 function streamCandidates(s){
  const out=[];
- const verified=healthStatus.stations&&healthStatus.stations[s.stationuuid];
- if(verified&&verified.working===true&&verified.streamUrl)out.push(verified.streamUrl);
- // Prefer the broadcaster's official HTTPS stream for Radio Romania Actualitati.
- if(/radio\s*rom[âa]nia\s*actualit[ăa]ți|radio\s*romania\s*actualitati/i.test(s.name||""))out.push("https://stream4.srr.ro:8443/romania-actualitati");
- // ProFM stream listed by a current radio-stream directory; try before Radio Browser URLs.
- if(/pro\s*fm/i.test(s.name||""))out.push("https://edge126.rcs-rds.ro/profm/profm.mp3");
- // Official Europa FM AAC HTTPS stream (64 kbps).
- if(/europa\s*fm/i.test(s.name||""))out.push("https://astreaming.edi.ro:8443/EuropaFM_aac");
- const raw=[s.url_resolved,s.url].filter(Boolean);
- for(const value of raw){
-  try{
-   const u=new URL(value);
-   const variants=[];
-   if(u.protocol==="https:")variants.push(u.href);
-   else if(u.protocol==="http:"){
-    const secure=new URL(u.href);secure.protocol="https:";variants.push(secure.href,u.href);
-   }else variants.push(u.href);
-   for(const v of variants)if(!out.includes(v))out.push(v);
-  }catch{}
- }
+ for(const value of [s.url_resolved,s.url])if(value&&!out.includes(value))out.push(value);
  return out;
 }
 async function tryStream(url){
@@ -260,11 +236,12 @@ async function tryStream(url){
 }
 async function playStation(s){
  if(current&&stationId(current)===stationId(s)&&playing){audio.pause();playing=false;updatePlayer();render();return}
- const request=++streamRequest;switchingStream=true;clearTimeout(waitingTimer);current=s;updateListenerCount();playing=false;activeStreamUrl=null;
- $("nowName").textContent=s.name;$("nowMeta").textContent=(s.stationCountry?countries[s.stationCountry].flag+" · ":"")+(s.bitrate?s.bitrate+" кбит/с":"Качество зависит от станции");$("status").textContent="Проверяем подключение…";$("toggle").textContent="…";
- const urls=streamCandidates(s);audio.pause();audio.removeAttribute("src");audio.load();audio.preload="auto";let started=false,lastError=null;
- for(let i=0;i<urls.length;i++){if(request!==streamRequest)return;try{$("status").textContent="Проверяем поток "+(i+1)+" из "+urls.length+"…";await tryStream(urls[i]);if(request!==streamRequest)return;activeStreamUrl=urls[i];started=true;playing=true;$("status").textContent=i?"Подключено к резервному потоку":"В эфире";break}catch(error){lastError=error;audio.pause();audio.removeAttribute("src");audio.load()}}
- switchingStream=false;if(!started){playing=false;$("status").textContent=urls.length?"Все потоки станции недоступны":"У станции нет доступной ссылки на поток";console.warn("Не удалось запустить станцию:",s.name,lastError)}updatePlayer();render();
+ const request=++streamRequest;current=s;updateListenerCount();playing=false;activeStreamUrl=null;
+ $("nowName").textContent=s.name;$("nowMeta").textContent=(s.stationCountry?countries[s.stationCountry].flag+" · ":"")+(s.bitrate?s.bitrate+" кбит/с":"Качество зависит от станции");$("status").textContent="Подключаемся…";$("toggle").textContent="…";
+ const urls=streamCandidates(s);audio.pause();audio.removeAttribute("src");audio.load();let started=false;
+ for(const url of urls){if(request!==streamRequest)return;try{audio.src=url;audio.load();await audio.play();if(request!==streamRequest)return;activeStreamUrl=url;started=true;playing=true;$("status").textContent="В эфире";break}catch(error){audio.pause();audio.removeAttribute("src");audio.load()}}
+ if(!started){playing=false;$("status").textContent="Поток не запустился — попробуйте другую станцию"}
+ updatePlayer();render();
 }
 async function recoverCurrentStream(reason){
  if(!current||!playing||switchingStream||audio.paused)return;switchingStream=true;clearTimeout(waitingTimer);
