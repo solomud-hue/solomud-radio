@@ -442,6 +442,7 @@ async function load(){
    if(stationName.startsWith("retro fm"))logo="https://moldova.mom-gmr.org/downloads/Archive/2024/MediaOutletLogos/MDA/4224.png";
    else if(stationName.startsWith("hit fm"))logo="https://hitfm.md/img/channel/FD2xq5aZnF3oSabfMpUfNjRGijKCL8WT.png";
   }
+  if(String(s.countrycode||"").toUpperCase()==="RU"&&stationName.startsWith("радио ностальжи россия"))logo="https://cdn.freebiesupply.com/logos/large/2x/nostalgie-radio-logo-png-transparent.png";
   const enriched=logo?{...s,favicon:logo}:s;
   return check&&check.working===true&&check.streamUrl?{...enriched,url_resolved:check.streamUrl,url:check.streamUrl,verifiedLatencyMs:check.latencyMs}:enriched;
  }).filter(Boolean);
