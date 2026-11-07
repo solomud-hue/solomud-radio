@@ -310,6 +310,18 @@ body[data-theme]:not([data-theme="original"]) .select option{background:var(--pa
 .equalizer i{animation:none!important;transform:scaleY(var(--eq-level,.12));height:18px!important;transition:transform .08s linear}
 @media(max-width:700px){.theme-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.theme-swatch{height:32px}.atmosphere{padding:12px}.eq-canvas{height:86px}.atmosphere-head span{font-size:10px}}
 
+
+/* Studio spectrum: luminous LED columns, peak caps and a reflected stage. */
+.station-screen-inner{height:max-content;min-height:100dvh}.station-screen-inner > *{flex-shrink:0}
+.eq-panel{isolation:isolate;border-radius:20px;border-color:color-mix(in srgb,var(--eq-a) 25%,transparent);background:radial-gradient(ellipse at 50% 100%,color-mix(in srgb,var(--eq-a) 10%,transparent),transparent 65%),linear-gradient(155deg,#08101bd9,#050811ef);box-shadow:inset 0 1px 0 #ffffff0b,0 12px 32px #0003}
+.eq-panel::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 90%,color-mix(in srgb,var(--eq-b) 13%,transparent),transparent 70%);opacity:calc(.25 + var(--bass,0)*.65)}
+.eq-head{padding:14px 18px 2px}.eq-label{display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:2px}.eq-label::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--eq-a);box-shadow:0 0 calc(3px + var(--bass,0)*10px) var(--eq-a);opacity:calc(.35 + var(--bass,0)*.65)}
+.eq-canvas{height:180px}.eq-status{padding:0 18px 12px;font-size:10px}.screen-eq{width:min(100%,660px);max-width:660px;min-height:0;margin:22px 0 18px;border-radius:24px}.screen-eq .eq-canvas{height:228px}.eq-caption{font:600 9px/1.3 system-ui;letter-spacing:1.5px;color:#96a6bd}
+.station .equalizer{width:48px;height:34px;padding:6px;gap:3px;border-radius:10px;background:linear-gradient(145deg,#060e1de6,#101c2bea);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--eq-a) 28%,transparent),0 0 12px color-mix(in srgb,var(--eq-a) 12%,transparent);filter:none;align-items:flex-end;flex-shrink:0}
+.station .equalizer i{width:4px;height:21px!important;border-radius:2px;transform-origin:center bottom;background:linear-gradient(to top,var(--eq-a),var(--eq-b) 65%,var(--eq-c))!important;box-shadow:0 0 6px color-mix(in srgb,var(--eq-a) 65%,transparent)!important;opacity:.95;transition:transform .06s linear}
+@media(max-width:650px){.eq-head{padding:12px 12px 0}.eq-label{font-size:9px;letter-spacing:1.3px}.eq-caption{font-size:8px;letter-spacing:1px}.eq-canvas{height:148px}.screen-eq{margin:18px 0 14px;border-radius:18px}.screen-eq .eq-canvas{height:190px}.station .equalizer{width:42px;padding:6px 5px;gap:2px}.eq-status{padding:0 12px 10px}.eq-toggle{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.eq-panel::before{opacity:.25}.station .equalizer i{transition:none}}
+
 </style></head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><div class="logo-wrap"><img class="logo-photo" id="brandPhoto" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABcQERQRDhcUEhQaGBcbIjklIh8fIkYyNSk5UkhXVVFIUE5bZoNvW2F8Yk5QcptzfIeLkpSSWG2grJ+OqoOPko3/2wBDARgaGiIeIkMlJUONXlBejY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY3/wAARCACcAFgDASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAAECBAUDBv/EAC4QAAIBAwQABQIGAwEAAAAAAAECAAMEERIhMUEFEyJRYVJxMmKBobHBFELRkf/EABgBAAMBAQAAAAAAAAAAAAAAAAABAgME/8QAGxEBAQEAAwEBAAAAAAAAAAAAAAERAhIhMVH/2gAMAwEAAhEDEQA/AOsI4pszKKSigCijigCnKpVWmyghjqOAQM7zrKlxbgVUZXdWd98H49oULMUVJWWmA7am7PvJRkQJBBBwRxCEIGsxRxRAopKKAKKOKAKU72uKNSlkZwdX9S5KPiq5ooccNC/Di4DkAjgwkaW9FD+USUZFCEIEsxRxRGUUlEYBzqv5VMuVLAbkDmULi+IOkHHrHqX6ZoVFDU2Vs4I3xPPu6lRt6pPK4qRu06gq0w68NxKHirklKY45l4FaFqpbYKo/iZVDVdXql98nJhy/CjWRdKKvsAI44SyRhHCAWMRSwlHWwHAMsGzpknGZHaQ8Z0TEKCScAdmXGsXzsQZheIXakNSXpsH5heUGCr4gGZqagBTtqMo1BSZl0bAbYxI60UkhNRP1f8nMsSfvM7bVY7Xdw9ep6iMLsAOJf8Mt/Ko+Yw9T8fAmZSUPWRTwWAM9DjEvj76VKKSiMtJQhCML9OtobOMzuLtfplQjBikZD1dNyOsTNfw+yeuajoxJOSNWxnQxEw6nrH8aSil4ooKFXQMqBtMzuXvEzqvHPtgSj3Iqo7W211Sz9Y/megxPOU20urezAz0srimomRMmZEy0owjhGGuSj7MokHtkOSpIMakdyNSsBsJlNW4VKLIMmcjOruT3K11VFG3Z26GJaWDWYvUdzuSxMrdzs1RcYUcnucQRMln1PS0zqpIfdQZ5sET0Fm+u0pH8uJXFNdSJEyZkTNCRhGYRk1WSmp3OP1nN6QZcowImbe1jc1QofAG4ErrdV6LaUfK54E5+1W0mUqcGVr4IbOprGRjb7ztRqi4UMNuiD0Zw8YC07I7gliAJpvhMG3o+dUfHCIWP6Qr23lUqVQtnzRnGOJpWNuE8Nr1j+N1b9AJVvgBbWnv5cnPDPw6yp3CM9QthTjA7muiLTUKgAUcASv4bTFOyUjl/UZalyJoiMISgUIQgFFxQ0OF1a13GRicKfqfScjM73DYJ0DJP+xHOJ2srXz6euqo3OQcczn+LdbSoFQ01XUdyp/7FWOcJdDW4+k4AlynTSmMIMCZd1Vb/AC6uDsGxF2tOTHFktmJOKtMnb0tmQqWoq6dNyDpGAHGMCBGeJEg+8NpmFvbZcUzlPykETUoVfNpKxBDdhhgzJy68fsYea4GCTtxnqXOVibG1FKlnctVYoxzgZBluay6i+CEIRhVp27VxpIAJAJIHA6H9zSpr5dMLnYCUra6p0bQM7ZYk7D/yV61zVuDgnQh6E5bdayLde/SkNNP1t+0y3cs7MxGonJlulajRqdW52z3OF9tcsMDgYA6ihuWTFk+0AIZjBE/EiXGZLMNiYEEqeW2pG0n4ly1unqVQjEEH4lLA9p1tiEqh86cdmVLZSsasJJAr/hYH7Qm3aIxi2VJXugpJIxk47mxRootRjpAxgD42mb4YMXbfAx+81EPqqff+hOW/Wk+CrsPtmZFy61LhmXjM0r2o1OgpXbJmUW+BCGBzF1BRvECSZRJdRADOY5FT64AyJNaihdJAyOyJE8SCjU2/tGKv2lVKdRd8g8/EJxsKS172hSfOl2AOOYSol//Z" alt="Памятник"><div class="made"><span>MADE</span> <span>IN</span> <span>MOLDOVA</span></div><div class="powered">Powered by Solomud</div></div><span class="brand-word"><span class="brand-solomud">Solomud</span> <span class="brand-web">Web</span> <span class="brand-radio">Radio</span></span></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end"><button class="install-app" id="installApp" type="button" hidden><span aria-hidden="true">＋</span><span id="installAppLabel">Установить радио</span></button><div class="language-switcher" role="group" aria-label="Язык сайта"><button class="lang-btn active" type="button" data-lang="ru">РУС</button><button class="lang-btn" type="button" data-lang="en">ENG</button><button class="lang-btn" type="button" data-lang="ro">RO</button></div><div class="listener-count is-offline" id="listenerCount" aria-live="polite"><svg class="listener-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3.7"></circle><path d="M4.4 20.5c0-4.2 3.4-7.5 7.6-7.5s7.6 3.3 7.6 7.5H4.4z"></path></svg><span class="listener-copy" id="listenerCopy">Слушателей: —</span></div></div></header>
@@ -372,7 +384,7 @@ body[data-theme]:not([data-theme="original"]) .select option{background:var(--pa
   <div class="station-screen-country" id="stationScreenCountry">РАДИО ОНЛАЙН</div>
   <h2 class="station-screen-name" id="stationScreenName">Выберите радиостанцию</h2>
   <div class="station-screen-meta" id="stationScreenMeta">Solomud Web Radio</div>
-  <div class="eq-panel screen-eq"><canvas class="eq-canvas" id="screenEqualizer" aria-label="Спектр звука радиостанции"></canvas></div>
+  <div class="eq-panel screen-eq"><div class="eq-head"><span class="eq-label">SOLOMUD · LIVE SPECTRUM</span><span class="eq-caption" aria-hidden="true">BASS / MID / HIGH</span></div><canvas class="eq-canvas" id="screenEqualizer" aria-label="Спектр звука радиостанции"></canvas></div>
   <div class="station-screen-controls">
    <button class="track-nav" id="screenPrevious" type="button" aria-label="Предыдущая радиостанция">‹</button>
    <button class="mainplay" id="screenToggle" type="button" aria-label="Воспроизвести">▶</button>
@@ -943,27 +955,57 @@ function spectrumBands(count){
  let sum=0;for(let j=from;j<to;j++)sum+=eqData[j]*eqData[j];levels[i]=Math.sqrt(sum/Math.max(1,to-from))/255;
  }return levels;
 }
+const eqPeaks=new Float32Array(64),eqPeakHold=new Float64Array(64),eqWave=new Uint8Array(2048);
+let eqDrawTime=0;
 function drawSpectrum(){
  if(!atmosphereReady)return;
- const levels=spectrumBands(48),style=getComputedStyle(document.body),a=style.getPropertyValue('--eq-a').trim(),b=style.getPropertyValue('--eq-b').trim(),c=style.getPropertyValue('--eq-c').trim();
- const bass=levels.slice(0,12).reduce((x,y)=>x+y,0)/12;
+ const now=performance.now(),dt=Math.min(.12,(now-eqDrawTime)/1000||.033);eqDrawTime=now;
+ const levels=spectrumBands(64),active=eqEnabled&&eqAnalyser&&!audio.paused&&!audio.ended&&!eqBuffering;
+ const style=getComputedStyle(document.body),a=style.getPropertyValue('--eq-a').trim(),b=style.getPropertyValue('--eq-b').trim(),c=style.getPropertyValue('--eq-c').trim();
+ const bass=levels.slice(0,16).reduce((x,y)=>x+y,0)/16;
  document.documentElement.style.setProperty('--bass',eqReduced.matches?0:bass);
- for(const id of ['mainEqualizer','screenEqualizer']){
- const canvas=$(id);if(!canvas||!canvas.clientWidth)continue;
- const rect=canvas.getBoundingClientRect();if(rect.bottom<0||rect.top>innerHeight)continue;
- const w=canvas.clientWidth,h=canvas.clientHeight,dpr=Math.min(devicePixelRatio||1,2);
- if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}
- const ctx=canvas.getContext('2d');if(!ctx)continue;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
- const grad=ctx.createLinearGradient(0,h,w,0);grad.addColorStop(0,a);grad.addColorStop(.5,b);grad.addColorStop(1,c);
- const step=(w-24)/levels.length,bar=Math.max(2,step*.62),base=h*.77;
- ctx.strokeStyle='#ffffff0b';ctx.lineWidth=1;for(let y=18;y<base;y+=22){ctx.beginPath();ctx.moveTo(12,y);ctx.lineTo(w-12,y);ctx.stroke()}
- for(let i=0;i<levels.length;i++){
- const value=Math.max(2,levels[i]*(base-10)),x=12+i*step;
- ctx.fillStyle=grad;ctx.globalAlpha=1;ctx.shadowColor=i<24?a:b;ctx.shadowBlur=eqReduced.matches?0:8*levels[i];ctx.fillRect(x,base-value,bar,value);
- ctx.shadowBlur=0;ctx.globalAlpha=.17;ctx.fillRect(x,base+5,bar,value*.19);
- }ctx.globalAlpha=1;
+ for(let i=0;i<64;i++){
+  if(!active){eqPeaks[i]=0;eqPeakHold[i]=0;continue}
+  if(levels[i]>=eqPeaks[i]){eqPeaks[i]=levels[i];eqPeakHold[i]=now+210}
+  else if(now>eqPeakHold[i])eqPeaks[i]=Math.max(levels[i],eqPeaks[i]-dt*.38);
  }
- document.querySelectorAll('.equalizer i').forEach((el,i)=>{const band=i%5,start=Math.floor(band*48/5),end=Math.floor((band+1)*48/5);const level=levels.slice(start,end).reduce((x,y)=>x+y,0)/(end-start);el.style.setProperty('--eq-level',Math.max(.12,level))});
+ if(active)eqAnalyser.getByteTimeDomainData(eqWave);else eqWave.fill(128);
+ for(const id of ['mainEqualizer','screenEqualizer']){
+  const canvas=$(id);if(!canvas||!canvas.clientWidth)continue;
+  const rect=canvas.getBoundingClientRect();if(rect.bottom<0||rect.top>innerHeight)continue;
+  const w=canvas.clientWidth,h=canvas.clientHeight,dpr=Math.min(devicePixelRatio||1,2);
+  if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}
+  const ctx=canvas.getContext('2d');if(!ctx)continue;
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+  const pad=w<400?14:20,plot=w-pad*2,base=h*.76,top=30,amplitude=base-top,step=plot/64,bar=Math.max(1.7,step*.67);
+  const gradient=ctx.createLinearGradient(pad,base,w-pad,top);gradient.addColorStop(0,a);gradient.addColorStop(.52,b);gradient.addColorStop(1,c);
+  // Quiet studio grid and logarithmically positioned frequency labels.
+  ctx.lineWidth=1;ctx.strokeStyle='#ffffff07';
+  for(let row=0;row<4;row++){const y=top+row*amplitude/4;ctx.beginPath();ctx.moveTo(pad,y+.5);ctx.lineTo(w-pad,y+.5);ctx.stroke()}
+  ctx.font='8px system-ui';ctx.fillStyle='#8da0ba';
+  for(const [freq,label]of [[60,'60 Hz'],[250,'250'],[1000,'1k'],[4000,'4k'],[12000,'12k Hz']]){
+   const x=pad+Math.log(freq/40)/Math.log(400)*plot;
+   ctx.textAlign='center';ctx.globalAlpha=.55;ctx.fillText(label,x,h-7);
+   ctx.globalAlpha=1;ctx.strokeStyle='#ffffff05';ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,base);ctx.stroke();
+  }
+  // Actual time-domain waveform, never a decorative oscillator.
+  ctx.beginPath();for(let i=0;i<=128;i++){const x=pad+i/128*plot,y=15+(eqWave[Math.min(2047,i*16)]-128)/128*10;i?ctx.lineTo(x,y):ctx.moveTo(x,y)}
+  ctx.strokeStyle=gradient;ctx.lineWidth=1;ctx.globalAlpha=active?.38:.16;ctx.stroke();ctx.globalAlpha=1;
+  const floor=ctx.createRadialGradient(w/2,base,0,w/2,base,plot*.55);floor.addColorStop(0,a+'30');floor.addColorStop(1,a+'00');
+  ctx.fillStyle=floor;ctx.globalAlpha=.3+bass*.4;ctx.fillRect(pad,base-8,plot,38);ctx.globalAlpha=1;
+  for(let i=0;i<64;i++){
+   const value=Math.max(2,levels[i]*amplitude),x=pad+i*step+(step-bar)/2;
+   ctx.fillStyle=gradient;ctx.shadowColor=i<32?a:b;ctx.shadowBlur=eqReduced.matches?0:Math.min(13,levels[i]*12);
+   // Segmented LEDs keep the silhouette crisp even on small screens.
+   for(let y=0;y<value;y+=5){const segment=Math.min(3.5,value-y);ctx.globalAlpha=.65+.35*(y/value);ctx.fillRect(x,base-y-segment,bar,segment)}
+   ctx.shadowBlur=0;ctx.globalAlpha=1;
+   if(active&&eqPeaks[i]>.035){ctx.fillStyle='#eaffff';ctx.globalAlpha=.65;ctx.fillRect(x,base-eqPeaks[i]*amplitude-4,bar,1.5)}
+   ctx.fillStyle=gradient;
+   for(let y=0;y<value*.24;y+=4){ctx.globalAlpha=.17*(1-y/Math.max(1,value*.24));ctx.fillRect(x,base+5+y,bar,2)}
+  }
+  ctx.globalAlpha=.35;ctx.fillStyle=gradient;ctx.fillRect(pad,base+2,plot,.7);ctx.globalAlpha=1;
+ }
+ document.querySelectorAll('.equalizer i').forEach((el,i)=>{const band=i%5,start=Math.floor(band*64/5),end=Math.floor((band+1)*64/5);const level=levels.slice(start,end).reduce((x,y)=>x+y,0)/(end-start);el.style.setProperty('--eq-level',Math.max(.09,level))});
  updateSpectrumStatus();
 }
 function startSpectrum(){
