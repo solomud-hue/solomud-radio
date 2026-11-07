@@ -261,6 +261,30 @@ body{background:radial-gradient(ellipse at 8% 0%,#0d776d55 0,transparent 36%),ra
 .share-copy{border-color:#42f5cf66;background:#104a4933}
 .share-status{min-height:18px;margin:8px 0 0;color:#aab3d1;font-size:11px}
 @media(max-width:650px){.install-app{font-size:10px;padding:6px 8px}.share-panel{margin:12px 0 8px;padding:12px}.share-actions{gap:6px}.share-button{padding:8px 10px;font-size:12px}}
+
+/* My wave: a quiet personal corner, independent of catalog/player layout. */
+.my-wave{margin:18px 0 24px;padding:22px;border:1px solid #62e0bf45;border-radius:22px;background:radial-gradient(ellipse at top right,#62e0bf15,transparent 65%),linear-gradient(125deg,#102824,#0d1c23);box-shadow:0 12px 30px #0002;color:#f4f6ff}
+.wave-top{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.wave-eyebrow{font-size:10px;letter-spacing:2px;color:#78d7c3;font-weight:800}
+.my-wave h2{font-size:24px;line-height:1.2;margin:6px 0 8px}
+.my-wave p{margin:0;color:#a7c2bd;font-size:13px}
+.wave-surprise{border:1px solid #71e0c6;border-radius:14px;background:linear-gradient(120deg,#b5f3d9,#69d5ca);color:#082b26;font:750 14px system-ui;padding:13px 18px;cursor:pointer;flex-shrink:0;box-shadow:0 4px 18px #62e0bf18;transition:transform .18s,box-shadow .18s}
+.wave-surprise:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 22px #62e0bf38}
+.wave-surprise:disabled{opacity:.5;cursor:wait}
+.wave-resume{display:flex;flex-direction:column;gap:6px;text-align:left;width:100%;padding:16px 18px;margin-top:18px;border:1px solid #7bdac130;border-radius:16px;background:#ffffff07;color:#f5fffa;cursor:pointer}
+.wave-resume[hidden],.my-wave [hidden]{display:none}
+.wave-resume span{font-size:12px;color:#8de5cf}.wave-resume strong{font:700 17px system-ui;overflow-wrap:anywhere}
+.wave-recent-title{margin:17px 0 9px;font-size:11px;color:#9ab7b1}
+.wave-recent{display:flex;flex-wrap:wrap;gap:8px}.wave-recent-item{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:9px 13px;border:1px solid #88b5ac35;border-radius:99px;background:#ffffff06;color:#d5e6e1;font:500 12px system-ui;cursor:pointer}
+.wave-recent-item:hover,.wave-resume:hover{border-color:#82d8c2;background:#71e0c612}
+.my-wave .wave-empty{margin-top:18px}.my-wave .wave-status:not(:empty){margin-top:12px;color:#f6d693}
+.my-wave button:focus-visible{outline:2px solid #b5f3d9;outline-offset:4px}
+.station-screen .station-screen-logo{animation:wave-glow 4s ease-in-out infinite;animation-play-state:paused}
+.station-screen.open.wave-playing .station-screen-logo{animation-play-state:running}
+@keyframes wave-glow{0%,100%{box-shadow:0 15px 55px #0008,0 0 0 5px #ffffff13,0 0 25px #62e0bf20}50%{box-shadow:0 15px 55px #0008,0 0 0 5px #ffffff18,0 0 60px #62e0bf50}}
+@media(max-width:650px){.my-wave{padding:17px;border-radius:18px}.wave-top{align-items:stretch;flex-direction:column;gap:14px}.wave-surprise{align-self:flex-start}.my-wave h2{font-size:22px}}
+@media(prefers-reduced-motion:reduce){.station-screen .station-screen-logo{animation:none}.wave-surprise{transition:none}}
+
 </style></head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><div class="logo-wrap"><img class="logo-photo" id="brandPhoto" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABcQERQRDhcUEhQaGBcbIjklIh8fIkYyNSk5UkhXVVFIUE5bZoNvW2F8Yk5QcptzfIeLkpSSWG2grJ+OqoOPko3/2wBDARgaGiIeIkMlJUONXlBejY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY3/wAARCACcAFgDASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAAECBAUDBv/EAC4QAAIBAwQABQIGAwEAAAAAAAECAAMEERIhMUEFEyJRYVJxMmKBobHBFELRkf/EABgBAAMBAQAAAAAAAAAAAAAAAAABAgME/8QAGxEBAQEAAwEBAAAAAAAAAAAAAAERAhIhMVH/2gAMAwEAAhEDEQA/AOsI4pszKKSigCijigCnKpVWmyghjqOAQM7zrKlxbgVUZXdWd98H49oULMUVJWWmA7am7PvJRkQJBBBwRxCEIGsxRxRAopKKAKKOKAKU72uKNSlkZwdX9S5KPiq5ooccNC/Di4DkAjgwkaW9FD+USUZFCEIEsxRxRGUUlEYBzqv5VMuVLAbkDmULi+IOkHHrHqX6ZoVFDU2Vs4I3xPPu6lRt6pPK4qRu06gq0w68NxKHirklKY45l4FaFqpbYKo/iZVDVdXql98nJhy/CjWRdKKvsAI44SyRhHCAWMRSwlHWwHAMsGzpknGZHaQ8Z0TEKCScAdmXGsXzsQZheIXakNSXpsH5heUGCr4gGZqagBTtqMo1BSZl0bAbYxI60UkhNRP1f8nMsSfvM7bVY7Xdw9ep6iMLsAOJf8Mt/Ko+Yw9T8fAmZSUPWRTwWAM9DjEvj76VKKSiMtJQhCML9OtobOMzuLtfplQjBikZD1dNyOsTNfw+yeuajoxJOSNWxnQxEw6nrH8aSil4ooKFXQMqBtMzuXvEzqvHPtgSj3Iqo7W211Sz9Y/megxPOU20urezAz0srimomRMmZEy0owjhGGuSj7MokHtkOSpIMakdyNSsBsJlNW4VKLIMmcjOruT3K11VFG3Z26GJaWDWYvUdzuSxMrdzs1RcYUcnucQRMln1PS0zqpIfdQZ5sET0Fm+u0pH8uJXFNdSJEyZkTNCRhGYRk1WSmp3OP1nN6QZcowImbe1jc1QofAG4ErrdV6LaUfK54E5+1W0mUqcGVr4IbOprGRjb7ztRqi4UMNuiD0Zw8YC07I7gliAJpvhMG3o+dUfHCIWP6Qr23lUqVQtnzRnGOJpWNuE8Nr1j+N1b9AJVvgBbWnv5cnPDPw6yp3CM9QthTjA7muiLTUKgAUcASv4bTFOyUjl/UZalyJoiMISgUIQgFFxQ0OF1a13GRicKfqfScjM73DYJ0DJP+xHOJ2srXz6euqo3OQcczn+LdbSoFQ01XUdyp/7FWOcJdDW4+k4AlynTSmMIMCZd1Vb/AC6uDsGxF2tOTHFktmJOKtMnb0tmQqWoq6dNyDpGAHGMCBGeJEg+8NpmFvbZcUzlPykETUoVfNpKxBDdhhgzJy68fsYea4GCTtxnqXOVibG1FKlnctVYoxzgZBluay6i+CEIRhVp27VxpIAJAJIHA6H9zSpr5dMLnYCUra6p0bQM7ZYk7D/yV61zVuDgnQh6E5bdayLde/SkNNP1t+0y3cs7MxGonJlulajRqdW52z3OF9tcsMDgYA6ihuWTFk+0AIZjBE/EiXGZLMNiYEEqeW2pG0n4ly1unqVQjEEH4lLA9p1tiEqh86cdmVLZSsasJJAr/hYH7Qm3aIxi2VJXugpJIxk47mxRootRjpAxgD42mb4YMXbfAx+81EPqqff+hOW/Wk+CrsPtmZFy61LhmXjM0r2o1OgpXbJmUW+BCGBzF1BRvECSZRJdRADOY5FT64AyJNaihdJAyOyJE8SCjU2/tGKv2lVKdRd8g8/EJxsKS172hSfOl2AOOYSol//Z" alt="Памятник"><div class="made"><span>MADE</span> <span>IN</span> <span>MOLDOVA</span></div><div class="powered">Powered by Solomud</div></div><span class="brand-word"><span class="brand-solomud">Solomud</span> <span class="brand-web">Web</span> <span class="brand-radio">Radio</span></span></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end"><button class="install-app" id="installApp" type="button" hidden><span aria-hidden="true">＋</span><span id="installAppLabel">Установить радио</span></button><div class="language-switcher" role="group" aria-label="Язык сайта"><button class="lang-btn active" type="button" data-lang="ru">РУС</button><button class="lang-btn" type="button" data-lang="en">ENG</button><button class="lang-btn" type="button" data-lang="ro">RO</button></div><div class="listener-count is-offline" id="listenerCount" aria-live="polite"><svg class="listener-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3.7"></circle><path d="M4.4 20.5c0-4.2 3.4-7.5 7.6-7.5s7.6 3.3 7.6 7.5H4.4z"></path></svg><span class="listener-copy" id="listenerCopy">Слушателей: —</span></div></div></header>
@@ -302,6 +326,13 @@ body{background:radial-gradient(ellipse at 8% 0%,#0d776d55 0,transparent 36%),ra
  </div>
  <label class="adult-filter"><input id="hideAdult" type="checkbox" role="switch" checked><span id="hideAdultLabel">Скрыть 18+</span></label>
 </div>
+<section class="my-wave" id="myWave" aria-labelledby="myWaveTitle">
+ <div class="wave-top"><div><div class="wave-eyebrow">SOLOMUD · FOR YOU</div><h2 id="myWaveTitle">Моя волна</h2><p id="myWaveSub"></p></div><button type="button" class="wave-surprise" id="waveSurprise">✦ Удиви меня</button></div>
+ <button type="button" class="wave-resume" id="waveResume" hidden></button>
+ <p class="wave-empty" id="waveEmpty"></p>
+ <div class="wave-recent-title" id="waveRecentTitle" hidden></div><div class="wave-recent" id="waveRecent"></div>
+ <p class="wave-status" id="waveStatus" role="status" aria-live="polite"></p>
+</section>
 <div class="stations" id="stations"><div class="empty">Подключаем каталог радиостанций…</div></div>
 <div class="notice"><strong>О качестве звука.</strong> Плеер воспроизводит качество, которое передаёт сама радиостанция. Если станция вещает в 320 кбит/с, вы услышите именно этот поток; повысить качество исходного эфира плеер не может.</div>
 <footer><span class="brand-word"><span class="brand-solomud">Solomud</span> <span class="brand-web">Web</span> <span class="brand-radio">Radio</span></span> · Бесплатное интернет-радио · Каталог предоставляется Radio Browser</footer>
@@ -374,6 +405,59 @@ let pendingSharedStation=new URLSearchParams(location.search).get("station");
 let selectedGenre="all",hideAdultContent=true,sleepTimerHandle=null;let stationHealthCache=null,stationHealthLoaded=false;
 try{const savedAdultSetting=localStorage.getItem("solomud-hide-adult");if(savedAdultSetting!==null)hideAdultContent=savedAdultSetting==="true"}catch{}
 const $=id=>document.getElementById(id),audio=$("audio");
+
+const waveCopy={
+ ru:{title:"Моя волна",sub:"Любимые эфиры ближе, новые — в одном нажатии.",resume:"Продолжить слушать",recent:"Недавно слушал",empty:"Включи первую станцию — здесь появится твоя история.",surprise:"✦ Удиви меня",hint:"Новая станция из выбранной страны и жанра",none:"В этом жанре пока нет другой станции. Попробуй другой жанр.",busy:"Выбираем волну…"},
+ en:{title:"My wave",sub:"Your familiar stations. A new discovery, one tap away.",resume:"Continue listening",recent:"Recently played",empty:"Play your first station to start your history.",surprise:"✦ Surprise me",hint:"A new station from your selected country and genre",none:"No other station in this genre yet. Try another genre.",busy:"Finding your wave…"},
+ ro:{title:"Unda mea",sub:"Posturile preferate aproape. Descoperiri noi, la o atingere.",resume:"Continuă ascultarea",recent:"Ascultate recent",empty:"Pornește primul post pentru a începe istoricul.",surprise:"✦ Surprinde-mă",hint:"Un post nou din țara și genul selectate",none:"Nu există alt post în acest gen. Încearcă alt gen.",busy:"Căutăm unda ta…"}
+};
+let waveHistory=readWaveHistory(),waveBusy=false,waveCatalogReady=false,waveLastPick="",waveLoadRequest=0;
+function readWaveHistory(){
+ try{const items=JSON.parse(localStorage.getItem("solomud-recent-v1")||"[]");
+ return Array.isArray(items)?items.filter(s=>s&&typeof s.name==="string"&&/^https:\/\//i.test(s.url_resolved||s.url||"")).slice(0,5):[];
+ }catch{return[]}
+}
+function rememberWave(s){
+ if(!s)return;
+ const item={};for(const key of ["stationuuid","name","url","url_resolved","favicon","tags","bitrate","country","countrycode","stationCountry"])if(s[key]!==undefined)item[key]=s[key];
+ item.stationCountry=s.stationCountry||country;
+ waveHistory=[item,...waveHistory.filter(x=>stationId(x)!==stationId(item))].slice(0,5);
+ try{localStorage.setItem("solomud-recent-v1",JSON.stringify(waveHistory))}catch{}
+ renderMyWave();
+}
+function resumeWave(s){const station=findStation(stationId(s))||s;if(current&&stationId(current)===stationId(station)&&playing){openStationScreen(current);return}playStation(station)}
+function waveCandidates(){
+ if(!waveCatalogReady)return[];
+ return all.filter(s=>(!s.stationCountry||s.stationCountry===country)&&(!hideAdultContent||!isAdultStation(s))&&stationMatchesGenre(s,selectedGenre)&&/^https:\/\//i.test(s.url_resolved||s.url||"")&&(!current||stationId(s)!==stationId(current)));
+}
+function renderMyWave(){
+ const box=$("myWave");if(!box)return;
+ const c=waveCopy[language]||waveCopy.ru;
+ $("myWaveTitle").textContent=c.title;$("myWaveSub").textContent=c.sub;
+ const button=$("waveSurprise");button.textContent=waveBusy?c.busy:c.surprise;button.title=c.hint;button.disabled=waveBusy||!waveCatalogReady;
+ $("waveRecentTitle").textContent=c.recent;
+ const visible=waveHistory.filter(s=>!hideAdultContent||!isAdultStation(s));
+ const resume=$("waveResume");resume.replaceChildren();resume.hidden=!visible.length;
+ if(visible.length){
+  const s=visible[0],label=document.createElement("span"),name=document.createElement("strong");
+  label.textContent="▶ "+c.resume;name.textContent=s.name;
+  resume.append(label,name);resume.onclick=()=>resumeWave(s);
+ }
+ $("waveEmpty").textContent=c.empty;$("waveEmpty").hidden=!!visible.length;
+ $("waveRecentTitle").hidden=visible.length<2;
+ const list=$("waveRecent");list.replaceChildren();
+ visible.slice(1).forEach(s=>{const b=document.createElement("button");b.type="button";b.className="wave-recent-item";b.textContent="↺ "+s.name;b.title=s.name;b.onclick=()=>resumeWave(s);list.appendChild(b)});
+}
+async function surpriseWave(){
+ if(waveBusy)return;
+ const c=waveCopy[language]||waveCopy.ru;
+ let pool=waveCandidates();const fresh=pool.filter(s=>stationId(s)!==waveLastPick);if(fresh.length)pool=fresh;
+ if(!pool.length){$("waveStatus").textContent=c.none;return}
+ const s=pool[Math.floor(Math.random()*pool.length)];waveLastPick=stationId(s);waveBusy=true;$("waveStatus").textContent="";
+ renderMyWave();
+ try{await playStation(s)}finally{waveBusy=false;renderMyWave()}
+}
+
 const worldClockCities={Moldova:{zone:"Europe/Chisinau",ru:"Кишинёв",en:"Chișinău",ro:"Chișinău"},Russia:{zone:"Europe/Moscow",ru:"Москва",en:"Moscow",ro:"Moscova"},Romania:{zone:"Europe/Bucharest",ru:"Бухарест",en:"Bucharest",ro:"București"}};
 const enhancementCopy={
  ru:{clockTitle:"Время в столицах",clockNote:"Обновляется автоматически",genres:{all:"Все",pop:"Поп",rock:"Рок",news:"Новости",chill:"Чилл"},hideAdult:"Скрыть 18+",sleep:"Таймер сна",timerOptions:["Выкл.","15 минут","30 минут","45 минут","60 минут"],timerSet:"Эфир выключится через ",timerEnd:"Таймер сна завершён — эфир остановлен."},
@@ -471,6 +555,7 @@ function stationId(s){return s.stationuuid||s.url_resolved||s.name}
 function savedStations(){try{return JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{return{}}}
 function findStation(id){return all.find(x=>stationId(x)===id)||savedStations()[id]||null}
 function render(){
+ renderMyWave();
  const q=$("search").value.trim().toLowerCase(),sort=$("sort").value;
  const saved=(()=>{try{return JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{return{}}})();
  let source=viewMode==="favorites"?Object.values(saved):all;
@@ -483,6 +568,7 @@ function render(){
  $("stations").innerHTML=list.length?list.map((s,index)=>{const id=stationId(s),isFav=favs().includes(id),isPlaying=current&&stationId(current)===id&&playing,cover=stationCover(s.name);return '<article class="station '+(isPlaying?'playing':'')+'" data-station="'+esc(id)+'" role="button" tabindex="0" aria-label="'+tr("Слушать")+" "+esc(s.name)+'"><span class="station-number" title='+tr("Номер станции")+'>'+(index+1)+'</span><img class="stationlogo" src="'+esc(s.favicon||"")+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'" alt=""><div class="stationlogo fallback" style="--cover-hue:'+cover.hue+';display:none" aria-hidden="true"><span>'+esc(cover.mark)+'</span><i></i><i></i><i></i></div><div class="stationinfo"><strong>'+esc(s.name)+'</strong><small>'+esc(stationGenreLabel(s))+' · '+(s.bitrate?s.bitrate+" "+tr("кбит/с"):tr("качество не указано"))+'</small>'+'</div>'+(isPlaying?'<span class="equalizer" title="'+tr("Сейчас играет")+'" aria-label="'+tr("Сейчас играет")+'"><i></i><i></i><i></i><i></i><i></i></span>':'')+'<button class="fav '+(isFav?"on":"")+'" data-fav="'+esc(id)+'" title="'+tr("Избранное")+'">★</button><button class="play" data-play="'+esc(id)+'" title="'+tr("Слушать")+'">'+(isPlaying?"Ⅱ":"▶")+'</button></article>'}).join(""):'<div class="empty">'+(viewMode==="favorites"?tr("Вы ещё не добавили станции в избранное. Нажмите ★ на карточке любой станции."):tr("Станции не найдены. Попробуйте изменить запрос."))+'</div>';
 }
 async function load(){
+ const loadRequest=++waveLoadRequest;waveCatalogReady=false;renderMyWave();
  const healthPromise=loadStationHealth();
  $("stations").innerHTML='<div class="empty">Загружаем каталог радиостанций…</div>';$("count").textContent=tr("Загрузка…");
  const codes={Moldova:"MD",Russia:"RU",Romania:"RO"};
@@ -494,12 +580,14 @@ async function load(){
    const res=await fetch(host+"/json/stations/search?"+params.toString(),{headers:{Accept:"application/json","User-Agent":"SolomudRadio/1.0"}});
    if(!res.ok)throw Error("HTTP "+res.status);
    const rows=await res.json();
+   if(loadRequest!==waveLoadRequest)return;
    if(!Array.isArray(rows))throw Error("Bad catalogue response");
    data=rows;
    if(data.length)break;
   }catch(e){lastError=e}
  }
  const health=await healthPromise;
+ if(loadRequest!==waveLoadRequest)return;
  const statusMap=health||{},seenStreams=new Set(),seenNames=new Set();
  const candidates=data.map(s=>{
   const check=statusMap[s.stationuuid];
@@ -531,6 +619,7 @@ async function load(){
  const stationLimit=1000;
  all=all.slice(0,stationLimit).map((s,index)=>({...s,stationNo:index+1,stationCountry:country}));
  if(country==="Russia"){all=all.filter(s=>s.stationuuid!=="solomud-pioner-fm");all.unshift({stationuuid:"solomud-pioner-fm",name:"Пионер FM",url:"https://ppr.status-media.ru/ppr128.mp3",url_resolved:"https://listen9.myradio24.com/pionerfm_256",favicon:"https://top-radio.ru/assets/image/radio/180/pioner-fm.png",country:"Russia",countrycode:"RU",stationCountry:"Russia",tags:"pop, dance",bitrate:256,clickcount:1000000});}
+ waveCatalogReady=true;renderMyWave();
  const savedNow=savedStations();all.forEach(s=>{const id=stationId(s);if(favs().includes(id))savedNow[id]=s});localStorage.setItem("solomud-fav-stations",JSON.stringify(savedNow));
  if(all.length){
   all.slice(0,4).forEach(preconnectStation);render();
@@ -657,7 +746,7 @@ async function recoverCurrentStream(reason){
  for(let i=0;i<urls.length;i++){try{await tryStream(urls[i]);activeStreamUrl=urls[i];playing=true;switchingStream=false;$("status").textContent=tr("Переключено на резервный поток");markListening();updatePlayer();render();return}catch(e){audio.pause();audio.removeAttribute("src");audio.load()}}
  switchingStream=false;playing=false;stopListening();$("status").textContent=tr("Не удалось восстановить эфир. Выберите другую станцию");console.warn("Автовосстановление не удалось:",reason);updatePlayer();render();
 }
-function updatePlayer(){$("toggle").textContent=playing?"Ⅱ":"▶";$("screenToggle").textContent=playing?"Ⅱ":"▶";if(!current)$("nowName").textContent=tr("Выберите радиостанцию")}
+function updatePlayer(){ $("stationScreen").classList.toggle("wave-playing",playing);$("toggle").textContent=playing?"Ⅱ":"▶";$("screenToggle").textContent=playing?"Ⅱ":"▶";if(!current)$("nowName").textContent=tr("Выберите радиостанцию")}
 function stationShareUrl(s){
  const target=new URL(location.pathname,location.origin);
  target.searchParams.set("country",s.stationCountry||country);
@@ -737,14 +826,15 @@ function changeStation(direction){
 $("previousStation").addEventListener("click",()=>changeStation(-1));
 $("nextStation").addEventListener("click",()=>changeStation(1));
 $("toggle").addEventListener("click",()=>{if(!current){$("status").textContent=tr("Сначала выберите станцию");return}if(playing){audio.pause();playing=false;$("status").textContent=tr("Пауза");updatePlayer();render();return}playStation(current)});
-audio.addEventListener("playing",()=>{clearTimeout(waitingTimer);$("stationScreenHint").textContent=tr("Эфир играет");warmedStationId=current?stationId(current):null;playing=true;if(!$("status").textContent.includes("резерв"))$("status").textContent=tr("В эфире");markListening();updatePlayer();render()});
+audio.addEventListener("playing",()=>{rememberWave(current);clearTimeout(waitingTimer);$("stationScreenHint").textContent=tr("Эфир играет");warmedStationId=current?stationId(current):null;playing=true;if(!$("status").textContent.includes("резерв"))$("status").textContent=tr("В эфире");markListening();updatePlayer();render()});
 audio.addEventListener("waiting",()=>{if(!playing||switchingStream)return;clearTimeout(waitingTimer);waitingTimer=setTimeout(()=>recoverCurrentStream("долгая остановка буфера"),12000)});
 audio.addEventListener("pause",()=>{stopListening();if(!audio.ended){playing=false;updatePlayer();render()}});
 audio.addEventListener("error",()=>{stopListening();if(playing&&!switchingStream){recoverCurrentStream("ошибка аудиопотока");return}if(!switchingStream){$("status").textContent=tr("Ошибка потока. Выберите другую станцию");playing=false;updatePlayer();render()}});
 audio.addEventListener("ended",()=>{stopListening();if(playing&&!switchingStream)recoverCurrentStream("эфир завершился")});
 audio.addEventListener("emptied",stopListening);
-function setVolume(value){const level=Math.max(0,Math.min(1,Number(value)));audio.volume=level;$("volume").value=level;$("screenVolume").value=level;$("screenVolumeValue").textContent=Math.round(level*100)+"%"}
-$("volume").addEventListener("input",e=>setVolume(e.target.value));$("screenVolume").addEventListener("input",e=>setVolume(e.target.value));setVolume(.8);
+function setVolume(value){const level=Math.max(0,Math.min(1,Number(value)));audio.volume=level;$("volume").value=level;$("screenVolume").value=level;$("screenVolumeValue").textContent=Math.round(level*100)+"%";try{localStorage.setItem("solomud-volume",String(level))}catch{}}
+$("volume").addEventListener("input",e=>setVolume(e.target.value));$("screenVolume").addEventListener("input",e=>setVolume(e.target.value));let restoredVolume=.8;try{const savedVolume=localStorage.getItem("solomud-volume");if(savedVolume!==null&&Number.isFinite(Number(savedVolume)))restoredVolume=Math.max(0,Math.min(1,Number(savedVolume)))}catch{}setVolume(restoredVolume);
+$("waveSurprise").addEventListener("click",surpriseWave);renderMyWave();
 updateWorldClocks();setInterval(updateWorldClocks,1000);translatePage();setLanguage(language);selectCountry(country);
 const installButton=$("installApp");let deferredInstallPrompt=null;
 function appIsInstalled(){return window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}
