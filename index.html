@@ -405,7 +405,7 @@ function render(){
  const saved=(()=>{try{return JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{return{}}})();
  let source=viewMode==="favorites"?Object.values(saved):all;
  let list=source.filter(s=>(s.name+" "+(s.tags||"")+" "+(s.state||"")).toLowerCase().includes(q)).filter(s=>!hideAdultContent||!isAdultStation(s)).filter(s=>stationMatchesGenre(s,selectedGenre));
- list.sort((a,b)=>(country==="Russia"&&viewMode==="all"?((b.stationuuid==="solomud-svoe-fm")-(a.stationuuid==="solomud-svoe-fm")):0)||(sort==="name"?a.name.localeCompare(b.name):sort==="bitrate"?(b.bitrate||0)-(a.bitrate||0):(country==="Russia"&&viewMode==="all"?((b.stationuuid==="solomud-dfm-moscow")-(a.stationuuid==="solomud-dfm-moscow")):0)||(b.votes||0)-(a.votes||0)));
+ list.sort((a,b)=>(country==="Russia"&&viewMode==="all"?((b.stationuuid==="solomud-pioner-fm")-(a.stationuuid==="solomud-pioner-fm")):0)||(sort==="name"?a.name.localeCompare(b.name):sort==="bitrate"?(b.bitrate||0)-(a.bitrate||0):(country==="Russia"&&viewMode==="all"?((b.stationuuid==="solomud-dfm-moscow")-(a.stationuuid==="solomud-dfm-moscow")):0)||(b.votes||0)-(a.votes||0)));
  $("count").textContent=viewMode==="favorites"?tr("Избранное: ")+list.length+(language==="en"?" stations":language==="ro"?" posturi":" станций"):list.length+(language==="en"?" stations":language==="ro"?" posturi":" станций");
  if(viewMode==="favorites")$("countryTitle").textContent=tr("★ Моё избранное");else $("countryTitle").textContent=countries[country].flag+" "+tr(countries[country].title);
  $("favCount").textContent=favs().length;
