@@ -85,6 +85,11 @@ body{background:radial-gradient(ellipse at 8% 0%,#5424a955 0,transparent 36%),ra
 .station-screen-controls{display:flex;align-items:center;justify-content:center;gap:18px;margin:6px 0 16px}
 .station-screen-controls .mainplay{width:62px;height:62px;font-size:23px}
 .station-screen-controls .track-nav{width:48px;height:48px;font-size:27px}
+.station-volume{width:min(100%,340px);display:flex;align-items:center;gap:12px;margin:8px 0 20px;padding:11px 16px;border:1px solid #8e75ff66;border-radius:999px;background:linear-gradient(110deg,#211b3ddd,#102d38dd);box-shadow:0 8px 28px #0004,inset 0 1px #ffffff12}
+.station-volume-icon{display:grid;place-items:center;width:22px;height:22px;flex:none;color:#54e9d1;filter:drop-shadow(0 0 7px #54e9d177)}
+.station-volume input{flex:1;min-width:0;height:5px;margin:0;accent-color:#54e9d1;cursor:pointer}
+.station-volume output{min-width:38px;color:#e4ddff;font:700 12px/1 system-ui,sans-serif;text-align:right;font-variant-numeric:tabular-nums}
+.station-volume input:focus-visible{outline:2px solid #54e9d1;outline-offset:5px;border-radius:9px}
 .station-screen-hint{color:#8792b1;font-size:12px;max-width:420px}
 @media(max-width:650px){.station-screen{padding:0}.station-screen-inner{min-height:100vh;min-height:100dvh;padding:64px 18px calc(28px + env(safe-area-inset-bottom));border-radius:0}.station-screen-logo{width:clamp(165px,48vw,250px);height:clamp(165px,48vw,250px);margin:8px 0 28px}.track-card{margin:28px 0 24px}.station-screen-controls{gap:15px}}
 .volume{accent-color:#a66bff}
@@ -314,6 +319,11 @@ body{background:radial-gradient(ellipse at 8% 0%,#0d776d55 0,transparent 36%),ra
    <button class="track-nav" id="screenPrevious" type="button" aria-label="Предыдущая радиостанция">‹</button>
    <button class="mainplay" id="screenToggle" type="button" aria-label="Воспроизвести">▶</button>
    <button class="track-nav" id="screenNext" type="button" aria-label="Следующая радиостанция">›</button>
+  </div>
+  <div class="station-volume">
+   <span class="station-volume-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h4l5 4V6l-5 4H4z"/><path d="M17 9a5 5 0 0 1 0 6"/><path d="M19.5 6.5a8 8 0 0 1 0 11"/></svg></span>
+   <input id="screenVolume" type="range" min="0" max="1" step=".01" value=".8" aria-label="Громкость" title="Громкость">
+   <output id="screenVolumeValue" for="screenVolume">80%</output>
   </div>
   <div class="share-panel" aria-label="Поделиться веб-радио">
    <div class="share-title" id="shareTitle">Поделиться веб-радио</div>
@@ -733,7 +743,8 @@ audio.addEventListener("pause",()=>{stopListening();if(!audio.ended){playing=fal
 audio.addEventListener("error",()=>{stopListening();if(playing&&!switchingStream){recoverCurrentStream("ошибка аудиопотока");return}if(!switchingStream){$("status").textContent=tr("Ошибка потока. Выберите другую станцию");playing=false;updatePlayer();render()}});
 audio.addEventListener("ended",()=>{stopListening();if(playing&&!switchingStream)recoverCurrentStream("эфир завершился")});
 audio.addEventListener("emptied",stopListening);
-$("volume").addEventListener("input",e=>audio.volume=Number(e.target.value));audio.volume=.8;
+function setVolume(value){const level=Math.max(0,Math.min(1,Number(value)));audio.volume=level;$("volume").value=level;$("screenVolume").value=level;$("screenVolumeValue").textContent=Math.round(level*100)+"%"}
+$("volume").addEventListener("input",e=>setVolume(e.target.value));$("screenVolume").addEventListener("input",e=>setVolume(e.target.value));setVolume(.8);
 updateWorldClocks();setInterval(updateWorldClocks,1000);translatePage();setLanguage(language);selectCountry(country);
 const installButton=$("installApp");let deferredInstallPrompt=null;
 function appIsInstalled(){return window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}
