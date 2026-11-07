@@ -451,7 +451,7 @@ async function load(){
   }
  const stationLimit=1000;
  all=all.slice(0,stationLimit).map((s,index)=>({...s,stationNo:index+1,stationCountry:country}));
- if(country==="Russia"){all=all.filter(s=>s.stationuuid!=="solomud-svoe-fm");all.unshift({stationuuid:"solomud-svoe-fm",name:"Своё FM",url:"https://stream02.pcradio.biz/svoe_fm-med",url_resolved:"https://stream02.pcradio.biz/svoe_fm-med",country:"Russia",countrycode:"RU",stationCountry:"Russia",tags:"electronic,house,deep house,club,chill-out",bitrate:128,clickcount:1000000});}
+ if(country==="Russia"){all=all.filter(s=>s.stationuuid!=="solomud-svoe-fm");all.unshift({stationuuid:"solomud-svoe-fm",name:"Своё FM",url:"https://h.getradio.me/svoefm/hls.m3u8",url_resolved:"https://h.getradio.me/svoefm/hls.m3u8",favicon:"https://top-radio.ru/assets/image/radio/180/Svoe-fm.png",country:"Russia",countrycode:"RU",stationCountry:"Russia",tags:"electronic,house,deep house,club,chill-out",bitrate:96,clickcount:1000000});}
  const savedNow=savedStations();all.forEach(s=>{const id=stationId(s);if(favs().includes(id))savedNow[id]=s});localStorage.setItem("solomud-fav-stations",JSON.stringify(savedNow));
  if(all.length){all.slice(0,2).forEach(preconnectStation);render();return}
  $("count").textContent=lastError?tr("Каталог недоступен"):tr("0 станций");
