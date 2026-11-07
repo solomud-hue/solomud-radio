@@ -663,8 +663,7 @@ function updateShareLinks(s){
  $("shareStatus").textContent="";
 }
 async function copyStationLink(){
- if(!current){$("shareStatus").textContent=tr("Сначала выбери станцию");return}
- const url=stationShareUrl(current);
+ const url=new URL(location.pathname,location.origin).toString();
  try{await navigator.clipboard.writeText(url)}
  catch(error){
   try{
