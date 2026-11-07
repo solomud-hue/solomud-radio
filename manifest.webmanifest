@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "Solomud Web Radio",
+  "short_name": "Solomud Radio",
+  "description": "Радиостанции Молдовы, России и Румынии — слушай онлайн.",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#071b1a",
+  "theme_color": "#0d2b29",
+  "icons": [
+    {
+      "src": "./icons/radio.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
