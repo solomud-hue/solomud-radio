@@ -182,10 +182,25 @@ footer{color:#9b9bbd}
 @media(max-width:760px){.country{height:154px}.country-info{padding:14px}.country strong{font-size:18px}.country small{font-size:10px}}
 @media(max-width:650px){.world-clock{margin:0 0 18px;padding:12px;border-radius:16px}.world-clock-head{margin-bottom:8px}.world-clock-head h2{font-size:15px}.world-clock-head span{font-size:9px}.clock-grid{gap:6px}.clock-card{padding:9px 7px;text-align:center}.clock-card>span{font-size:10px}.clock-card time{font-size:18px;letter-spacing:0}.clock-card small{font-size:8px}.countries{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:16px 0 20px}.country{height:118px;border-radius:13px}.country-info{padding:9px}.country strong{font-size:13px}.country small{font-size:9px}.filter-bar{align-items:flex-start}.genre-filters{gap:6px}.genre-chip{padding:7px 10px;font-size:11px}.adult-filter{padding-top:7px}.sleep-timer-control{font-size:10px}.sleep-timer-control select{max-width:92px;padding:6px}}
 @media(max-width:390px){.clock-card time{font-size:16px}.clock-card small{font-size:7px}.country{height:105px}.country-info{padding:7px}.country strong{font-size:12px}.country small{font-size:8px}.genre-chip{padding:6px 8px;font-size:10px}}
+/* Header art and compact city/country cards */
+.hero{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:34px 0 24px}
+.hero-copy{position:relative;z-index:1;max-width:72%}
+.hero-art{width:min(34%,370px);min-width:220px;flex:none;filter:drop-shadow(0 10px 28px #13d6df24)}
+.hero-art svg{display:block;width:100%;height:auto;overflow:visible}
+.world-clock{margin:2px 0 16px;padding:12px 15px;border-radius:17px}
+.world-clock-head{margin-bottom:9px}
+.world-clock-head h2{font-size:15px}
+.clock-grid{gap:8px}
+.clock-card{padding:9px 12px;border-radius:12px}
+.clock-card time{font-size:clamp(20px,2.5vw,27px)}
+.country{height:170px;border-radius:16px}
+@media(max-width:760px){.hero{gap:8px;padding:28px 0 18px}.hero-copy{max-width:69%}.hero-art{width:31%;min-width:0}.country{height:126px}}
+@media(max-width:650px){.hero{padding:25px 0 17px}.hero-copy{max-width:70%}.hero-art{width:30%;min-width:0}.hero h1{font-size:clamp(27px,7vw,40px)}.hero p{font-size:13px;margin-top:9px}.world-clock{margin:0 0 14px;padding:10px;border-radius:15px}.world-clock-head h2{font-size:14px}.clock-card{padding:8px 6px}.clock-card time{font-size:17px}.country{height:104px;border-radius:12px}}
+@media(max-width:390px){.hero{gap:4px}.hero-copy{max-width:73%}.hero-art{width:27%}.hero h1{font-size:27px}.hero p{font-size:12px}.clock-card time{font-size:15px}.country{height:94px}}
 </style></head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><div class="logo-wrap"><img class="logo-photo" id="brandPhoto" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABcQERQRDhcUEhQaGBcbIjklIh8fIkYyNSk5UkhXVVFIUE5bZoNvW2F8Yk5QcptzfIeLkpSSWG2grJ+OqoOPko3/2wBDARgaGiIeIkMlJUONXlBejY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY3/wAARCACcAFgDASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAAECBAUDBv/EAC4QAAIBAwQABQIGAwEAAAAAAAECAAMEERIhMUEFEyJRYVJxMmKBobHBFELRkf/EABgBAAMBAQAAAAAAAAAAAAAAAAABAgME/8QAGxEBAQEAAwEBAAAAAAAAAAAAAAERAhIhMVH/2gAMAwEAAhEDEQA/AOsI4pszKKSigCijigCnKpVWmyghjqOAQM7zrKlxbgVUZXdWd98H49oULMUVJWWmA7am7PvJRkQJBBBwRxCEIGsxRxRAopKKAKKOKAKU72uKNSlkZwdX9S5KPiq5ooccNC/Di4DkAjgwkaW9FD+USUZFCEIEsxRxRGUUlEYBzqv5VMuVLAbkDmULi+IOkHHrHqX6ZoVFDU2Vs4I3xPPu6lRt6pPK4qRu06gq0w68NxKHirklKY45l4FaFqpbYKo/iZVDVdXql98nJhy/CjWRdKKvsAI44SyRhHCAWMRSwlHWwHAMsGzpknGZHaQ8Z0TEKCScAdmXGsXzsQZheIXakNSXpsH5heUGCr4gGZqagBTtqMo1BSZl0bAbYxI60UkhNRP1f8nMsSfvM7bVY7Xdw9ep6iMLsAOJf8Mt/Ko+Yw9T8fAmZSUPWRTwWAM9DjEvj76VKKSiMtJQhCML9OtobOMzuLtfplQjBikZD1dNyOsTNfw+yeuajoxJOSNWxnQxEw6nrH8aSil4ooKFXQMqBtMzuXvEzqvHPtgSj3Iqo7W211Sz9Y/megxPOU20urezAz0srimomRMmZEy0owjhGGuSj7MokHtkOSpIMakdyNSsBsJlNW4VKLIMmcjOruT3K11VFG3Z26GJaWDWYvUdzuSxMrdzs1RcYUcnucQRMln1PS0zqpIfdQZ5sET0Fm+u0pH8uJXFNdSJEyZkTNCRhGYRk1WSmp3OP1nN6QZcowImbe1jc1QofAG4ErrdV6LaUfK54E5+1W0mUqcGVr4IbOprGRjb7ztRqi4UMNuiD0Zw8YC07I7gliAJpvhMG3o+dUfHCIWP6Qr23lUqVQtnzRnGOJpWNuE8Nr1j+N1b9AJVvgBbWnv5cnPDPw6yp3CM9QthTjA7muiLTUKgAUcASv4bTFOyUjl/UZalyJoiMISgUIQgFFxQ0OF1a13GRicKfqfScjM73DYJ0DJP+xHOJ2srXz6euqo3OQcczn+LdbSoFQ01XUdyp/7FWOcJdDW4+k4AlynTSmMIMCZd1Vb/AC6uDsGxF2tOTHFktmJOKtMnb0tmQqWoq6dNyDpGAHGMCBGeJEg+8NpmFvbZcUzlPykETUoVfNpKxBDdhhgzJy68fsYea4GCTtxnqXOVibG1FKlnctVYoxzgZBluay6i+CEIRhVp27VxpIAJAJIHA6H9zSpr5dMLnYCUra6p0bQM7ZYk7D/yV61zVuDgnQh6E5bdayLde/SkNNP1t+0y3cs7MxGonJlulajRqdW52z3OF9tcsMDgYA6ihuWTFk+0AIZjBE/EiXGZLMNiYEEqeW2pG0n4ly1unqVQjEEH4lLA9p1tiEqh86cdmVLZSsasJJAr/hYH7Qm3aIxi2VJXugpJIxk47mxRootRjpAxgD42mb4YMXbfAx+81EPqqff+hOW/Wk+CrsPtmZFy61LhmXjM0r2o1OgpXbJmUW+BCGBzF1BRvECSZRJdRADOY5FT64AyJNaihdJAyOyJE8SCjU2/tGKv2lVKdRd8g8/EJxsKS172hSfOl2AOOYSol//Z" alt="Памятник"><div class="made"><span>MADE</span> <span>IN</span> <span>MOLDOVA</span></div><div class="powered">Powered by Solomud</div></div><span class="brand-word"><span class="brand-solomud">Solomud</span> <span class="brand-web">Web</span> <span class="brand-radio">Radio</span></span></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end"><div class="language-switcher" role="group" aria-label="Язык сайта"><button class="lang-btn active" type="button" data-lang="ru">РУС</button><button class="lang-btn" type="button" data-lang="en">ENG</button><button class="lang-btn" type="button" data-lang="ro">RO</button></div><div class="listener-count" id="listenerCount">👥 Слушателей: —</div><div class="live">● РАДИО ОНЛАЙН</div></div></header>
-<section class="hero"><div class="eyebrow">ТВОЯ МУЗЫКА. ТВОИ СТРАНЫ.</div><h1>Радио, которое<br>всегда с тобой.</h1><p>Выбирай страну, находи любимую станцию и слушай прямо в браузере. Бесплатно, без регистрации.</p></section>
+<section class="hero"><div class="hero-copy"><div class="eyebrow">ТВОЯ МУЗЫКА. ТВОИ СТРАНЫ.</div><h1>Радио, которое<br>всегда с тобой.</h1><p>Выбирай страну, находи любимую станцию и слушай прямо в браузере. Бесплатно, без регистрации.</p></div><div class="hero-art" aria-hidden="true"><svg viewBox="0 0 420 300" role="presentation"><defs><linearGradient id="headband" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#57f2d0"/><stop offset=".48" stop-color="#55a7ff"/><stop offset="1" stop-color="#c061ff"/></linearGradient><linearGradient id="earcup" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1a4f72"/><stop offset=".5" stop-color="#171c45"/><stop offset="1" stop-color="#6f39c9"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="9"/></filter></defs><ellipse cx="227" cy="254" rx="150" ry="24" fill="#37dded" opacity=".18" filter="url(#glow)"/><g fill="none" stroke="#39e6dc" stroke-width="7" stroke-linecap="round" opacity=".65"><path d="M28 232v-48"/><path d="M49 232v-80"/><path d="M70 232v-112"/><path d="M92 232v-73"/><path d="M330 232v-93"/><path d="M352 232v-128"/><path d="M374 232v-78"/><path d="M396 232v-48"/></g><path d="M106 184a111 111 0 0 1 222 0" fill="none" stroke="#0b1129" stroke-width="37" stroke-linecap="round"/><path d="M106 184a111 111 0 0 1 222 0" fill="none" stroke="url(#headband)" stroke-width="23" stroke-linecap="round"/><path d="M105 171c-9 23-13 45-13 70" fill="none" stroke="#9c62ff" stroke-width="11" stroke-linecap="round"/><path d="M329 171c9 23 13 45 13 70" fill="none" stroke="#43e8db" stroke-width="11" stroke-linecap="round"/><g><rect x="55" y="205" width="93" height="91" rx="31" fill="#0c1127" stroke="#a967ff" stroke-width="8"/><rect x="67" y="215" width="70" height="72" rx="25" fill="url(#earcup)" stroke="#55b9ff" stroke-width="3"/><rect x="272" y="205" width="93" height="91" rx="31" fill="#0c1127" stroke="#51e8db" stroke-width="8"/><rect x="283" y="215" width="70" height="72" rx="25" fill="url(#earcup)" stroke="#8260ff" stroke-width="3"/></g><g transform="translate(301 237)" fill="none" stroke="#45f4df" stroke-width="5" stroke-linecap="round"><path d="M0 26V12"/><path d="M11 32V5"/><path d="M22 27V11"/><path d="M33 20V16"/></g></svg></div></section>
 <section class="world-clock" aria-label="Местное время">
  <div class="world-clock-head"><h2 id="worldClockTitle">Время в столицах</h2><span id="worldClockNote">Обновляется автоматически</span></div>
  <div class="clock-grid">
@@ -236,11 +251,6 @@ footer{color:#9b9bbd}
   <div class="station-screen-country" id="stationScreenCountry">РАДИО ОНЛАЙН</div>
   <h2 class="station-screen-name" id="stationScreenName">Выберите радиостанцию</h2>
   <div class="station-screen-meta" id="stationScreenMeta">Solomud Web Radio</div>
-  <div class="track-card">
-   <div class="track-card-label">Сейчас играет</div>
-   <div class="track-card-title" id="trackTitle">Ожидаем информацию о песне…</div>
-   <div class="track-card-artist" id="trackArtist">Название композиции появится, если радиостанция передаёт эти данные</div>
-  </div>
   <div class="station-screen-controls">
    <button class="track-nav" id="screenPrevious" type="button" aria-label="Предыдущая радиостанция">‹</button>
    <button class="mainplay" id="screenToggle" type="button" aria-label="Воспроизвести">▶</button>
@@ -271,7 +281,7 @@ function translatePage(){
  const notice=$(".notice");if(notice){const strong=notice.querySelector("strong");if(strong)strong.textContent=tr("О качестве звука.");if(notice.childNodes[1])notice.childNodes[1].textContent=" "+tr("Плеер воспроизводит качество, которое передаёт сама радиостанция. Если станция вещает в 320 кбит/с, вы услышите именно этот поток; повысить качество исходного эфира плеер не может.");}
  const names={Moldova:"Молдова",Russia:"Россия",Romania:"Румыния"};document.querySelectorAll(".country").forEach(b=>{const n=names[b.dataset.country];const a=b.querySelector("strong"),sm=b.querySelector("small");if(a)a.textContent=tr(n);if(sm)sm.textContent=tr("Радиостанции страны");});
  const attrs=[[".countries","aria-label","Выбрать страну"],["#previousStation","aria-label","Предыдущая радиостанция"],["#previousStation","title","Предыдущая радиостанция"],["#nextStation","aria-label","Следующая радиостанция"],["#nextStation","title","Следующая радиостанция"],["#toggle","aria-label","Воспроизвести"],["#volume","aria-label","Громкость"],["#stationScreen","aria-label","Плеер радиостанции"],["#closeStationScreen","aria-label","Закрыть плеер"],["#closeStationScreen","title","Закрыть"],["#stationScreenLogo","alt","Логотип радиостанции"],["#screenPrevious","aria-label","Предыдущая радиостанция"],["#screenNext","aria-label","Следующая радиостанция"],["#screenToggle","aria-label","Воспроизвести"]];attrs.forEach(([sel,attr,val])=>{const el=$(sel);if(el)el.setAttribute(attr,tr(val));});
- set(".track-card-label","Сейчас играет");
+
  const foot=document.querySelector("footer");if(foot)foot.innerHTML='<span class="brand-word"><span class="brand-solomud">Solomud</span> <span class="brand-web">Web</span> <span class="brand-radio">Radio</span></span> · '+tr("Бесплатное интернет-радио")+' · '+(language==="en"?"Directory provided by Radio Browser":language==="ro"?"Catalog furnizat de Radio Browser":"Каталог предоставляется Radio Browser");
  document.querySelectorAll(".country-art[aria-label]").forEach(el=>el.setAttribute("aria-label",tr(el.getAttribute("aria-label"))));document.querySelectorAll(".country-art img[alt]").forEach(el=>el.alt=tr(el.alt));const cap=document.querySelector(".art-caption");if(cap)cap.textContent="ROMANIA";
  if($("trackTitle"))$("trackTitle").textContent=tr($("trackTitle").textContent);if($("trackArtist"))$("trackArtist").textContent=tr($("trackArtist").textContent);if($("stationScreenHint"))$("stationScreenHint").textContent=tr($("stationScreenHint").textContent);if($("status"))$("status").textContent=tr($("status").textContent);
@@ -559,16 +569,7 @@ function openStationScreen(s){
  $("stationScreenHint").textContent=tr("Загрузка эфира…");
 }
 function closeStationScreen(){$("stationScreen").classList.remove("open");$("stationScreen").setAttribute("aria-hidden","true")}
-function resetTrackInfo(){
- $("trackTitle").textContent=tr("Ожидаем информацию о песне…");
- $("trackArtist").textContent=tr("Если станция передаёт название композиции, оно появится здесь");
-}
-function updateTrackInfo(title,artist){
- if(!title&&!artist)return;
- $("trackTitle").textContent=title||artist||tr("Сейчас в эфире");
- $("trackArtist").textContent=artist&&title&&artist!==title?artist:(title?tr("Информация от радиостанции"):"");
- $("stationScreenHint").textContent=tr("Информация о композиции от радиостанции");
-}
+function resetTrackInfo(){} function updateTrackInfo(title,artist){}
 function decodeId3Text(data){
  if(!data||data.length<10)return;
  const bytes=data instanceof Uint8Array?data:new Uint8Array(data);
