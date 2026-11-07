@@ -434,10 +434,17 @@ async function load(){
  const candidates=data.map(s=>{
   const check=statusMap[s.stationuuid];
   if(check&&check.working===false)return null;
-  return check&&check.working===true&&check.streamUrl?{...s,url_resolved:check.streamUrl,url:check.streamUrl,verifiedLatencyMs:check.latencyMs}:s;
+  const stationName=String(s.name||"").trim().toLowerCase();
+  let logo="";
+  if(String(s.countrycode||"").toUpperCase()==="MD"){
+   if(stationName.startsWith("retro fm"))logo="https://moldova.mom-gmr.org/downloads/Archive/2024/MediaOutletLogos/MDA/4224.png";
+   else if(stationName.startsWith("hit fm"))logo="https://hitfm.md/img/channel/FD2xq5aZnF3oSabfMpUfNjRGijKCL8WT.png";
+  }
+  const enriched=logo?{...s,favicon:logo}:s;
+  return check&&check.working===true&&check.streamUrl?{...enriched,url_resolved:check.streamUrl,url:check.streamUrl,verifiedLatencyMs:check.latencyMs}:enriched;
  }).filter(Boolean);
  all=candidates.filter(s=>{
-  if(country==="Russia"&&/^звезда\\s*тв/i.test(String(s.name||"")))return false;
+  if(country==="Russia"&&String(s.name||"").trim().toLowerCase().startsWith("звезда тв"))return false;
   const url=String(s.url_resolved||s.url||"").trim();
   if(!s.name||!url||!/^https:\/\//i.test(url)||Number(s.bitrate||0)<128||s.lastcheckok===0||/aquarelle|radio\s*manele\s*premium/i.test(s.name))return false;
   let streamKey=url;
