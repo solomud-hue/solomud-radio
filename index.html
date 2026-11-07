@@ -280,7 +280,7 @@ document.querySelectorAll(".lang-btn").forEach(b=>b.addEventListener("click",()=
 
 
 let country="Moldova",all=[],current=null,playing=false,viewMode="all",hlsPlayer=null,warmedStationId=null,activeStreamUrl=null,switchingStream=false,waitingTimer=null,streamRequest=0;
-let selectedGenre="all",hideAdultContent=true,sleepTimerHandle=null;
+let selectedGenre="all",hideAdultContent=true,sleepTimerHandle=null;let stationHealthCache=null,stationHealthLoaded=false;
 try{const savedAdultSetting=localStorage.getItem("solomud-hide-adult");if(savedAdultSetting!==null)hideAdultContent=savedAdultSetting==="true"}catch{}
 const $=id=>document.getElementById(id),audio=$("audio");
 const worldClockCities={Moldova:{zone:"Europe/Chisinau",ru:"Кишинёв",en:"Chișinău",ro:"Chișinău"},Russia:{zone:"Europe/Moscow",ru:"Москва",en:"Moscow",ro:"Moscova"},Romania:{zone:"Europe/Bucharest",ru:"Бухарест",en:"Bucharest",ro:"București"}};
@@ -307,11 +307,45 @@ function updateWorldClocks(){
  }
 }
 function isAdultStation(s){return /(?:adult|18\+|18plus|xxx|erotic|sex|porn|explicit|nsfw)/i.test((s.name||"")+" "+(s.tags||""))}
+const genreDefinitions=[
+ {id:"news",label:{ru:"Новости",en:"News",ro:"Știri"},pattern:/news|\btalk\b|politic|current affairs|journalism|information|rfi|bbc world service/i},
+ {id:"sports",label:{ru:"Спорт",en:"Sports",ro:"Sport"},pattern:/sport|football|soccer|basketball|hockey/i},
+ {id:"rock",label:{ru:"Рок",en:"Rock",ro:"Rock"},pattern:/rock|metal|punk|alternative|indie|\broks?\b/i},
+ {id:"pop",label:{ru:"Поп",en:"Pop",ro:"Pop"},pattern:/pop|hits?|top\s*40|r\s*&\s*b|hip.?hop|latin|k.?pop|rap/i},
+ {id:"dance",label:{ru:"Танцевальная",en:"Dance",ro:"Dance"},pattern:/dance|disco|edm|house|trance|techno|electronic/i},
+ {id:"jazz",label:{ru:"Джаз / блюз",en:"Jazz / blues",ro:"Jazz / blues"},pattern:/jazz|blues|soul|funk/i},
+ {id:"classical",label:{ru:"Классика",en:"Classical",ro:"Clasică"},pattern:/classical|orchestral|opera|symphony/i},
+ {id:"folk",label:{ru:"Фолк",en:"Folk",ro:"Folk"},pattern:/folk|folklore|traditional|ethno|manele/i},
+ {id:"retro",label:{ru:"Ретро",en:"Retro",ro:"Retro"},pattern:/retro|oldies|70s|80s|90s|00s|2000s|throwback/i},
+ {id:"chill",label:{ru:"Спокойная",en:"Chill",ro:"Relax"},pattern:/chill|ambient|lounge|relax|acoustic|nature|lo.?fi|easy listening|sleep/i},
+ {id:"religious",label:{ru:"Религиозная",en:"Religious",ro:"Religioasă"},pattern:/christian|gospel|religious|worship|spiritual/i}
+];
+function classifyStationGenres(s){
+ const text=((s.name||"")+" "+(s.tags||"")).normalize("NFKD").replace(/\\p{M}/gu,"").toLowerCase();
+ const found=genreDefinitions.filter(item=>item.pattern.test(text)).map(item=>item.id);
+ return found.length?found:["music"];
+}
+function stationGenreLabel(s){
+ const ids=classifyStationGenres(s);
+ if(ids[0]==="music")return language==="en"?"Music":language==="ro"?"Muzică":"Музыка";
+ return ids.slice(0,2).map(id=>genreDefinitions.find(item=>item.id===id)?.label[language]||genreDefinitions.find(item=>item.id===id)?.label.ru).join(" · ");
+}
 function stationMatchesGenre(s,genre){
  if(genre==="all")return true;
- const text=(s.name||"")+" "+(s.tags||"");
- const patterns={pop:/pop|dance|disco|hits?|top\s*40|r\s*&\s*b|hip.?hop|latin/i,rock:/rock|metal|punk|alternative|indie/i,news:/news|talk|sport|politic|current affairs|journalism|information/i,chill:/chill|ambient|lounge|relax|jazz|blues|classical|acoustic|nature|lo.?fi/i};
- return patterns[genre]?.test(text)||false;
+ const ids=classifyStationGenres(s);
+ const groups={pop:["pop","dance"],rock:["rock"],news:["news"],chill:["chill","jazz","classical"]};
+ return (groups[genre]||[]).some(id=>ids.includes(id));
+}
+async function loadStationHealth(){
+ if(stationHealthLoaded)return stationHealthCache;
+ stationHealthLoaded=true;
+ try{
+  const response=await fetch("./station-status.json",{cache:"no-store"});
+  if(!response.ok)return null;
+  const data=await response.json(),age=Date.now()-Date.parse(data.generatedAt||"");
+  if(!Number.isFinite(age)||age<0||age>36*60*60*1000||!data.stations)return null;
+  stationHealthCache=data.stations;return stationHealthCache;
+ }catch(error){console.warn("Сводка проверки потоков недоступна:",error);return null}
 }
 function setSleepTimer(minutes){
  clearTimeout(sleepTimerHandle);sleepTimerHandle=null;
@@ -353,9 +387,10 @@ function render(){
  if(viewMode==="favorites")$("countryTitle").textContent=tr("★ Моё избранное");else $("countryTitle").textContent=countries[country].flag+" "+tr(countries[country].title);
  $("favCount").textContent=favs().length;
  $("allTab").classList.toggle("active",viewMode==="all");$("favTab").classList.toggle("active",viewMode==="favorites");
- $("stations").innerHTML=list.length?list.map((s,index)=>{const id=stationId(s),isFav=favs().includes(id),isPlaying=current&&stationId(current)===id&&playing,stationFlag=countries[s.stationCountry||country]?.flag||"📻";return '<article class="station '+(isPlaying?'playing':'')+'" data-station="'+esc(id)+'" role="button" tabindex="0" aria-label="'+tr("Слушать ")+esc(s.name)+'"><span class="station-number" title="Номер станции">'+(index+1)+'</span><img class="stationlogo" src="'+esc(s.favicon||"")+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'" alt=""><div class="stationlogo fallback" style="display:none">'+stationFlag+'</div><div class="stationinfo"><strong>'+esc(s.name)+'</strong><small>'+esc((s.tags||tr("Радио")) .split(",").slice(0,2).join(" · ")||tr("Радиостанция"))+' · '+(s.bitrate?s.bitrate+" "+tr("кбит/с"):tr("качество не указано"))+'</small>'+'</div>'+(isPlaying?'<span class="equalizer" title="Сейчас играет" aria-label="Сейчас играет"><i></i><i></i><i></i><i></i></span>':'')+'<button class="fav '+(isFav?"on":"")+'" data-fav="'+esc(id)+'" title="Избранное">★</button><button class="play" data-play="'+esc(id)+'" title="Слушать">'+(isPlaying?"Ⅱ":"▶")+'</button></article>'}).join(""):'<div class="empty">'+(viewMode==="favorites"?tr("Вы ещё не добавили станции в избранное. Нажмите ★ на карточке любой станции."):tr("Станции не найдены. Попробуйте изменить запрос."))+'</div>';
+ $("stations").innerHTML=list.length?list.map((s,index)=>{const id=stationId(s),isFav=favs().includes(id),isPlaying=current&&stationId(current)===id&&playing,stationFlag=countries[s.stationCountry||country]?.flag||"📻";return '<article class="station '+(isPlaying?'playing':'')+'" data-station="'+esc(id)+'" role="button" tabindex="0" aria-label="'+tr("Слушать ")+esc(s.name)+'"><span class="station-number" title="Номер станции">'+(index+1)+'</span><img class="stationlogo" src="'+esc(s.favicon||"")+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'" alt=""><div class="stationlogo fallback" style="display:none">'+stationFlag+'</div><div class="stationinfo"><strong>'+esc(s.name)+'</strong><small>'+esc(stationGenreLabel(s))+' · '+(s.bitrate?s.bitrate+" "+tr("кбит/с"):tr("качество не указано"))+'</small>'+'</div>'+(isPlaying?'<span class="equalizer" title="Сейчас играет" aria-label="Сейчас играет"><i></i><i></i><i></i><i></i></span>':'')+'<button class="fav '+(isFav?"on":"")+'" data-fav="'+esc(id)+'" title="Избранное">★</button><button class="play" data-play="'+esc(id)+'" title="Слушать">'+(isPlaying?"Ⅱ":"▶")+'</button></article>'}).join(""):'<div class="empty">'+(viewMode==="favorites"?tr("Вы ещё не добавили станции в избранное. Нажмите ★ на карточке любой станции."):tr("Станции не найдены. Попробуйте изменить запрос."))+'</div>';
 }
 async function load(){
+ const healthPromise=loadStationHealth();
  $("stations").innerHTML='<div class="empty">Загружаем каталог радиостанций…</div>';$("count").textContent=tr("Загрузка…");
  const codes={Moldova:"MD",Russia:"RU",Romania:"RO"};
  const hosts=["https://de1.api.radio-browser.info","https://at1.api.radio-browser.info","https://nl1.api.radio-browser.info"];
@@ -371,13 +406,21 @@ async function load(){
    if(data.length)break;
   }catch(e){lastError=e}
  }
- const seenStreams=new Set();
- all=data.filter(s=>{
+ const health=await healthPromise;
+ const statusMap=health||{},seenStreams=new Set(),seenNames=new Set();
+ const candidates=data.map(s=>{
+  const check=statusMap[s.stationuuid];
+  if(check&&check.working===false)return null;
+  return check&&check.working===true&&check.streamUrl?{...s,url_resolved:check.streamUrl,url:check.streamUrl,verifiedLatencyMs:check.latencyMs}:s;
+ }).filter(Boolean);
+ all=candidates.filter(s=>{
   const url=String(s.url_resolved||s.url||"").trim();
   if(!s.name||!url||!/^https:\/\//i.test(url)||Number(s.bitrate||0)<128||s.lastcheckok===0||/aquarelle|radio\s*manele\s*premium/i.test(s.name))return false;
-  const key=url.toLowerCase().replace(/\/$/,"");
-  if(seenStreams.has(key))return false;
-  seenStreams.add(key);return true;
+  let streamKey=url;
+  try{const parsed=new URL(url);parsed.hash="";parsed.hostname=parsed.hostname.toLowerCase().replace(/^www\\./,"");parsed.pathname=parsed.pathname.replace(/\\/+$/,"");streamKey=parsed.toString()}catch{}
+  const nameKey=String(s.name).normalize("NFKD").replace(/\\p{M}/gu,"").toLowerCase().replace(/[^\\p{L}\\p{N}]+/gu," ").trim();
+  if(seenStreams.has(streamKey)||(nameKey&&seenNames.has(nameKey)))return false;
+  seenStreams.add(streamKey);if(nameKey)seenNames.add(nameKey);return true;
  }).sort((x,y)=>(y.clickcount||y.votes||0)-(x.clickcount||x.votes||0));
   if(country==="Russia"){
    all=all.filter(s=>!/\bdfm\b/i.test(s.name));
