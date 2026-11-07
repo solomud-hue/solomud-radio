@@ -437,6 +437,7 @@ async function load(){
   return check&&check.working===true&&check.streamUrl?{...s,url_resolved:check.streamUrl,url:check.streamUrl,verifiedLatencyMs:check.latencyMs}:s;
  }).filter(Boolean);
  all=candidates.filter(s=>{
+  if(country==="Russia"&&/^звезда\\s*тв/i.test(String(s.name||"")))return false;
   const url=String(s.url_resolved||s.url||"").trim();
   if(!s.name||!url||!/^https:\/\//i.test(url)||Number(s.bitrate||0)<128||s.lastcheckok===0||/aquarelle|radio\s*manele\s*premium/i.test(s.name))return false;
   let streamKey=url;
