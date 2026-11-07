@@ -523,7 +523,7 @@ async function tryStream(url){
    audio.pause();
    audio.removeAttribute("src");
    audio.load();
-   if(/\\.m3u8(?:$|[?#])/i.test(url)&&window.Hls&&!audio.canPlayType("application/vnd.apple.mpegurl")){
+   if(/\.m3u8(?:$|[?#])/i.test(url)&&window.Hls&&!audio.canPlayType("application/vnd.apple.mpegurl")){
     if(!Hls.isSupported())throw new Error("HLS не поддерживается браузером");
     hlsPlayer=new Hls({enableWorker:true,lowLatencyMode:true,backBufferLength:30});
     hlsPlayer.on(Hls.Events.FRAG_PARSING_METADATA,(event,data)=>{for(const sample of (data.samples||[])){if(sample.data)decodeId3Text(sample.data)}});
