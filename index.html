@@ -453,7 +453,7 @@ async function load(){
  all=all.slice(0,stationLimit).map((s,index)=>({...s,stationNo:index+1,stationCountry:country}));
  if(country==="Russia"){all=all.filter(s=>s.stationuuid!=="solomud-pioner-fm");all.unshift({stationuuid:"solomud-pioner-fm",name:"Пионер FM",url:"https://ppr.status-media.ru/ppr128.mp3",url_resolved:"https://listen9.myradio24.com/pionerfm_256",favicon:"https://top-radio.ru/assets/image/radio/180/pioner-fm.png",country:"Russia",countrycode:"RU",stationCountry:"Russia",tags:"pop, dance",bitrate:256,clickcount:1000000});}
  const savedNow=savedStations();all.forEach(s=>{const id=stationId(s);if(favs().includes(id))savedNow[id]=s});localStorage.setItem("solomud-fav-stations",JSON.stringify(savedNow));
- if(all.length){all.slice(0,2).forEach(preconnectStation);render();return}
+ if(all.length){all.slice(0,4).forEach(preconnectStation);render();return}
  $("count").textContent=lastError?tr("Каталог недоступен"):tr("0 станций");
  $("stations").innerHTML='<div class="empty">Не удалось получить станции. Попробуйте обновить каталог чуть позже.</div>';
 }
