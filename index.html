@@ -149,32 +149,85 @@ footer{color:#9b9bbd}
 @media(max-width:650px){.countries{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:16px 0 20px}.country{min-height:94px;padding:12px 8px;border-radius:15px}.country-identity{flex-direction:column;align-items:flex-start;gap:8px}.country .flag{width:43px;height:32px}.country .flag-map{width:48px;height:60px}.country strong{font-size:14px}.country small{font-size:10px;margin-top:3px}}
 @media(max-width:380px){.country{padding:9px 6px}.country .flag{width:38px;height:28px}.country .flag-map{width:42px;height:52px}.country strong{font-size:12px}.country small{font-size:9px}}
 
+
+/* Approved Solomud enhancements */
+.world-clock{margin:4px 0 20px;padding:16px 18px;border:1px solid #8e75ff55;border-radius:20px;background:linear-gradient(110deg,#171832dd,#102b37dd);box-shadow:0 8px 24px #0003}
+.world-clock-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.world-clock-head h2{font-size:17px;margin:0;color:#f4f6ff}
+.world-clock-head span{font-size:11px;color:var(--muted)}
+.clock-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.clock-card{min-width:0;padding:11px 14px;border:1px solid #ffffff16;border-radius:14px;background:#ffffff08}
+.clock-card>span{display:block;color:#b9c8e9;font-size:12px;font-weight:700}
+.clock-card time{display:block;margin:2px 0;color:#fff;font-size:clamp(22px,3vw,30px);font-weight:850;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.clock-card small{display:block;color:#8794b4;font-size:10px;overflow:hidden;text-overflow:ellipsis}
+.filter-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 16px;flex-wrap:wrap}
+.genre-filters{display:flex;gap:8px;flex-wrap:wrap}
+.genre-chip{border:1px solid #45436e;border-radius:999px;padding:8px 14px;background:linear-gradient(145deg,#191b35,#111b30);color:#c5cbe0;font:700 12px inherit;cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
+.genre-chip:hover,.genre-chip.active{border-color:#65dff0;background:linear-gradient(110deg,#713de0,#176f88);color:#fff;transform:translateY(-1px)}
+.adult-filter{display:inline-flex;align-items:center;gap:8px;color:#d9dcef;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.adult-filter input{width:17px;height:17px;accent-color:#a66bff}
+.sleep-timer-control{display:flex;align-items:center;gap:6px;color:#bbc4dc;font-size:11px;white-space:nowrap}
+.sleep-timer-control select{max-width:104px;padding:7px 8px;border:1px solid #45436e;border-radius:10px;background:#15172d;color:#fff;font:inherit}
+.country{position:relative;display:block;isolation:isolate;min-width:0;height:210px;padding:0;overflow:hidden;border:1px solid #45436e;border-radius:20px;background:#111a2b;color:#fff;text-align:left;box-shadow:0 8px 25px #0005;transition:transform .2s,border-color .2s,box-shadow .2s}
+.country::before{content:"";display:block;position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,#06101df2 0%,#07121d9c 28%,#06101d00 70%)}
+.country-identity{position:absolute;inset:0;display:flex;align-items:flex-end;min-height:0;margin:0}
+.country-art{position:absolute;inset:0;z-index:-2;display:block;width:100%;height:100%;margin:0;border-radius:0;filter:none;opacity:1;background:#142337}
+.country-art img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 52%;border-radius:0;transition:transform .5s}
+.country:hover .country-art img{transform:scale(1.04)}
+.country-info{position:relative;z-index:1;display:block;width:100%;padding:18px 18px 17px;background:linear-gradient(0deg,#07101cf2 0%,#07101d9c 76%,transparent 100%);color:#fff}
+.country strong{display:block;margin:0;color:#fff;font-size:22px;line-height:1.2;text-shadow:0 2px 6px #000}
+.country small{display:block;margin:5px 0 0;color:#e3e9f6;font-size:12px;text-shadow:0 1px 4px #000}
+.country .flag,.country .flag-map{display:none}
+.country:hover,.country.active{transform:translateY(-2px);border-color:#65dff0;background:#111a2b;box-shadow:0 0 0 1px #65dff055,0 13px 28px #0006}
+@media(max-width:760px){.country{height:154px}.country-info{padding:14px}.country strong{font-size:18px}.country small{font-size:10px}}
+@media(max-width:650px){.world-clock{margin:0 0 18px;padding:12px;border-radius:16px}.world-clock-head{margin-bottom:8px}.world-clock-head h2{font-size:15px}.world-clock-head span{font-size:9px}.clock-grid{gap:6px}.clock-card{padding:9px 7px;text-align:center}.clock-card>span{font-size:10px}.clock-card time{font-size:18px;letter-spacing:0}.clock-card small{font-size:8px}.countries{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:16px 0 20px}.country{height:118px;border-radius:13px}.country-info{padding:9px}.country strong{font-size:13px}.country small{font-size:9px}.filter-bar{align-items:flex-start}.genre-filters{gap:6px}.genre-chip{padding:7px 10px;font-size:11px}.adult-filter{padding-top:7px}.sleep-timer-control{font-size:10px}.sleep-timer-control select{max-width:92px;padding:6px}}
+@media(max-width:390px){.clock-card time{font-size:16px}.clock-card small{font-size:7px}.country{height:105px}.country-info{padding:7px}.country strong{font-size:12px}.country small{font-size:8px}.genre-chip{padding:6px 8px;font-size:10px}}
 </style></head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><div class="logo-wrap"><img class="logo-photo" id="brandPhoto" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABcQERQRDhcUEhQaGBcbIjklIh8fIkYyNSk5UkhXVVFIUE5bZoNvW2F8Yk5QcptzfIeLkpSSWG2grJ+OqoOPko3/2wBDARgaGiIeIkMlJUONXlBejY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY3/wAARCACcAFgDASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAAECBAUDBv/EAC4QAAIBAwQABQIGAwEAAAAAAAECAAMEERIhMUEFEyJRYVJxMmKBobHBFELRkf/EABgBAAMBAQAAAAAAAAAAAAAAAAABAgME/8QAGxEBAQEAAwEBAAAAAAAAAAAAAAERAhIhMVH/2gAMAwEAAhEDEQA/AOsI4pszKKSigCijigCnKpVWmyghjqOAQM7zrKlxbgVUZXdWd98H49oULMUVJWWmA7am7PvJRkQJBBBwRxCEIGsxRxRAopKKAKKOKAKU72uKNSlkZwdX9S5KPiq5ooccNC/Di4DkAjgwkaW9FD+USUZFCEIEsxRxRGUUlEYBzqv5VMuVLAbkDmULi+IOkHHrHqX6ZoVFDU2Vs4I3xPPu6lRt6pPK4qRu06gq0w68NxKHirklKY45l4FaFqpbYKo/iZVDVdXql98nJhy/CjWRdKKvsAI44SyRhHCAWMRSwlHWwHAMsGzpknGZHaQ8Z0TEKCScAdmXGsXzsQZheIXakNSXpsH5heUGCr4gGZqagBTtqMo1BSZl0bAbYxI60UkhNRP1f8nMsSfvM7bVY7Xdw9ep6iMLsAOJf8Mt/Ko+Yw9T8fAmZSUPWRTwWAM9DjEvj76VKKSiMtJQhCML9OtobOMzuLtfplQjBikZD1dNyOsTNfw+yeuajoxJOSNWxnQxEw6nrH8aSil4ooKFXQMqBtMzuXvEzqvHPtgSj3Iqo7W211Sz9Y/megxPOU20urezAz0srimomRMmZEy0owjhGGuSj7MokHtkOSpIMakdyNSsBsJlNW4VKLIMmcjOruT3K11VFG3Z26GJaWDWYvUdzuSxMrdzs1RcYUcnucQRMln1PS0zqpIfdQZ5sET0Fm+u0pH8uJXFNdSJEyZkTNCRhGYRk1WSmp3OP1nN6QZcowImbe1jc1QofAG4ErrdV6LaUfK54E5+1W0mUqcGVr4IbOprGRjb7ztRqi4UMNuiD0Zw8YC07I7gliAJpvhMG3o+dUfHCIWP6Qr23lUqVQtnzRnGOJpWNuE8Nr1j+N1b9AJVvgBbWnv5cnPDPw6yp3CM9QthTjA7muiLTUKgAUcASv4bTFOyUjl/UZalyJoiMISgUIQgFFxQ0OF1a13GRicKfqfScjM73DYJ0DJP+xHOJ2srXz6euqo3OQcczn+LdbSoFQ01XUdyp/7FWOcJdDW4+k4AlynTSmMIMCZd1Vb/AC6uDsGxF2tOTHFktmJOKtMnb0tmQqWoq6dNyDpGAHGMCBGeJEg+8NpmFvbZcUzlPykETUoVfNpKxBDdhhgzJy68fsYea4GCTtxnqXOVibG1FKlnctVYoxzgZBluay6i+CEIRhVp27VxpIAJAJIHA6H9zSpr5dMLnYCUra6p0bQM7ZYk7D/yV61zVuDgnQh6E5bdayLde/SkNNP1t+0y3cs7MxGonJlulajRqdW52z3OF9tcsMDgYA6ihuWTFk+0AIZjBE/EiXGZLMNiYEEqeW2pG0n4ly1unqVQjEEH4lLA9p1tiEqh86cdmVLZSsasJJAr/hYH7Qm3aIxi2VJXugpJIxk47mxRootRjpAxgD42mb4YMXbfAx+81EPqqff+hOW/Wk+CrsPtmZFy61LhmXjM0r2o1OgpXbJmUW+BCGBzF1BRvECSZRJdRADOY5FT64AyJNaihdJAyOyJE8SCjU2/tGKv2lVKdRd8g8/EJxsKS172hSfOl2AOOYSol//Z" alt="Памятник"><div class="made"><span>MADE</span> <span>IN</span> <span>MOLDOVA</span></div><div class="powered">Powered by Solomud</div></div><span class="brand-word"><span class="brand-solomud">Solomud</span> <span class="brand-web">Web</span> <span class="brand-radio">Radio</span></span></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end"><div class="language-switcher" role="group" aria-label="Язык сайта"><button class="lang-btn active" type="button" data-lang="ru">РУС</button><button class="lang-btn" type="button" data-lang="en">ENG</button><button class="lang-btn" type="button" data-lang="ro">RO</button></div><div class="listener-count" id="listenerCount">👥 Слушателей: —</div><div class="live">● РАДИО ОНЛАЙН</div></div></header>
 <section class="hero"><div class="eyebrow">ТВОЯ МУЗЫКА. ТВОИ СТРАНЫ.</div><h1>Радио, которое<br>всегда с тобой.</h1><p>Выбирай страну, находи любимую станцию и слушай прямо в браузере. Бесплатно, без регистрации.</p></section>
+<section class="world-clock" aria-label="Местное время">
+ <div class="world-clock-head"><h2 id="worldClockTitle">Время в столицах</h2><span id="worldClockNote">Обновляется автоматически</span></div>
+ <div class="clock-grid">
+  <article class="clock-card"><span id="clockCityMoldova">Кишинёв</span><time id="clockMoldova" aria-label="Местное время Кишинёва">--:--:--</time><small>Europe/Chisinau</small></article>
+  <article class="clock-card"><span id="clockCityRussia">Москва</span><time id="clockRussia" aria-label="Местное время Москвы">--:--:--</time><small>Europe/Moscow</small></article>
+  <article class="clock-card"><span id="clockCityRomania">Бухарест</span><time id="clockRomania" aria-label="Местное время Бухареста">--:--:--</time><small>Europe/Bucharest</small></article>
+ </div>
+</section>
+
 <section class="countries" aria-label="Выбрать страну">
- <button class="country active" data-country="Moldova">
-  <span class="country-identity">
-   <img class="flag-map" src="./moldova-map.png" alt="Карта Молдовы в цветах флага с государственным гербом"/>
-   <span class="country-info"><strong>Молдова</strong><small>33 радиостанции</small></span>
-  </span>
+ <button class="country active" data-country="Moldova" type="button">
+  <span class="country-art" role="img" aria-label="Часовая башня в центре Кишинёва"><img src="./images/chisinau-clock.webp" alt="Часовая башня в центре Кишинёва" loading="lazy" decoding="async"></span>
+  <span class="country-identity"><span class="country-info"><strong>Молдова</strong><small>Радиостанции страны</small></span></span>
  </button>
- <button class="country" data-country="Russia">
-  <span class="country-identity"><span class="flag ru" role="img" aria-label="Флаг России"><span></span><span></span><span></span></span><span class="country-info"><strong>Россия</strong><small>200+ радиостанций</small></span></span>
+ <button class="country" data-country="Russia" type="button">
+  <span class="country-art" role="img" aria-label="Кремль с набережной Москвы-реки"><img src="./images/moscow-kremlin.webp" alt="Кремль с набережной Москвы-реки" loading="lazy" decoding="async"></span>
+  <span class="country-identity"><span class="country-info"><strong>Россия</strong><small>Радиостанции страны</small></span></span>
  </button>
- <button class="country" data-country="Romania">
-  <span class="country-identity"><span class="flag ro" role="img" aria-label="Флаг Румынии"><span></span><span></span><span></span></span><span class="country-info"><strong>Румыния</strong><small>100+ радиостанций</small></span></span>
+ <button class="country" data-country="Romania" type="button">
+  <span class="country-art" role="img" aria-label="Замок Бран в Трансильвании"><img src="./images/bran-castle.webp" alt="Замок Бран в Трансильвании" loading="lazy" decoding="async"></span>
+  <span class="country-identity"><span class="country-info"><strong>Румыния</strong><small>Радиостанции страны</small></span></span>
  </button>
 </section>
 <div class="sectionhead"><h2 id="countryTitle">🇲🇩 Радио Молдовы</h2><span class="count" id="count">Загружаем станции…</span></div>
 <div class="viewtabs" role="group" aria-label="Каталог станций"><button class="viewtab active" id="allTab" type="button">Все станции</button><button class="viewtab" id="favTab" type="button">★ Избранное <span id="favCount">0</span></button></div>
 <div class="toolbar"><input class="search" id="search" placeholder="Найти радиостанцию…" aria-label="Поиск станции"><select class="select" id="sort"><option value="votes">Популярные</option><option value="name">По названию</option><option value="bitrate">По качеству потока</option></select></div>
+
+<div class="filter-bar">
+ <div class="genre-filters" role="group" aria-label="Фильтр по жанру">
+  <button class="genre-chip active" type="button" data-genre="all">Все</button>
+  <button class="genre-chip" type="button" data-genre="pop">Поп</button>
+  <button class="genre-chip" type="button" data-genre="rock">Рок</button>
+  <button class="genre-chip" type="button" data-genre="news">Новости</button>
+  <button class="genre-chip" type="button" data-genre="chill">Чилл</button>
+ </div>
+ <label class="adult-filter"><input id="hideAdult" type="checkbox" checked><span id="hideAdultLabel">Скрыть 18+</span></label>
+</div>
 <div class="stations" id="stations"><div class="empty">Подключаем каталог радиостанций…</div></div>
 <div class="notice"><strong>О качестве звука.</strong> Плеер воспроизводит качество, которое передаёт сама радиостанция. Если станция вещает в 320 кбит/с, вы услышите именно этот поток; повысить качество исходного эфира плеер не может.</div>
 <footer><span class="brand-word"><span class="brand-solomud">Solomud</span> <span class="brand-web">Web</span> <span class="brand-radio">Radio</span></span> · Бесплатное интернет-радио · Каталог предоставляется Radio Browser</footer>
 </main>
-<div class="player"><div class="playerinner"><button class="track-nav" id="previousStation" type="button" aria-label="Предыдущая радиостанция" title="Предыдущая радиостанция">‹</button><button class="mainplay" id="toggle" aria-label="Воспроизвести">▶</button><button class="track-nav" id="nextStation" type="button" aria-label="Следующая радиостанция" title="Следующая радиостанция">›</button><div class="now"><strong id="nowName">Выберите радиостанцию</strong><small id="nowMeta"><span class="brand-solomud">Solomud</span> <span class="brand-web">Web</span> <span class="brand-radio">Radio</span></small></div><div class="status" id="status">Готов к воспроизведению</div><input class="volume" id="volume" type="range" min="0" max="1" step=".01" value=".8" aria-label="Громкость"></div></div>
+<div class="player"><div class="playerinner"><button class="track-nav" id="previousStation" type="button" aria-label="Предыдущая радиостанция" title="Предыдущая радиостанция">‹</button><button class="mainplay" id="toggle" aria-label="Воспроизвести">▶</button><button class="track-nav" id="nextStation" type="button" aria-label="Следующая радиостанция" title="Следующая радиостанция">›</button><div class="now"><strong id="nowName">Выберите радиостанцию</strong><small id="nowMeta"><span class="brand-solomud">Solomud</span> <span class="brand-web">Web</span> <span class="brand-radio">Radio</span></small></div><div class="status" id="status">Готов к воспроизведению</div><input class="volume" id="volume" type="range" min="0" max="1" step=".01" value=".8" aria-label="Громкость"><label class="sleep-timer-control"><span id="sleepTimerLabel">Таймер сна</span><select id="sleepTimer" aria-label="Таймер сна"><option value="0">Выкл.</option><option value="15">15 минут</option><option value="30">30 минут</option><option value="45">45 минут</option><option value="60">60 минут</option></select></label></div></div>
 <audio id="audio" preload="none"></audio>
 <section class="station-screen" id="stationScreen" aria-hidden="true" aria-label="Плеер радиостанции">
  <div class="station-screen-inner">
@@ -205,7 +258,7 @@ const countries={Moldova:{flag:"🇲🇩",title:"Радио Молдовы"},Rus
 const translations={"en":{"ТВОЯ МУЗЫКА. ТВОИ СТРАНЫ.":"YOUR MUSIC. YOUR COUNTRIES.","Радио, которое<br>всегда с тобой.":"Radio that<br>stays with you.","Выбирай страну, находи любимую станцию и слушай прямо в браузере. Бесплатно, без регистрации.":"Choose a country, find your favourite station and listen in your browser. Free, no registration.","👥 Слушателей: —":"👥 Listeners: —","● РАДИО ОНЛАЙН":"● RADIO ONLINE","Выбрать страну":"Choose a country","Флаг Молдовы":"Flag of Moldova","Флаг России":"Flag of Russia","Флаг Румынии":"Flag of Romania","Молдова":"Moldova","Россия":"Russia","Румыния":"Romania","Радиостанции страны":"Country radio stations","🇲🇩 Радио Молдовы":"🇲🇩 Moldova Radio","Радио Молдовы":"Moldova Radio","Радио России":"Russia Radio","Радио Румынии":"Romania Radio","🇷🇺 Радио России":"🇷🇺 Russia Radio","🇷🇴 Радио Румынии":"🇷🇴 Romania Radio","Каталог станций":"Station directory","Все станции":"All stations","★ Избранное ":"★ Favourites ","Найти радиостанцию…":"Find a radio station…","Поиск станции":"Search stations","Популярные":"Popular","По названию":"By name","По качеству потока":"By stream quality","Предыдущая радиостанция":"Previous station","Следующая радиостанция":"Next station","Воспроизвести":"Play","Выберите радиостанцию":"Choose a station","Готов к воспроизведению":"Ready to play","Громкость":"Volume","Плеер радиостанции":"Radio player","Закрыть плеер":"Close player","Закрыть":"Close","Логотип радиостанции":"Station logo","★ Моё избранное":"★ My favourites","Радио":"Radio","Радиостанция":"Radio station","кбит/с":"kbps","качество не указано":"quality not specified","Сейчас играет":"Now playing","Избранное":"Favourites","Слушать":"Listen","Вы ещё не добавили станции в избранное. Нажмите ★ на карточке любой станции.":"You haven't added any stations to favourites yet. Press ★ on any station card.","Станции не найдены. Попробуйте изменить запрос.":"No stations found. Try changing your search.","Загружаем каталог радиостанций…":"Loading radio directory…","Загрузка…":"Loading…","Каталог недоступен":"Directory unavailable","0 станций":"0 stations","Не удалось получить станции. Попробуйте обновить каталог чуть позже.":"Couldn't load stations. Please try refreshing the directory later.","О качестве звука.":"About sound quality.","Плеер воспроизводит качество, которое передаёт сама радиостанция. Если станция вещает в 320 кбит/с, вы услышите именно этот поток; повысить качество исходного эфира плеер не может.":"The player streams the quality provided by the radio station. If a station broadcasts at 320 kbps, you will hear that stream; the player cannot improve the original broadcast quality.","Бесплатное интернет-радио":"Free internet radio","Сейчас слушают: ":"Listening now: "," · эту станцию: ":" · this station: ","Только активные подключения, передающие статус воспроизведения":"Only active connections reporting playback status","Счётчик временно недоступен":"Listener count temporarily unavailable","Избранное: ":"Favourites: "," станций":" stations","Номер станции":"Station number","Информация от радиостанции":"Information from the radio station","Качество зависит от станции":"Quality depends on the station","Запускаем эфир…":"Starting stream…","В эфире":"On air","Поток недоступен — попробуйте другую станцию":"Stream unavailable — try another station","Поток прервался — ищем резервный…":"Stream interrupted — looking for a backup…","Переключено на резервный поток":"Switched to backup stream","Не удалось восстановить эфир. Выберите другую станцию":"Couldn't restore the stream. Choose another station","Загрузка эфира…":"Loading stream…","Ожидаем информацию о песне…":"Waiting for track information…","Если станция передаёт название композиции, оно появится здесь":"If the station provides track information, it will appear here","Название композиции появится, если радиостанция передаёт эти данные":"Track information will appear if the station provides it","Сейчас в эфире":"Now playing","Информация о композиции от радиостанции":"Track information provided by the station","Сначала выберите страну и дождитесь загрузки станций":"Choose a country and wait for stations to load first","Сначала выберите станцию":"Choose a station first","Пауза":"Paused","Эфир играет":"Playing","Ошибка потока. Выберите другую станцию":"Stream error. Choose another station","МОКАНИЦА":"MOCĂNIȚA","Моканица — старинный паровоз в горах Румынии":"Mocănița — a historic steam train in Romania's mountains","Моканица — старинный паровоз среди гор и лесов":"Mocănița — a historic steam train among mountains and forests","Красивая деревянная винная бочка с гроздьями винограда":"Beautiful wooden wine barrel with grape clusters","Яркая расписная русская матрёшка":"Colourful traditional Russian matryoshka doll"},"ro":{"ТВОЯ МУЗЫКА. ТВОИ СТРАНЫ.":"MUZICA TA. ȚĂRILE TALE.","Радио, которое<br>всегда с тобой.":"Radioul care<br>este mereu cu tine.","Выбирай страну, находи любимую станцию и слушай прямо в браузере. Бесплатно, без регистрации.":"Alege țara, găsește postul preferat și ascultă direct în browser. Gratuit, fără înregistrare.","👥 Слушателей: —":"👥 Ascultători: —","● РАДИО ОНЛАЙН":"● RADIO ONLINE","Выбрать страну":"Alege țara","Флаг Молдовы":"Steagul Moldovei","Флаг России":"Steagul Rusiei","Флаг Румынии":"Steagul României","Молдова":"Moldova","Россия":"Rusia","Румыния":"România","Радиостанции страны":"Posturi radio din țară","🇲🇩 Радио Молдовы":"🇲🇩 Radio Moldova","Радио Молдовы":"Radio Moldova","Радио России":"Radio Rusia","Радио Румынии":"Radio România","🇷🇺 Радио России":"🇷🇺 Radio Rusia","🇷🇴 Радио Румынии":"🇷🇴 Radio România","Каталог станций":"Lista posturilor","Все станции":"Toate posturile","★ Избранное ":"★ Favorite ","Найти радиостанцию…":"Caută un post de radio…","Поиск станции":"Caută posturi","Популярные":"Populare","По названию":"După nume","По качеству потока":"După calitatea fluxului","Предыдущая радиостанция":"Postul anterior","Следующая радиостанция":"Postul următor","Воспроизвести":"Redă","Выберите радиостанцию":"Alege un post de radio","Готов к воспроизведению":"Pregătit pentru redare","Громкость":"Volum","Плеер радиостанции":"Player radio","Закрыть плеер":"Închide playerul","Закрыть":"Închide","Логотип радиостанции":"Logo-ul postului","★ Моё избранное":"★ Favoritele mele","Радио":"Radio","Радиостанция":"Post de radio","кбит/с":"kbps","качество не указано":"calitate nespecificată","Сейчас играет":"Acum se redă","Избранное":"Favorite","Слушать":"Ascultă","Вы ещё не добавили станции в избранное. Нажмите ★ на карточке любой станции.":"Nu ai adăugat încă posturi la favorite. Apasă ★ pe cardul unui post.","Станции не найдены. Попробуйте изменить запрос.":"Nu s-au găsit posturi. Încearcă altă căutare.","Загружаем каталог радиостанций…":"Se încarcă lista posturilor…","Загрузка…":"Se încarcă…","Каталог недоступен":"Lista nu este disponibilă","0 станций":"0 posturi","Не удалось получить станции. Попробуйте обновить каталог чуть позже.":"Posturile nu au putut fi încărcate. Încearcă să reîmprospătezi lista mai târziu.","О качестве звука.":"Despre calitatea sunetului.","Плеер воспроизводит качество, которое передаёт сама радиостанция. Если станция вещает в 320 кбит/с, вы услышите именно этот поток; повысить качество исходного эфира плеер не может.":"Playerul redă calitatea transmisă de postul de radio. Dacă postul emite la 320 kbps, vei asculta exact acel flux; playerul nu poate îmbunătăți calitatea transmisiei originale.","Бесплатное интернет-радио":"Radio online gratuit","Сейчас слушают: ":"Ascultă acum: "," · эту станцию: ":" · acest post: ","Только активные подключения, передающие статус воспроизведения":"Doar conexiunile active care transmit starea redării","Счётчик временно недоступен":"Contorul de ascultători nu este disponibil temporar","Избранное: ":"Favorite: "," станций":" posturi","Номер станции":"Numărul postului","Информация от радиостанции":"Informații de la postul de radio","Качество зависит от станции":"Calitatea depinde de post","Запускаем эфир…":"Se pornește transmisia…","В эфире":"În direct","Поток недоступен — попробуйте другую станцию":"Flux indisponibil — încearcă alt post","Поток прервался — ищем резервный…":"Flux întrerupt — căutăm o alternativă…","Переключено на резервный поток":"S-a trecut la fluxul alternativ","Не удалось восстановить эфир. Выберите другую станцию":"Transmisia nu a putut fi restabilită. Alege alt post","Загрузка эфира…":"Se încarcă transmisia…","Ожидаем информацию о песне…":"Se așteaptă informații despre melodie…","Если станция передаёт название композиции, оно появится здесь":"Dacă postul transmite informații despre melodie, acestea vor apărea aici","Название композиции появится, если радиостанция передаёт эти данные":"Titlul melodiei va apărea dacă postul transmite aceste date","Сейчас в эфире":"Acum în direct","Информация о композиции от радиостанции":"Informații despre melodie de la postul de radio","Сначала выберите страну и дождитесь загрузки станций":"Alege mai întâi o țară și așteaptă încărcarea posturilor","Сначала выберите станцию":"Alege mai întâi un post","Пауза":"Pauză","Эфир играет":"Se redă","Ошибка потока. Выберите другую станцию":"Eroare de flux. Alege alt post","МОКАНИЦА":"MOCĂNIȚA","Моканица — старинный паровоз в горах Румынии":"Mocănița — tren cu abur istoric în munții României","Моканица — старинный паровоз среди гор и лесов":"Mocănița — tren cu abur istoric printre munți și păduri","Красивая деревянная винная бочка с гроздьями винограда":"Butoi frumos de vin din lemn, cu ciorchini de struguri","Яркая расписная русская матрёшка":"Matrioșcă rusească tradițională, pictată în culori vii"}};
 let language=(()=>{try{return localStorage.getItem("solomud-language")||"ru"}catch{return"ru"}})();
 function tr(value){const s=String(value??"");if(language==="ru")return s;const keys=Object.keys(translations.en);for(const key of keys){if(s===key||s===translations.en[key]||s===translations.ro[key])return translations[language]?.[key]||key;}return translations[language]?.[s]||s;}
-function setLanguage(code){if(!["ru","en","ro"].includes(code))return;language=code;try{localStorage.setItem("solomud-language",code)}catch{}document.documentElement.lang=code;document.querySelectorAll(".lang-btn").forEach(b=>b.classList.toggle("active",b.dataset.lang===code));translatePage();render();updateListenerCount();}
+function setLanguage(code){if(!["ru","en","ro"].includes(code))return;language=code;try{localStorage.setItem("solomud-language",code)}catch{}document.documentElement.lang=code;document.querySelectorAll(".lang-btn").forEach(b=>b.classList.toggle("active",b.dataset.lang===code));translatePage();applyEnhancementLabels();render();updateListenerCount();}
 function translatePage(){
  const set=(sel,val)=>{const el=document.querySelector(sel);if(el)el.textContent=tr(val)};
  const setHtml=(sel,val)=>{const el=document.querySelector(sel);if(el)el.innerHTML=tr(val)};
@@ -225,8 +278,48 @@ function translatePage(){
 }
 document.querySelectorAll(".lang-btn").forEach(b=>b.addEventListener("click",()=>setLanguage(b.dataset.lang)));
 
+
 let country="Moldova",all=[],current=null,playing=false,viewMode="all",hlsPlayer=null,warmedStationId=null,activeStreamUrl=null,switchingStream=false,waitingTimer=null,streamRequest=0;
+let selectedGenre="all",hideAdultContent=true,sleepTimerHandle=null;
+try{const savedAdultSetting=localStorage.getItem("solomud-hide-adult");if(savedAdultSetting!==null)hideAdultContent=savedAdultSetting==="true"}catch{}
 const $=id=>document.getElementById(id),audio=$("audio");
+const worldClockCities={Moldova:{zone:"Europe/Chisinau",ru:"Кишинёв",en:"Chișinău",ro:"Chișinău"},Russia:{zone:"Europe/Moscow",ru:"Москва",en:"Moscow",ro:"Moscova"},Romania:{zone:"Europe/Bucharest",ru:"Бухарест",en:"Bucharest",ro:"București"}};
+const enhancementCopy={
+ ru:{clockTitle:"Время в столицах",clockNote:"Обновляется автоматически",genres:{all:"Все",pop:"Поп",rock:"Рок",news:"Новости",chill:"Чилл"},hideAdult:"Скрыть 18+",sleep:"Таймер сна",timerOptions:["Выкл.","15 минут","30 минут","45 минут","60 минут"],timerSet:"Эфир выключится через ",timerEnd:"Таймер сна завершён — эфир остановлен."},
+ en:{clockTitle:"Local time",clockNote:"Updates automatically",genres:{all:"All",pop:"Pop",rock:"Rock",news:"News",chill:"Chill"},hideAdult:"Hide 18+",sleep:"Sleep timer",timerOptions:["Off","15 minutes","30 minutes","45 minutes","60 minutes"],timerSet:"Radio will stop in ",timerEnd:"Sleep timer finished — radio stopped."},
+ ro:{clockTitle:"Ora locală",clockNote:"Se actualizează automat",genres:{all:"Toate",pop:"Pop",rock:"Rock",news:"Știri",chill:"Chill"},hideAdult:"Ascunde 18+",sleep:"Temporizator somn",timerOptions:["Oprit","15 minute","30 minute","45 minute","60 minute"],timerSet:"Radioul se oprește în ",timerEnd:"Temporizatorul s-a încheiat — radioul s-a oprit."}
+};
+function applyEnhancementLabels(){
+ const copy=enhancementCopy[language]||enhancementCopy.ru;
+ $("worldClockTitle").textContent=copy.clockTitle;$("worldClockNote").textContent=copy.clockNote;
+ for(const key of ["Moldova","Russia","Romania"])$("clockCity"+key).textContent=worldClockCities[key][language]||worldClockCities[key].en;
+ document.querySelectorAll(".genre-chip").forEach(b=>{b.textContent=copy.genres[b.dataset.genre];b.classList.toggle("active",b.dataset.genre===selectedGenre)});
+ $("hideAdultLabel").textContent=copy.hideAdult;$("hideAdult").checked=hideAdultContent;
+ $("sleepTimerLabel").textContent=copy.sleep;const timerOptions=$("sleepTimer").options;
+ copy.timerOptions.forEach((label,i)=>{if(timerOptions[i])timerOptions[i].textContent=label});
+}
+function updateWorldClocks(){
+ const now=new Date(),locale=language==="en"?"en-GB":language==="ro"?"ro-RO":"ru-RU";
+ for(const key of ["Moldova","Russia","Romania"]){
+  const el=$("clock"+key);if(!el)continue;
+  el.textContent=new Intl.DateTimeFormat(locale,{timeZone:worldClockCities[key].zone,hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).format(now);
+  el.dateTime=now.toISOString();
+ }
+}
+function isAdultStation(s){return /(?:adult|18\+|18plus|xxx|erotic|sex|porn|explicit|nsfw)/i.test((s.name||"")+" "+(s.tags||""))}
+function stationMatchesGenre(s,genre){
+ if(genre==="all")return true;
+ const text=(s.name||"")+" "+(s.tags||"");
+ const patterns={pop:/pop|dance|disco|hits?|top\s*40|r\s*&\s*b|hip.?hop|latin/i,rock:/rock|metal|punk|alternative|indie/i,news:/news|talk|sport|politic|current affairs|journalism|information/i,chill:/chill|ambient|lounge|relax|jazz|blues|classical|acoustic|nature|lo.?fi/i};
+ return patterns[genre]?.test(text)||false;
+}
+function setSleepTimer(minutes){
+ clearTimeout(sleepTimerHandle);sleepTimerHandle=null;
+ if(!minutes){$("status").textContent=tr("Готов к воспроизведению");return}
+ const copy=enhancementCopy[language]||enhancementCopy.ru;
+ $("status").textContent=copy.timerSet+minutes+(language==="en"?" minutes":language==="ro"?" minute":" мин.");
+ sleepTimerHandle=setTimeout(()=>{audio.pause();playing=false;stopListening();updatePlayer();render();$("status").textContent=copy.timerEnd;$("sleepTimer").value="0";sleepTimerHandle=null},minutes*60*1000);
+}
 
 const firebaseConfig={apiKey:"AIzaSyAQbauuRrbCqFiBcYGJudI4dKFaq6olA5s",authDomain:"solomud-radio.firebaseapp.com",databaseURL:"https://solomud-radio-default-rtdb.europe-west1.firebasedatabase.app",projectId:"solomud-radio",storageBucket:"solomud-radio.firebasestorage.app",messagingSenderId:"819052556755",appId:"1:819052556755:web:1afd00e3f3a9614f0f3f26"};
 let presenceDb=null,presenceRef=null,presenceUid=null,presenceReady=false,activeListenersSnapshot=null;
@@ -254,7 +347,7 @@ function render(){
  const q=$("search").value.trim().toLowerCase(),sort=$("sort").value;
  const saved=(()=>{try{return JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{return{}}})();
  let source=viewMode==="favorites"?Object.values(saved):all;
- let list=source.filter(s=>(s.name+" "+(s.tags||"")+" "+(s.state||"")).toLowerCase().includes(q));
+ let list=source.filter(s=>(s.name+" "+(s.tags||"")+" "+(s.state||"")).toLowerCase().includes(q)).filter(s=>!hideAdultContent||!isAdultStation(s)).filter(s=>stationMatchesGenre(s,selectedGenre));
  list.sort((a,b)=>(country==="Russia"&&viewMode==="all"?((b.stationuuid==="solomud-svoe-fm")-(a.stationuuid==="solomud-svoe-fm")):0)||(sort==="name"?a.name.localeCompare(b.name):sort==="bitrate"?(b.bitrate||0)-(a.bitrate||0):(country==="Russia"&&viewMode==="all"?((b.stationuuid==="solomud-dfm-moscow")-(a.stationuuid==="solomud-dfm-moscow")):0)||(b.votes||0)-(a.votes||0)));
  $("count").textContent=viewMode==="favorites"?tr("Избранное: ")+list.length+(language==="en"?" stations":language==="ro"?" posturi":" станций"):list.length+(language==="en"?" stations":language==="ro"?" posturi":" станций");
  if(viewMode==="favorites")$("countryTitle").textContent=tr("★ Моё избранное");else $("countryTitle").textContent=countries[country].flag+" "+tr(countries[country].title);
@@ -300,6 +393,10 @@ async function load(){
 function selectCountry(c){country=c;document.querySelectorAll(".country").forEach(b=>b.classList.toggle("active",b.dataset.country===c));$("countryTitle").textContent=countries[c].flag+" "+tr(countries[c].title);load()}
 document.querySelectorAll(".country").forEach(b=>b.addEventListener("click",()=>selectCountry(b.dataset.country)));
 $("search").addEventListener("input",render);$("sort").addEventListener("change",render);
+document.querySelectorAll(".genre-chip").forEach(b=>b.addEventListener("click",()=>{selectedGenre=b.dataset.genre;applyEnhancementLabels();render()}));
+$("hideAdult").addEventListener("change",e=>{hideAdultContent=e.target.checked;try{localStorage.setItem("solomud-hide-adult",String(hideAdultContent))}catch{}render()});
+$("sleepTimer").addEventListener("change",e=>setSleepTimer(Number(e.target.value)));
+
 $("allTab").addEventListener("click",()=>{viewMode="all";render()});
 $("favTab").addEventListener("click",()=>{viewMode="favorites";render()});
 $("stations").addEventListener("click",e=>{
@@ -476,5 +573,5 @@ audio.addEventListener("error",()=>{stopListening();if(playing&&!switchingStream
 audio.addEventListener("ended",()=>{stopListening();if(playing&&!switchingStream)recoverCurrentStream("эфир завершился")});
 audio.addEventListener("emptied",stopListening);
 $("volume").addEventListener("input",e=>audio.volume=Number(e.target.value));audio.volume=.8;
-translatePage();setLanguage(language);selectCountry("Moldova");
+updateWorldClocks();setInterval(updateWorldClocks,1000);translatePage();setLanguage(language);selectCountry("Moldova");
 </script></body></html>
