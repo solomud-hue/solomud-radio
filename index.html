@@ -321,7 +321,7 @@ const genreDefinitions=[
  {id:"religious",label:{ru:"Религиозная",en:"Religious",ro:"Religioasă"},pattern:/christian|gospel|religious|worship|spiritual/i}
 ];
 function classifyStationGenres(s){
- const text=((s.name||"")+" "+(s.tags||"")).normalize("NFKD").replace(/\\p{M}/gu,"").toLowerCase();
+ const text=((s.name||"")+" "+(s.tags||"")).normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
  const found=genreDefinitions.filter(item=>item.pattern.test(text)).map(item=>item.id);
  return found.length?found:["music"];
 }
@@ -417,8 +417,8 @@ async function load(){
   const url=String(s.url_resolved||s.url||"").trim();
   if(!s.name||!url||!/^https:\/\//i.test(url)||Number(s.bitrate||0)<128||s.lastcheckok===0||/aquarelle|radio\s*manele\s*premium/i.test(s.name))return false;
   let streamKey=url;
-  try{const parsed=new URL(url);parsed.hash="";parsed.hostname=parsed.hostname.toLowerCase().replace(/^www\\./,"");parsed.pathname=parsed.pathname.replace(/\\/+$/,"");streamKey=parsed.toString()}catch{}
-  const nameKey=String(s.name).normalize("NFKD").replace(/\\p{M}/gu,"").toLowerCase().replace(/[^\\p{L}\\p{N}]+/gu," ").trim();
+  try{const parsed=new URL(url);parsed.hash="";parsed.hostname=parsed.hostname.toLowerCase().replace(/^www\./,"");parsed.pathname=parsed.pathname.replace(/\/+$/,"");streamKey=parsed.toString()}catch{}
+  const nameKey=String(s.name).normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9а-яё]+/gi," ").trim();
   if(seenStreams.has(streamKey)||(nameKey&&seenNames.has(nameKey)))return false;
   seenStreams.add(streamKey);if(nameKey)seenNames.add(nameKey);return true;
  }).sort((x,y)=>(y.clickcount||y.votes||0)-(x.clickcount||x.votes||0));
