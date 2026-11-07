@@ -444,7 +444,7 @@ async function load(){
   return check&&check.working===true&&check.streamUrl?{...enriched,url_resolved:check.streamUrl,url:check.streamUrl,verifiedLatencyMs:check.latencyMs}:enriched;
  }).filter(Boolean);
  all=candidates.filter(s=>{
-  if(country==="Russia"&&String(s.name||"").trim().toLowerCase().startsWith("звезда тв"))return false;
+  if(country==="Russia"&&/^звезда\s*тв/i.test(String(s.name||"").trim()))return false;
   const url=String(s.url_resolved||s.url||"").trim();
   if(!s.name||!url||!/^https:\/\//i.test(url)||Number(s.bitrate||0)<128||s.lastcheckok===0||/aquarelle|radio\s*manele\s*premium/i.test(s.name))return false;
   let streamKey=url;
