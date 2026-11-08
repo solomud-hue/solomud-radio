@@ -603,10 +603,30 @@ function stationCover(name){const value=String(name||"Radio"),parts=value.normal
 const favs=()=>{try{return JSON.parse(localStorage.getItem("solomud-favs")||"[]")}catch{return[]}};
 function saveFavs(a){localStorage.setItem("solomud-favs",JSON.stringify(a))}
 function stationId(s){return s.stationuuid||s.url_resolved||s.name}
-// Remember the last selected live station between visits (no automatic audio).
+// Remember the last station and also support listening history saved by older site versions.
 const lastStationKey='solomud-last-station';
-function rememberLastStation(s){if(!s)return;try{localStorage.setItem(lastStationKey,JSON.stringify(s))}catch{}}
-function restoreLastStation(){if(current)return;try{const saved=JSON.parse(localStorage.getItem(lastStationKey)||'null');if(!saved||!saved.name||!streamCandidates(saved).length)return;current=saved;$('nowName').textContent=saved.name;$('nowMeta').textContent=(saved.stationCountry&&countries[saved.stationCountry]?countries[saved.stationCountry].flag+' · ':'')+(saved.bitrate?saved.bitrate+' '+tr('кбит/с'):tr('Качество зависит от станции'));updatePlayer()}catch{}}
+function rememberLastStation(s){
+ if(!s||!s.name||!streamCandidates(s).length)return;
+ try{localStorage.setItem(lastStationKey,JSON.stringify(s))}catch{}
+}
+function restoreLastStation(){
+ if(current)return current;
+ let saved=null;
+ try{saved=JSON.parse(localStorage.getItem(lastStationKey)||'null')}catch{}
+ // Older Solomud Radio versions recorded the last *playing* station here.
+ // Use that history if the newer key hasn't been written yet.
+ if(!saved||!saved.name||!streamCandidates(saved).length){
+  const recent=Array.isArray(waveHistory)?waveHistory:[];
+  saved=recent.find(s=>s&&s.name&&streamCandidates(s).length)||null;
+ }
+ if(!saved)return null;
+ current=all.find(s=>stationId(s)===stationId(saved))||saved;
+ rememberLastStation(current);
+ $('nowName').textContent=current.name;
+ $('nowMeta').textContent=(current.stationCountry&&countries[current.stationCountry]?countries[current.stationCountry].flag+' · ':'')+(current.bitrate?current.bitrate+' '+tr('кбит/с'):tr('Качество зависит от станции'));
+ updatePlayer();
+ return current;
+}
 
 function savedStations(){try{return JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{return{}}}
 function findStation(id){return all.find(x=>stationId(x)===id)||savedStations()[id]||null}
@@ -885,8 +905,8 @@ function changeStation(direction){
 }
 $("previousStation").addEventListener("click",()=>changeStation(-1));
 $("nextStation").addEventListener("click",()=>changeStation(1));
-$("toggle").addEventListener("click",()=>{if(!current)restoreLastStation();if(!current){$("status").textContent=tr("Сначала выберите станцию");return}if(playing){audio.pause();playing=false;$("status").textContent=tr("Пауза");updatePlayer();render();return}playStation(current)});
-onAudio("playing",()=>{rememberWave(current);clearTimeout(waitingTimer);$("stationScreenHint").textContent=tr("Эфир играет");warmedStationId=current?stationId(current):null;playing=true;if(!$("status").textContent.includes("резерв"))$("status").textContent=tr("В эфире");markListening();updatePlayer();render()});
+$("toggle").addEventListener("click",()=>{if(!current)restoreLastStation();if(!current){$("status").textContent=tr("Сначала выберите станцию");return}if(playing){audio.pause();playing=false;$("status").textContent=tr("Пауза");updatePlayer();render();return}playStation(current,{preserveClosedScreen:true})});
+onAudio("playing",()=>{rememberWave(current);rememberLastStation(current);clearTimeout(waitingTimer);$("stationScreenHint").textContent=tr("Эфир играет");warmedStationId=current?stationId(current):null;playing=true;if(!$("status").textContent.includes("резерв"))$("status").textContent=tr("В эфире");markListening();updatePlayer();render()});
 onAudio("waiting",()=>{if(!playing||switchingStream)return;clearTimeout(waitingTimer);waitingTimer=setTimeout(()=>recoverCurrentStream("долгая остановка буфера"),12000)});
 onAudio("pause",()=>{stopListening();if(!audio.ended){playing=false;updatePlayer();render()}});
 onAudio("error",()=>{stopListening();if(playing&&!switchingStream){recoverCurrentStream("ошибка аудиопотока");return}if(!switchingStream){$("status").textContent=tr("Ошибка потока. Выберите другую станцию");playing=false;updatePlayer();render()}});
