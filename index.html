@@ -374,6 +374,17 @@ body.eq-fullscreen-open{overflow:hidden}
 @media(max-width:480px){.station-screen[data-receiver="retro"] .station-screen-inner{padding:65px 16px 30px}.station-screen[data-receiver="retro"] .receiver-meters{gap:10px}.receiver-meter{border-width:3px}.receiver-meter-label{bottom:7px;font-size:7px}.station-screen[data-receiver="retro"] .station-screen-name{padding:14px 10px}.receiver-switch button{padding:8px 15px}}
 @media(prefers-reduced-motion:reduce){.receiver-needle{transition:none}}
 
+.receiver-ticks{mask-image:none}
+.receiver-ticks:after{left:var(--tune-position,0%);pointer-events:none;transform:translateX(-50%)}
+#receiverTune{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize}
+.receiver-ticks:focus-within{outline:2px solid #573b20;outline-offset:4px}
+#receiverTuneLabel{display:block;min-height:1.4em;margin:8px 0;font:700 13px system-ui}
+.receiver-presets{display:flex;justify-content:center;gap:7px;margin:10px 0}
+.receiver-presets button,#receiverSave{min-height:36px;padding:5px 10px;border:1px solid #7a664a;border-radius:6px;background:linear-gradient(#faf3df,#aca293);color:#29241a;font:700 12px system-ui;cursor:pointer}
+.receiver-presets button{min-width:36px;touch-action:manipulation}
+.receiver-presets button[data-saved="true"]{border-color:#7c3218;box-shadow:inset 0 -3px #9a4d24}
+#receiverSave[aria-pressed="true"]{background:#573b20;color:#fff}
+#receiverPresetStatus{margin:6px 0 0;font-size:11px}
 </style></head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><div class="logo-wrap"><img class="logo-photo" id="brandPhoto" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABcQERQRDhcUEhQaGBcbIjklIh8fIkYyNSk5UkhXVVFIUE5bZoNvW2F8Yk5QcptzfIeLkpSSWG2grJ+OqoOPko3/2wBDARgaGiIeIkMlJUONXlBejY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY3/wAARCACcAFgDASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAAECBAUDBv/EAC4QAAIBAwQABQIGAwEAAAAAAAECAAMEERIhMUEFEyJRYVJxMmKBobHBFELRkf/EABgBAAMBAQAAAAAAAAAAAAAAAAABAgME/8QAGxEBAQEAAwEBAAAAAAAAAAAAAAERAhIhMVH/2gAMAwEAAhEDEQA/AOsI4pszKKSigCijigCnKpVWmyghjqOAQM7zrKlxbgVUZXdWd98H49oULMUVJWWmA7am7PvJRkQJBBBwRxCEIGsxRxRAopKKAKKOKAKU72uKNSlkZwdX9S5KPiq5ooccNC/Di4DkAjgwkaW9FD+USUZFCEIEsxRxRGUUlEYBzqv5VMuVLAbkDmULi+IOkHHrHqX6ZoVFDU2Vs4I3xPPu6lRt6pPK4qRu06gq0w68NxKHirklKY45l4FaFqpbYKo/iZVDVdXql98nJhy/CjWRdKKvsAI44SyRhHCAWMRSwlHWwHAMsGzpknGZHaQ8Z0TEKCScAdmXGsXzsQZheIXakNSXpsH5heUGCr4gGZqagBTtqMo1BSZl0bAbYxI60UkhNRP1f8nMsSfvM7bVY7Xdw9ep6iMLsAOJf8Mt/Ko+Yw9T8fAmZSUPWRTwWAM9DjEvj76VKKSiMtJQhCML9OtobOMzuLtfplQjBikZD1dNyOsTNfw+yeuajoxJOSNWxnQxEw6nrH8aSil4ooKFXQMqBtMzuXvEzqvHPtgSj3Iqo7W211Sz9Y/megxPOU20urezAz0srimomRMmZEy0owjhGGuSj7MokHtkOSpIMakdyNSsBsJlNW4VKLIMmcjOruT3K11VFG3Z26GJaWDWYvUdzuSxMrdzs1RcYUcnucQRMln1PS0zqpIfdQZ5sET0Fm+u0pH8uJXFNdSJEyZkTNCRhGYRk1WSmp3OP1nN6QZcowImbe1jc1QofAG4ErrdV6LaUfK54E5+1W0mUqcGVr4IbOprGRjb7ztRqi4UMNuiD0Zw8YC07I7gliAJpvhMG3o+dUfHCIWP6Qr23lUqVQtnzRnGOJpWNuE8Nr1j+N1b9AJVvgBbWnv5cnPDPw6yp3CM9QthTjA7muiLTUKgAUcASv4bTFOyUjl/UZalyJoiMISgUIQgFFxQ0OF1a13GRicKfqfScjM73DYJ0DJP+xHOJ2srXz6euqo3OQcczn+LdbSoFQ01XUdyp/7FWOcJdDW4+k4AlynTSmMIMCZd1Vb/AC6uDsGxF2tOTHFktmJOKtMnb0tmQqWoq6dNyDpGAHGMCBGeJEg+8NpmFvbZcUzlPykETUoVfNpKxBDdhhgzJy68fsYea4GCTtxnqXOVibG1FKlnctVYoxzgZBluay6i+CEIRhVp27VxpIAJAJIHA6H9zSpr5dMLnYCUra6p0bQM7ZYk7D/yV61zVuDgnQh6E5bdayLde/SkNNP1t+0y3cs7MxGonJlulajRqdW52z3OF9tcsMDgYA6ihuWTFk+0AIZjBE/EiXGZLMNiYEEqeW2pG0n4ly1unqVQjEEH4lLA9p1tiEqh86cdmVLZSsasJJAr/hYH7Qm3aIxi2VJXugpJIxk47mxRootRjpAxgD42mb4YMXbfAx+81EPqqff+hOW/Wk+CrsPtmZFy61LhmXjM0r2o1OgpXbJmUW+BCGBzF1BRvECSZRJdRADOY5FT64AyJNaihdJAyOyJE8SCjU2/tGKv2lVKdRd8g8/EJxsKS172hSfOl2AOOYSol//Z" alt="Памятник"><div class="made"><span>MADE</span> <span>IN</span> <span>MOLDOVA</span></div><div class="powered">Powered by Solomud</div></div><span class="brand-word"><span class="brand-solomud">Solomud</span> <span class="brand-web">Web</span> <span class="brand-radio">Radio</span></span></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end"><button class="install-app" id="installApp" type="button" hidden><span aria-hidden="true">＋</span><span id="installAppLabel">Установить радио</span></button><div class="language-switcher" role="group" aria-label="Язык сайта"><button class="lang-btn active" type="button" data-lang="ru">РУС</button><button class="lang-btn" type="button" data-lang="en">ENG</button><button class="lang-btn" type="button" data-lang="ro">RO</button></div><div class="listener-count is-offline" id="listenerCount" aria-live="polite"><svg class="listener-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3.7"></circle><path d="M4.4 20.5c0-4.2 3.4-7.5 7.6-7.5s7.6 3.3 7.6 7.5H4.4z"></path></svg><span class="listener-copy" id="listenerCopy">Слушателей: —</span></div></div></header>
@@ -437,7 +448,14 @@ body.eq-fullscreen-open{overflow:hidden}
   <div class="station-screen-country" id="stationScreenCountry">РАДИО ОНЛАЙН</div>
   <h2 class="station-screen-name" id="stationScreenName">Выберите радиостанцию</h2>
   <div class="station-screen-meta" id="stationScreenMeta">Solomud Web Radio</div>
-  <div class="receiver-dial" aria-hidden="true"><div class="receiver-dial-top"><span>SOLOMUD</span><span>WEB RADIO · ONLINE</span></div><div class="receiver-ticks"></div><div class="receiver-numbers"><span>•</span><span>MOLDOVA</span><span>RUSSIA</span><span>ROMANIA</span><span>•</span></div></div>
+  <div class="receiver-dial">
+   <div class="receiver-dial-top"><span>SOLOMUD</span><span>WEB RADIO · ONLINE</span></div>
+   <div class="receiver-ticks" id="receiverTicks"><input type="range" id="receiverTune" min="0" max="0" value="0" aria-label="Настройка станции"></div>
+   <output id="receiverTuneLabel" for="receiverTune"></output>
+   <div class="receiver-presets" id="receiverPresets"></div>
+   <button type="button" id="receiverSave" aria-pressed="false">Запомнить станцию</button>
+   <p id="receiverPresetStatus" role="status"></p>
+  </div>
   <div class="receiver-meters"><div class="receiver-meter" aria-hidden="true"><svg viewBox="0 0 240 136"><path d="M39 65 Q120 -1 201 65" fill="none" stroke="#6a5030" stroke-width="2"/><path d="M169 44 Q187 51 201 65" fill="none" stroke="#a14a32" stroke-width="3"/><g stroke="#685032" stroke-width="1.4"><path d="M41 65l8 8 M59 52l6 9 M80 42l4 10 M101 36l2 11 M120 34v11 M141 36l-2 11 M162 42l-4 10 M182 52l-6 9 M199 65l-8 8"/></g><g fill="#685032" font-size="9" font-family="monospace" text-anchor="middle"><text x="42" y="53">0</text><text x="80" y="30">25</text><text x="120" y="23">50</text><text x="162" y="30">75</text><text x="203" y="53">100</text></g><path class="receiver-needle" id="receiverNeedleLow" d="M120 112V39"/><circle cx="120" cy="112" r="7" fill="#423726"/></svg><span class="receiver-meter-label">LOW</span></div><div class="receiver-meter" aria-hidden="true"><svg viewBox="0 0 240 136"><path d="M39 65 Q120 -1 201 65" fill="none" stroke="#6a5030" stroke-width="2"/><path d="M169 44 Q187 51 201 65" fill="none" stroke="#a14a32" stroke-width="3"/><g stroke="#685032" stroke-width="1.4"><path d="M41 65l8 8 M59 52l6 9 M80 42l4 10 M101 36l2 11 M120 34v11 M141 36l-2 11 M162 42l-4 10 M182 52l-6 9 M199 65l-8 8"/></g><g fill="#685032" font-size="9" font-family="monospace" text-anchor="middle"><text x="42" y="53">0</text><text x="80" y="30">25</text><text x="120" y="23">50</text><text x="162" y="30">75</text><text x="203" y="53">100</text></g><path class="receiver-needle" id="receiverNeedleHigh" d="M120 112V39"/><circle cx="120" cy="112" r="7" fill="#423726"/></svg><span class="receiver-meter-label">HIGH</span></div><p class="receiver-meter-note" id="receiverMeterNote"></p></div>
   <div class="eq-panel screen-eq"><div class="eq-head"><span class="eq-label">SOLOMUD · LIVE SPECTRUM</span><span class="eq-caption" aria-hidden="true">BASS / MID / HIGH</span></div><canvas class="eq-canvas" id="screenEqualizer" aria-label="Спектр звука радиостанции"></canvas></div>
   <div class="station-screen-controls">
@@ -705,6 +723,7 @@ function restoreLastStation(){
 function savedStations(){try{return JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{return{}}}
 function findStation(id){return all.find(x=>stationId(x)===id)||savedStations()[id]||null}
 function render(){
+ refreshReceiverControls();
  renderMyWave();
  const q=$("search").value.trim().toLowerCase(),sort=$("sort").value;
  const saved=(()=>{try{return JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{return{}}})();
@@ -914,7 +933,7 @@ async function recoverCurrentStream(reason){
  const request=++streamRequest;setPlaybackState("recovering",1);updatePlayer();
  await connectStationStreams(current,request,true);
 }
-function updatePlayer(){ renderPlaybackStatus();$("stationScreen").classList.toggle("wave-playing",playing);$("toggle").textContent=playing?"Ⅱ":"▶";$("screenToggle").textContent=playing?"Ⅱ":"▶";if(!current)$("nowName").textContent=tr("Выберите радиостанцию")}
+function updatePlayer(){ renderPlaybackStatus();refreshReceiverControls();$("stationScreen").classList.toggle("wave-playing",playing);$("toggle").textContent=playing?"Ⅱ":"▶";$("screenToggle").textContent=playing?"Ⅱ":"▶";if(!current)$("nowName").textContent=tr("Выберите радиостанцию")}
 function stationShareUrl(s){
  const target=new URL(location.pathname,location.origin);
  target.searchParams.set("country",s.stationCountry||country);
@@ -941,6 +960,7 @@ async function copyStationLink(){
  $("shareStatus").textContent=tr("Ссылка скопирована");
 }
 function openStationScreen(s){
+ refreshReceiverControls();
  $("stationScreen").classList.add("open");$("stationScreen").setAttribute("aria-hidden","false");
  updateShareLinks(s);
  $("stationScreenName").textContent=s.name;
@@ -1103,7 +1123,78 @@ function drawReceiverMeters(levels,active){
  }
  refreshReceiverLabels();
 }
+const receiverPresetKey='solomud-receiver-presets';
+let receiverPresets=[],receiverSaving=false,receiverTuning=false,receiverPresetMessage=null;
+function receiverControlsCopy(){
+ return language==='en'?['Tune station','Save station','Choose a memory button','Empty','Saved']:
+ language==='ro'?['Alege postul','Memorează postul','Alege un buton de memorie','Liber','Salvat']:
+ ['Настройка станции','Запомнить станцию','Выбери кнопку памяти','Свободно','Сохранено'];
+}
+function receiverTuningStations(){return all.filter(station=>streamCandidates(station).length)}
+function showReceiverTuning(stations,selected=true){
+ const input=$('receiverTune'),index=Number(input.value),station=selected?stations[index]:null;
+ $('receiverTicks').style.setProperty('--tune-position',(stations.length>1?index/(stations.length-1)*100:0)+'%');
+ const label=station?(index+1)+' · '+station.name:current?.name||'';
+ $('receiverTuneLabel').textContent=label;
+ input.setAttribute('aria-valuetext',label);
+}
+function refreshReceiverControls(){
+ const copy=receiverControlsCopy(),input=$('receiverTune'),stations=receiverTuningStations();
+ input.setAttribute('aria-label',copy[0]);
+ if(!receiverTuning){
+  input.max=Math.max(0,stations.length-1);
+  input.disabled=stations.length<2;
+  const index=stations.findIndex(station=>current&&stationId(station)===stationId(current));
+  input.value=Math.max(0,index);
+  showReceiverTuning(stations,index>=0);
+ }
+ $('receiverSave').textContent=copy[1];
+ $('receiverSave').disabled=!current;
+ $('receiverSave').setAttribute('aria-pressed',String(receiverSaving));
+ [...$('receiverPresets').children].forEach((button,index)=>{
+  const station=receiverPresets[index];
+  button.dataset.saved=String(!!station);
+  button.title=(index+1)+' · '+(station?.name||copy[3]);
+  button.setAttribute('aria-label',button.title);
+ });
+ $('receiverPresetStatus').textContent=receiverSaving?copy[2]:receiverPresetMessage?copy[4]+' · '+receiverPresetMessage:'';
+}
+function selectReceiverStation(station){
+ if(!station||current&&stationId(current)===stationId(station)&&wantsPlayback)return;
+ playStation(station);
+}
+function saveReceiverPreset(index){
+ if(!current)return;
+ receiverPresets[index]={...current};
+ try{localStorage.setItem(receiverPresetKey,JSON.stringify(receiverPresets))}catch{}
+ receiverSaving=false;receiverPresetMessage=(index+1)+' · '+current.name;
+ refreshReceiverControls();
+}
+function initReceiverControls(){
+ try{const saved=JSON.parse(localStorage.getItem(receiverPresetKey));if(Array.isArray(saved))receiverPresets=saved.slice(0,5).map(station=>station?.name&&streamCandidates(station).length?station:null)}catch{}
+ const input=$('receiverTune');
+ input.addEventListener('input',()=>{receiverTuning=true;showReceiverTuning(receiverTuningStations())});
+ input.addEventListener('change',()=>{const station=receiverTuningStations()[Number(input.value)];receiverTuning=false;selectReceiverStation(station);refreshReceiverControls()});
+ input.addEventListener('pointercancel',()=>{receiverTuning=false;refreshReceiverControls()});
+ input.addEventListener('blur',()=>{receiverTuning=false;refreshReceiverControls()});
+ $('receiverSave').addEventListener('click',()=>{receiverSaving=!receiverSaving;receiverPresetMessage=null;refreshReceiverControls()});
+ for(let index=0;index<5;index++){
+  const button=document.createElement('button');button.type='button';button.textContent=index+1;
+  let timer,held=false;
+  button.addEventListener('pointerdown',event=>{if(event.button!==0)return;held=false;timer=setTimeout(()=>{held=true;saveReceiverPreset(index)},550)});
+  for(const type of ['pointerup','pointercancel','pointerleave'])button.addEventListener(type,()=>clearTimeout(timer));
+  button.addEventListener('contextmenu',event=>event.preventDefault());
+  button.addEventListener('click',event=>{
+   if(held&&event.detail){held=false;return}
+   if(receiverSaving||!receiverPresets[index])saveReceiverPreset(index);
+   else selectReceiverStation(findStation(stationId(receiverPresets[index]))||receiverPresets[index]);
+  });
+  $('receiverPresets').appendChild(button);
+ }
+ refreshReceiverControls();
+}
 function initReceiver(){
+ initReceiverControls();
  document.querySelectorAll('[data-receiver-mode]').forEach(b=>b.addEventListener('click',()=>setReceiverMode(b.dataset.receiverMode)));
  let mode='modern';try{mode=localStorage.getItem('solomud-receiver')||mode}catch{}
  setReceiverMode(mode);
