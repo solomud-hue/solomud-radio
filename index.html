@@ -2,6 +2,9 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- Prepare the two slow station origins before the catalogue arrives. -->
+<link rel="preconnect" href="https://megapolisfm.md:8443" crossorigin="anonymous">
+<link rel="preconnect" href="https://efir.retrofm.md:8000">
 <meta name="theme-color" content="#0d2b29"><meta name="description" content="Слушай радио онлайн в Solomud Web Radio."><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Solomud Radio"><link rel="manifest" href="./manifest.webmanifest"><title>Solomud Web Radio — радио без границ</title>
 <style>
 .brand-solomud{color:#2787ff!important;text-shadow:0 0 10px #2787ff55}.brand-web{color:#ffd633!important;text-shadow:0 0 10px #ffd63344}.brand-radio{color:#ff4545!important;text-shadow:0 0 10px #ff454544}.brand-word{font-weight:900;letter-spacing:.1px}:root{color-scheme:dark;--bg:#090d18;--panel:#111a2b;--muted:#91a0b8;--line:#243149;--accent:#8b7cff;--mint:#62e0bf}
@@ -798,6 +801,7 @@ $("stations").addEventListener("click",e=>{
  }
 });
 $("stations").addEventListener("pointerover",e=>{const card=e.target.closest("[data-station]");if(card){const s=findStation(card.dataset.station);if(s)preconnectStation(s)}});
+$("stations").addEventListener("pointerdown",e=>{const card=e.target.closest("[data-station]");if(card){const s=findStation(card.dataset.station);if(s)preconnectStation(s)}},{passive:true});
 $("stations").addEventListener("focusin",e=>{const card=e.target.closest("[data-station]");if(card){const s=findStation(card.dataset.station);if(s)preconnectStation(s)}});
 $("stations").addEventListener("keydown",e=>{
  if((e.key==="Enter"||e.key===" ")&&!e.target.closest("button")){
@@ -806,16 +810,22 @@ $("stations").addEventListener("keydown",e=>{
  }
 });
 function streamCandidates(s){
- const out=[];
- // Megapolis FM: use the broadcaster's direct MP3 endpoint first, avoiding
- // a possible playlist/redirect lookup before the audio starts.
- if(/megapolis\s*fm/i.test(s.name||'') && (s.stationCountry==='md'||country==='md'))out.push('https://megapolisfm.md:8443/886');
+ const out=[],stationCountry=String(s.stationCountry||s.countrycode||country).toLowerCase();
+ if(stationCountry==='moldova'||stationCountry==='md'){
+  if(/megapolis\s*fm/i.test(s.name||''))out.push('https://megapolisfm.md:8443/886');
+  if(/retro\s*fm|ретро\s*fm/i.test(s.name||''))out.push('https://efir.retrofm.md:8000/retro');
+ }
  for(const value of [s.url_resolved,s.url])if(value&&!out.includes(value))out.push(value);
  return out;
 }
+// This endpoint does not send Access-Control-Allow-Origin. Play it directly,
+// avoiding a guaranteed failed analyser request before the audible stream.
+function needsPlainAudio(url){
+ try{const u=new URL(url);return u.hostname==='efir.retrofm.md'&&u.port==='8000'}catch{return false}
+}
 
 // Open the station server connection ahead of playback; this does not start audio.
-const preconnectedOrigins=new Set();
+const preconnectedOrigins=new Set(['https://megapolisfm.md:8443','https://efir.retrofm.md:8000']);
 function preconnectStation(s){
  const url=streamCandidates(s).find(value=>/^https:\/\//i.test(value));
  if(!url)return;
@@ -823,7 +833,7 @@ function preconnectStation(s){
   const origin=new URL(url).origin;
   if(preconnectedOrigins.has(origin)||preconnectedOrigins.size>=6)return;
   preconnectedOrigins.add(origin);
-  const link=document.createElement("link");link.rel="preconnect";link.href=origin;link.crossOrigin="anonymous";
+  const link=document.createElement("link");link.rel="preconnect";link.href=origin;if(!needsPlainAudio(url))link.crossOrigin="anonymous";
   document.head.appendChild(link);
  }catch{}
 }
@@ -1055,7 +1065,7 @@ function tryStream(url){
  const attempt=async()=>{
  if(generation!==eqRequest)throw new Error('Superseded stream');
  eqBuffering=true;drawSpectrum();
- const analyse=!!eqContext&&!eqPlainStreams.has(url);
+ const analyse=!!eqContext&&!needsPlainAudio(url)&&!eqPlainStreams.has(url);
  resetSpectrumElement(analyse);
  try{await tryStreamOnce(url)}catch(error){
  if(generation!==eqRequest)throw error;
