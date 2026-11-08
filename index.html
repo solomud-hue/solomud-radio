@@ -711,6 +711,9 @@ $("stations").addEventListener("keydown",e=>{
 });
 function streamCandidates(s){
  const out=[];
+ // Megapolis FM: use the broadcaster's direct MP3 endpoint first, avoiding
+ // a possible playlist/redirect lookup before the audio starts.
+ if(/megapolis\s*fm/i.test(s.name||'') && (s.stationCountry==='md'||country==='md'))out.push('https://megapolisfm.md:8443/886');
  for(const value of [s.url_resolved,s.url])if(value&&!out.includes(value))out.push(value);
  return out;
 }
