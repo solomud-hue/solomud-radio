@@ -603,6 +603,11 @@ function stationCover(name){const value=String(name||"Radio"),parts=value.normal
 const favs=()=>{try{return JSON.parse(localStorage.getItem("solomud-favs")||"[]")}catch{return[]}};
 function saveFavs(a){localStorage.setItem("solomud-favs",JSON.stringify(a))}
 function stationId(s){return s.stationuuid||s.url_resolved||s.name}
+// Remember the last selected live station between visits (no automatic audio).
+const lastStationKey='solomud-last-station';
+function rememberLastStation(s){if(!s)return;try{localStorage.setItem(lastStationKey,JSON.stringify(s))}catch{}}
+function restoreLastStation(){if(current)return;try{const saved=JSON.parse(localStorage.getItem(lastStationKey)||'null');if(!saved||!saved.name||!streamCandidates(saved).length)return;current=saved;$('nowName').textContent=saved.name;$('nowMeta').textContent=(saved.stationCountry&&countries[saved.stationCountry]?countries[saved.stationCountry].flag+' · ':'')+(saved.bitrate?saved.bitrate+' '+tr('кбит/с'):tr('Качество зависит от станции'));updatePlayer()}catch{}}
+
 function savedStations(){try{return JSON.parse(localStorage.getItem("solomud-fav-stations")||"{}")}catch{return{}}}
 function findStation(id){return all.find(x=>stationId(x)===id)||savedStations()[id]||null}
 function render(){
@@ -771,7 +776,7 @@ async function playStation(s,options={}){
  if(current&&stationId(current)===stationId(s)&&playing){audio.pause();playing=false;updatePlayer();render();return}
  resumeSpectrumAudio();
  const request=++streamRequest;
- current=s;updateListenerCount();playing=false;activeStreamUrl=null;
+ current=s;rememberLastStation(s);updateListenerCount();playing=false;activeStreamUrl=null;
  $("nowName").textContent=s.name;
  if(!options.preserveClosedScreen||$("stationScreen").classList.contains("open"))openStationScreen(s);
  $("nowMeta").textContent=(s.stationCountry?countries[s.stationCountry].flag+" · ":"")+(s.bitrate?s.bitrate+" "+tr("кбит/с"):tr("Качество зависит от станции"));
@@ -880,7 +885,7 @@ function changeStation(direction){
 }
 $("previousStation").addEventListener("click",()=>changeStation(-1));
 $("nextStation").addEventListener("click",()=>changeStation(1));
-$("toggle").addEventListener("click",()=>{if(!current){$("status").textContent=tr("Сначала выберите станцию");return}if(playing){audio.pause();playing=false;$("status").textContent=tr("Пауза");updatePlayer();render();return}playStation(current)});
+$("toggle").addEventListener("click",()=>{if(!current)restoreLastStation();if(!current){$("status").textContent=tr("Сначала выберите станцию");return}if(playing){audio.pause();playing=false;$("status").textContent=tr("Пауза");updatePlayer();render();return}playStation(current)});
 onAudio("playing",()=>{rememberWave(current);clearTimeout(waitingTimer);$("stationScreenHint").textContent=tr("Эфир играет");warmedStationId=current?stationId(current):null;playing=true;if(!$("status").textContent.includes("резерв"))$("status").textContent=tr("В эфире");markListening();updatePlayer();render()});
 onAudio("waiting",()=>{if(!playing||switchingStream)return;clearTimeout(waitingTimer);waitingTimer=setTimeout(()=>recoverCurrentStream("долгая остановка буфера"),12000)});
 onAudio("pause",()=>{stopListening();if(!audio.ended){playing=false;updatePlayer();render()}});
@@ -1053,6 +1058,7 @@ function initAtmosphere(){
  window.addEventListener('popstate',()=>dismiss(true));
 })();
 
+restoreLastStation();
 initAtmosphere();
 $("waveSurprise").addEventListener("click",surpriseWave);renderMyWave();
 updateWorldClocks();setInterval(updateWorldClocks,1000);translatePage();setLanguage(language);selectCountry(country);
