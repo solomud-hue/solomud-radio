@@ -1122,8 +1122,10 @@ let eqDrawTime=0;
 function drawSpectrum(){
  if(!atmosphereReady)return;
  const now=performance.now(),dt=Math.min(.12,(now-eqDrawTime)/1000||.033);eqDrawTime=now;
+ const fullscreen=document.body.classList.contains('eq-fullscreen-open');
+ if(eqAnalyser)eqAnalyser.smoothingTimeConstant=fullscreen?.4:.72;
  const levels=spectrumBands(64),active=eqEnabled&&eqAnalyser&&!audio.paused&&!audio.ended&&!eqBuffering;
- drawReceiverMeters(levels,active);
+ if(!fullscreen)drawReceiverMeters(levels,active);
  const style=getComputedStyle(document.body),a=style.getPropertyValue('--eq-a').trim(),b=style.getPropertyValue('--eq-b').trim(),c=style.getPropertyValue('--eq-c').trim();
  const bass=levels.slice(0,16).reduce((x,y)=>x+y,0)/16;
  document.documentElement.style.setProperty('--bass',eqReduced.matches?0:bass);
@@ -1133,10 +1135,10 @@ function drawSpectrum(){
   else if(now>eqPeakHold[i])eqPeaks[i]=Math.max(levels[i],eqPeaks[i]-dt*.38);
  }
  if(active)eqAnalyser.getByteTimeDomainData(eqWave);else eqWave.fill(128);
- for(const id of ['mainEqualizer','screenEqualizer']){
+ for(const id of fullscreen?['screenEqualizer']:['mainEqualizer','screenEqualizer']){
   const canvas=$(id);if(!canvas||!canvas.clientWidth)continue;
   const rect=canvas.getBoundingClientRect();if(rect.bottom<0||rect.top>innerHeight)continue;
-  const w=canvas.clientWidth,h=canvas.clientHeight,dpr=Math.min(devicePixelRatio||1,2);
+  const w=canvas.clientWidth,h=canvas.clientHeight,dpr=Math.min(devicePixelRatio||1,fullscreen?1.25:2);
   if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}
   const ctx=canvas.getContext('2d');if(!ctx)continue;
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
@@ -1158,6 +1160,14 @@ function drawSpectrum(){
   ctx.fillStyle=floor;ctx.globalAlpha=.3+bass*.4;ctx.fillRect(pad,base-8,plot,38);ctx.globalAlpha=1;
   for(let i=0;i<64;i++){
    const value=Math.max(2,levels[i]*amplitude),x=pad+i*step+(step-bar)/2;
+   if(fullscreen){
+    ctx.fillStyle=gradient;
+    ctx.fillRect(x,base-value,bar,value);
+    if(active&&eqPeaks[i]>.035){
+     ctx.fillStyle='#eaffff';ctx.fillRect(x,base-eqPeaks[i]*amplitude-4,bar,1.5);
+    }
+    continue;
+   }
    ctx.fillStyle=gradient;ctx.shadowColor=i<32?a:b;ctx.shadowBlur=eqReduced.matches?0:Math.min(13,levels[i]*12);
    // Segmented LEDs keep the silhouette crisp even on small screens.
    for(let y=0;y<value;y+=5){const segment=Math.min(3.5,value-y);ctx.globalAlpha=.65+.35*(y/value);ctx.fillRect(x,base-y-segment,bar,segment)}
@@ -1168,12 +1178,12 @@ function drawSpectrum(){
   }
   ctx.globalAlpha=.35;ctx.fillStyle=gradient;ctx.fillRect(pad,base+2,plot,.7);ctx.globalAlpha=1;
  }
- document.querySelectorAll('.equalizer i').forEach((el,i)=>{const band=i%5,start=Math.floor(band*64/5),end=Math.floor((band+1)*64/5);const level=levels.slice(start,end).reduce((x,y)=>x+y,0)/(end-start);el.style.setProperty('--eq-level',Math.max(.09,level))});
+ if(!fullscreen)document.querySelectorAll('.equalizer i').forEach((el,i)=>{const band=i%5,start=Math.floor(band*64/5),end=Math.floor((band+1)*64/5);const level=levels.slice(start,end).reduce((x,y)=>x+y,0)/(end-start);el.style.setProperty('--eq-level',Math.max(.09,level))});
  updateSpectrumStatus();
 }
 function startSpectrum(){
  if(eqFrame||document.hidden)return;
- const tick=time=>{eqFrame=0;if(document.hidden)return;if(time-eqLastFrame>(eqReduced.matches?100:32)){drawSpectrum();eqLastFrame=time}if(eqEnabled&&!audio.paused&&!audio.ended)eqFrame=requestAnimationFrame(tick)};
+ const tick=time=>{eqFrame=0;if(document.hidden)return;if(time-eqLastFrame>(eqReduced.matches?100:document.body.classList.contains('eq-fullscreen-open')?16:32)){drawSpectrum();eqLastFrame=time}if(eqEnabled&&!audio.paused&&!audio.ended)eqFrame=requestAnimationFrame(tick)};
  eqFrame=requestAnimationFrame(tick);
 }
 function initAtmosphere(){
