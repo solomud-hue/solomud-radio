@@ -380,10 +380,10 @@ body.eq-fullscreen-open{overflow:hidden}
 .receiver-ticks:focus-within{outline:2px solid #573b20;outline-offset:4px}
 #receiverTuneLabel{display:block;min-height:1.4em;margin:8px 0;font:700 13px system-ui}
 .receiver-presets{display:flex;justify-content:center;gap:7px;margin:10px 0}
-.receiver-presets button,#receiverSave{min-height:36px;padding:5px 10px;border:1px solid #7a664a;border-radius:6px;background:linear-gradient(#faf3df,#aca293);color:#29241a;font:700 12px system-ui;cursor:pointer}
+.receiver-presets button,#receiverSave,#receiverClear{min-height:36px;padding:5px 10px;border:1px solid #7a664a;border-radius:6px;background:linear-gradient(#faf3df,#aca293);color:#29241a;font:700 12px system-ui;cursor:pointer}
 .receiver-presets button{min-width:36px;touch-action:manipulation}
 .receiver-presets button[data-saved="true"]{border-color:#7c3218;box-shadow:inset 0 -3px #9a4d24}
-#receiverSave[aria-pressed="true"]{background:#573b20;color:#fff}
+#receiverSave[aria-pressed="true"],#receiverClear[aria-pressed="true"]{background:#573b20;color:#fff}
 #receiverPresetStatus{margin:6px 0 0;font-size:11px}
 </style></head>
 <body><main class="wrap">
@@ -454,6 +454,7 @@ body.eq-fullscreen-open{overflow:hidden}
    <output id="receiverTuneLabel" for="receiverTune"></output>
    <div class="receiver-presets" id="receiverPresets"></div>
    <button type="button" id="receiverSave" aria-pressed="false">Запомнить станцию</button>
+   <button type="button" id="receiverClear" aria-pressed="false">Очистить ячейку</button>
    <p id="receiverPresetStatus" role="status"></p>
   </div>
   <div class="receiver-meters"><div class="receiver-meter" aria-hidden="true"><svg viewBox="0 0 240 136"><path d="M39 65 Q120 -1 201 65" fill="none" stroke="#6a5030" stroke-width="2"/><path d="M169 44 Q187 51 201 65" fill="none" stroke="#a14a32" stroke-width="3"/><g stroke="#685032" stroke-width="1.4"><path d="M41 65l8 8 M59 52l6 9 M80 42l4 10 M101 36l2 11 M120 34v11 M141 36l-2 11 M162 42l-4 10 M182 52l-6 9 M199 65l-8 8"/></g><g fill="#685032" font-size="9" font-family="monospace" text-anchor="middle"><text x="42" y="53">0</text><text x="80" y="30">25</text><text x="120" y="23">50</text><text x="162" y="30">75</text><text x="203" y="53">100</text></g><path class="receiver-needle" id="receiverNeedleLow" d="M120 112V39"/><circle cx="120" cy="112" r="7" fill="#423726"/></svg><span class="receiver-meter-label">LOW</span></div><div class="receiver-meter" aria-hidden="true"><svg viewBox="0 0 240 136"><path d="M39 65 Q120 -1 201 65" fill="none" stroke="#6a5030" stroke-width="2"/><path d="M169 44 Q187 51 201 65" fill="none" stroke="#a14a32" stroke-width="3"/><g stroke="#685032" stroke-width="1.4"><path d="M41 65l8 8 M59 52l6 9 M80 42l4 10 M101 36l2 11 M120 34v11 M141 36l-2 11 M162 42l-4 10 M182 52l-6 9 M199 65l-8 8"/></g><g fill="#685032" font-size="9" font-family="monospace" text-anchor="middle"><text x="42" y="53">0</text><text x="80" y="30">25</text><text x="120" y="23">50</text><text x="162" y="30">75</text><text x="203" y="53">100</text></g><path class="receiver-needle" id="receiverNeedleHigh" d="M120 112V39"/><circle cx="120" cy="112" r="7" fill="#423726"/></svg><span class="receiver-meter-label">HIGH</span></div><p class="receiver-meter-note" id="receiverMeterNote"></p></div>
@@ -1124,11 +1125,11 @@ function drawReceiverMeters(levels,active){
  refreshReceiverLabels();
 }
 const receiverPresetKey='solomud-receiver-presets';
-let receiverPresets=[],receiverSaving=false,receiverTuning=false,receiverPresetMessage=null;
+let receiverPresets=[],receiverSaving=false,receiverClearing=false,receiverTuning=false,receiverPresetMessage=null;
 function receiverControlsCopy(){
- return language==='en'?['Tune station','Save station','Choose a memory button','Empty','Saved']:
- language==='ro'?['Alege postul','Memorează postul','Alege un buton de memorie','Liber','Salvat']:
- ['Настройка станции','Запомнить станцию','Выбери кнопку памяти','Свободно','Сохранено'];
+ return language==='en'?['Tune station','Save station','Choose a memory button','Empty','Saved','Clear preset','Choose a saved preset','Cleared']:
+ language==='ro'?['Alege postul','Memorează postul','Alege un buton de memorie','Liber','Salvat','Șterge presetul','Alege un preset memorat','Șters']:
+ ['Настройка станции','Запомнить станцию','Выбери кнопку памяти','Свободно','Сохранено','Очистить ячейку','Выбери занятую ячейку','Очищено'];
 }
 function receiverTuningStations(){return all.filter(station=>streamCandidates(station).length)}
 function showReceiverTuning(stations,selected=true){
@@ -1151,13 +1152,18 @@ function refreshReceiverControls(){
  $('receiverSave').textContent=copy[1];
  $('receiverSave').disabled=!current;
  $('receiverSave').setAttribute('aria-pressed',String(receiverSaving));
+ const clear=$('receiverClear');
+ clear.textContent=copy[5];
+ clear.disabled=!receiverPresets.some(Boolean);
+ clear.setAttribute('aria-pressed',String(receiverClearing));
  [...$('receiverPresets').children].forEach((button,index)=>{
   const station=receiverPresets[index];
+  button.disabled=receiverClearing&&!station;
   button.dataset.saved=String(!!station);
   button.title=(index+1)+' · '+(station?.name||copy[3]);
   button.setAttribute('aria-label',button.title);
  });
- $('receiverPresetStatus').textContent=receiverSaving?copy[2]:receiverPresetMessage?copy[4]+' · '+receiverPresetMessage:'';
+ $('receiverPresetStatus').textContent=receiverClearing?copy[6]:receiverSaving?copy[2]:receiverPresetMessage?copy[receiverPresetMessage.key]+' · '+receiverPresetMessage.label:'';
 }
 function selectReceiverStation(station){
  if(!station||current&&stationId(current)===stationId(station)&&wantsPlayback)return;
@@ -1167,7 +1173,15 @@ function saveReceiverPreset(index){
  if(!current)return;
  receiverPresets[index]={...current};
  try{localStorage.setItem(receiverPresetKey,JSON.stringify(receiverPresets))}catch{}
- receiverSaving=false;receiverPresetMessage=(index+1)+' · '+current.name;
+ receiverSaving=false;receiverPresetMessage={key:4,label:(index+1)+' · '+current.name};
+ refreshReceiverControls();
+}
+function clearReceiverPreset(index){
+ if(!receiverPresets[index])return;
+ receiverPresets[index]=null;
+ try{localStorage.setItem(receiverPresetKey,JSON.stringify(receiverPresets))}catch{}
+ receiverClearing=false;
+ receiverPresetMessage={key:7,label:String(index+1)};
  refreshReceiverControls();
 }
 function initReceiverControls(){
@@ -1177,15 +1191,22 @@ function initReceiverControls(){
  input.addEventListener('change',()=>{const station=receiverTuningStations()[Number(input.value)];receiverTuning=false;selectReceiverStation(station);refreshReceiverControls()});
  input.addEventListener('pointercancel',()=>{receiverTuning=false;refreshReceiverControls()});
  input.addEventListener('blur',()=>{receiverTuning=false;refreshReceiverControls()});
- $('receiverSave').addEventListener('click',()=>{receiverSaving=!receiverSaving;receiverPresetMessage=null;refreshReceiverControls()});
+ $('receiverSave').addEventListener('click',()=>{receiverClearing=false;receiverSaving=!receiverSaving;receiverPresetMessage=null;refreshReceiverControls()});
+ $('receiverClear').addEventListener('click',()=>{
+  receiverSaving=false;
+  receiverClearing=!receiverClearing;
+  receiverPresetMessage=null;
+  refreshReceiverControls();
+ });
  for(let index=0;index<5;index++){
   const button=document.createElement('button');button.type='button';button.textContent=index+1;
   let timer,held=false;
-  button.addEventListener('pointerdown',event=>{if(event.button!==0)return;held=false;timer=setTimeout(()=>{held=true;saveReceiverPreset(index)},550)});
+  button.addEventListener('pointerdown',event=>{if(event.button!==0)return;held=false;if(receiverClearing)return;timer=setTimeout(()=>{held=true;saveReceiverPreset(index)},550)});
   for(const type of ['pointerup','pointercancel','pointerleave'])button.addEventListener(type,()=>clearTimeout(timer));
   button.addEventListener('contextmenu',event=>event.preventDefault());
   button.addEventListener('click',event=>{
    if(held&&event.detail){held=false;return}
+   if(receiverClearing){clearReceiverPreset(index);return}
    if(receiverSaving||!receiverPresets[index])saveReceiverPreset(index);
    else selectReceiverStation(findStation(stationId(receiverPresets[index]))||receiverPresets[index]);
   });
