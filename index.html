@@ -360,7 +360,7 @@ body.eq-fullscreen-open{overflow:hidden}
 .station-screen[data-receiver="retro"] .receiver-meters{display:grid;grid-template-columns:1fr 1fr;gap:18px;width:min(100%,530px);margin:0 0 18px}
 .receiver-meter{position:relative;border:5px solid #15130f;border-radius:11px 11px 20px 20px;background:radial-gradient(ellipse at 50% 85%,#fff0bf,#c9a46a);box-shadow:inset 0 0 18px #8c541d77,0 1px 0 #ffffff38;overflow:hidden}
 .receiver-meter svg{display:block;width:100%;height:auto}
-.receiver-needle{transform:rotate(-48deg);transform-origin:120px 112px;transition:transform 90ms linear;stroke:#7e2819;stroke-width:2;filter:drop-shadow(1px 1px 1px #0005)}
+.receiver-needle{transform:rotate(-58deg);transform-origin:120px 112px;transition:transform 90ms linear;stroke:#7e2819;stroke-width:2;filter:drop-shadow(1px 1px 1px #0005)}
 .receiver-meter-label{position:absolute;bottom:10px;left:0;right:0;text-align:center;font:800 8px system-ui;letter-spacing:2px;color:#5d4628}
 .receiver-meter-note{grid-column:1/-1;color:#ae9a79;text-align:center;font-size:10px;margin:-7px 0 0}
 .station-screen[data-receiver="retro"] .screen-eq:not(.eq-fullscreen){display:none}
@@ -1096,7 +1096,10 @@ function drawReceiverMeters(levels,active){
  if($('stationScreen').dataset.receiver!=='retro')return;
  for(const [id,start,end] of [['Low',0,24],['High',24,64]]){
   const value=active?Math.sqrt(levels.slice(start,end).reduce((sum,v)=>sum+v*v,0)/(end-start)):0;
-  $('receiverNeedle'+id).style.transform='rotate('+(-48+Math.min(1,value*1.8)*96)+'deg)';
+  // Frequency levels are measured before the player's volume control.
+  const audibleLevel=audio.muted?0:value*audio.volume;
+  const angle=-58+audibleLevel*116;
+  $('receiverNeedle'+id).style.transform='rotate('+angle+'deg)';
  }
  refreshReceiverLabels();
 }
