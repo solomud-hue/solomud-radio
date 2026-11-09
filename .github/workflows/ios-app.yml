@@ -1,0 +1,24 @@
+name: Build SoloMud Radio for iPhone
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'ios/**'
+      - '.github/workflows/ios-app.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  simulator:
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Build for the iOS Simulator
+        run: |
+          xcodebuild -project ios/SoloMudRadio.xcodeproj -scheme SoloMudRadio \
+            -configuration Debug -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/SoloMudRadio" CODE_SIGNING_ALLOWED=NO build
