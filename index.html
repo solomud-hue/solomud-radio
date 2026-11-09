@@ -461,6 +461,15 @@ body.eq-fullscreen-open{overflow:hidden}
 }
 @media(prefers-reduced-motion:reduce){.station-screen[data-receiver="retro"] .wood-now-eq i{animation:none}}
 
+
+/* Trim the incidental room/background pixels from the radio photograph.
+   The SVG clip follows the rounded cabinet and keeps both brass feet visible. */
+.station-screen[data-receiver="retro"] .wood-radio-clip-def{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
+.station-screen[data-receiver="retro"] .wood-radio-art{
+ clip-path:url(#woodCabinetClip);
+ -webkit-clip-path:url(#woodCabinetClip);
+}
+
 </style></head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><div class="logo-wrap"><img class="logo-photo" id="brandPhoto" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABcQERQRDhcUEhQaGBcbIjklIh8fIkYyNSk5UkhXVVFIUE5bZoNvW2F8Yk5QcptzfIeLkpSSWG2grJ+OqoOPko3/2wBDARgaGiIeIkMlJUONXlBejY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY3/wAARCACcAFgDASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAAECBAUDBv/EAC4QAAIBAwQABQIGAwEAAAAAAAECAAMEERIhMUEFEyJRYVJxMmKBobHBFELRkf/EABgBAAMBAQAAAAAAAAAAAAAAAAABAgME/8QAGxEBAQEAAwEBAAAAAAAAAAAAAAERAhIhMVH/2gAMAwEAAhEDEQA/AOsI4pszKKSigCijigCnKpVWmyghjqOAQM7zrKlxbgVUZXdWd98H49oULMUVJWWmA7am7PvJRkQJBBBwRxCEIGsxRxRAopKKAKKOKAKU72uKNSlkZwdX9S5KPiq5ooccNC/Di4DkAjgwkaW9FD+USUZFCEIEsxRxRGUUlEYBzqv5VMuVLAbkDmULi+IOkHHrHqX6ZoVFDU2Vs4I3xPPu6lRt6pPK4qRu06gq0w68NxKHirklKY45l4FaFqpbYKo/iZVDVdXql98nJhy/CjWRdKKvsAI44SyRhHCAWMRSwlHWwHAMsGzpknGZHaQ8Z0TEKCScAdmXGsXzsQZheIXakNSXpsH5heUGCr4gGZqagBTtqMo1BSZl0bAbYxI60UkhNRP1f8nMsSfvM7bVY7Xdw9ep6iMLsAOJf8Mt/Ko+Yw9T8fAmZSUPWRTwWAM9DjEvj76VKKSiMtJQhCML9OtobOMzuLtfplQjBikZD1dNyOsTNfw+yeuajoxJOSNWxnQxEw6nrH8aSil4ooKFXQMqBtMzuXvEzqvHPtgSj3Iqo7W211Sz9Y/megxPOU20urezAz0srimomRMmZEy0owjhGGuSj7MokHtkOSpIMakdyNSsBsJlNW4VKLIMmcjOruT3K11VFG3Z26GJaWDWYvUdzuSxMrdzs1RcYUcnucQRMln1PS0zqpIfdQZ5sET0Fm+u0pH8uJXFNdSJEyZkTNCRhGYRk1WSmp3OP1nN6QZcowImbe1jc1QofAG4ErrdV6LaUfK54E5+1W0mUqcGVr4IbOprGRjb7ztRqi4UMNuiD0Zw8YC07I7gliAJpvhMG3o+dUfHCIWP6Qr23lUqVQtnzRnGOJpWNuE8Nr1j+N1b9AJVvgBbWnv5cnPDPw6yp3CM9QthTjA7muiLTUKgAUcASv4bTFOyUjl/UZalyJoiMISgUIQgFFxQ0OF1a13GRicKfqfScjM73DYJ0DJP+xHOJ2srXz6euqo3OQcczn+LdbSoFQ01XUdyp/7FWOcJdDW4+k4AlynTSmMIMCZd1Vb/AC6uDsGxF2tOTHFktmJOKtMnb0tmQqWoq6dNyDpGAHGMCBGeJEg+8NpmFvbZcUzlPykETUoVfNpKxBDdhhgzJy68fsYea4GCTtxnqXOVibG1FKlnctVYoxzgZBluay6i+CEIRhVp27VxpIAJAJIHA6H9zSpr5dMLnYCUra6p0bQM7ZYk7D/yV61zVuDgnQh6E5bdayLde/SkNNP1t+0y3cs7MxGonJlulajRqdW52z3OF9tcsMDgYA6ihuWTFk+0AIZjBE/EiXGZLMNiYEEqeW2pG0n4ly1unqVQjEEH4lLA9p1tiEqh86cdmVLZSsasJJAr/hYH7Qm3aIxi2VJXugpJIxk47mxRootRjpAxgD42mb4YMXbfAx+81EPqqff+hOW/Wk+CrsPtmZFy61LhmXjM0r2o1OgpXbJmUW+BCGBzF1BRvECSZRJdRADOY5FT64AyJNaihdJAyOyJE8SCjU2/tGKv2lVKdRd8g8/EJxsKS172hSfOl2AOOYSol//Z" alt="Памятник"><div class="made"><span>MADE</span> <span>IN</span> <span>MOLDOVA</span></div><div class="powered">Powered by Solomud</div></div><span class="brand-word"><span class="brand-solomud">Solomud</span> <span class="brand-web">Web</span> <span class="brand-radio">Radio</span></span></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end"><button class="install-app" id="installApp" type="button" hidden><span aria-hidden="true">＋</span><span id="installAppLabel">Установить радио</span></button><div class="language-switcher" role="group" aria-label="Язык сайта"><button class="lang-btn active" type="button" data-lang="ru">РУС</button><button class="lang-btn" type="button" data-lang="en">ENG</button><button class="lang-btn" type="button" data-lang="ro">RO</button></div><div class="listener-count is-offline" id="listenerCount" aria-live="polite"><svg class="listener-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3.7"></circle><path d="M4.4 20.5c0-4.2 3.4-7.5 7.6-7.5s7.6 3.3 7.6 7.5H4.4z"></path></svg><span class="listener-copy" id="listenerCopy">Слушателей: —</span></div></div></header>
@@ -523,6 +532,11 @@ body.eq-fullscreen-open{overflow:hidden}
   <div class="wood-stage">
   <h2 class="wood-title">РЕТРО</h2>
   <div class="wood-radio" aria-label="Ретро-радиола SoloMud Radio, точный образец выбранного оформления">
+   <svg aria-hidden="true" focusable="false" class="wood-radio-clip-def" xmlns="http://www.w3.org/2000/svg" width="0" height="0">
+    <defs><clipPath id="woodCabinetClip" clipPathUnits="objectBoundingBox">
+      <path transform="scale(0.0008928571428571429 0.0016891891891891893)" d="M135 3 C100 3 72 20 50 45 C25 76 17 91 16 130 L15 449 C15 499 24 526 53 545 C76 560 99 563 136 566 L988 566 C1039 565 1063 556 1087 536 C1108 517 1118 491 1118 449 L1118 132 C1118 93 1109 65 1084 41 C1057 14 1021 3 984 3 Z M132 556 L205 556 L199 592 L137 592 Z M946 556 L1011 556 L1004 592 L950 592 Z"/>
+    </clipPath></defs>
+   </svg>
    <img src="./retro-radio-photo.jpg" class="wood-radio-art" alt="Винтажная деревянная радиола SoloMud Radio, с тканевой решёткой и золотым логотипом; на подсвеченной шкале Hit FM Hot Hits, Radio 7, Retro FM, Europa Plus, Chillout, Deep House, Rock Classic и Jazz FM, большая золотая ручка настройки" draggable="false">
    <div class="wood-photo-stations" role="group" aria-label="Станции на шкале">
    <button class="wood-hotspot" type="button" data-wood-station="0" data-side="left" data-row="0" aria-label="Настроить Hit FM Hot Hits" title="Hit FM Hot Hits"></button>
