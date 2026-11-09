@@ -1126,29 +1126,7 @@ function changeStation(direction){
 $("previousStation").addEventListener("click",()=>changeStation(-1));
 $("nextStation").addEventListener("click",()=>changeStation(1));
 $("toggle").addEventListener("click",()=>{if(!current)
-/* Bind illustrated radio controls to the existing audio engine. */
-(function initWoodenRadio(){
- const get=id=>document.getElementById(id);
- const next=()=>get('screenNext').click(),prev=()=>get('screenPrevious').click();
- const label=get('woodRadioStation'),source=get('stationScreenName');
- const syncLabel=()=>{label.textContent=source.textContent||'Выберите радиостанцию'};
- new MutationObserver(syncLabel).observe(source,{childList:true,subtree:true,characterData:true});syncLabel();
- const power=get('woodRadioPower'),originalPower=get('screenToggle');
- power.addEventListener('click',()=>originalPower.click());
- const syncPower=()=>power.setAttribute('aria-label',originalPower.getAttribute('aria-label')||'Включить или остановить радио');
- new MutationObserver(syncPower).observe(originalPower,{attributes:true,attributeFilter:['aria-label']});syncPower();
- get('woodRadioNext').addEventListener('click',next);get('woodRadioPrev').addEventListener('click',prev);
- const knob=get('woodRadioKnob');let dragStart=null;
- knob.addEventListener('pointerdown',event=>{dragStart=event.clientX});
- knob.addEventListener('pointerup',event=>{if(dragStart===null)return;const diff=event.clientX-dragStart;dragStart=null;if(Math.abs(diff)>18){if(diff>0)next();else prev();knob.dataset.dragged='yes';}});
- knob.addEventListener('click',()=>{if(knob.dataset.dragged==='yes'){delete knob.dataset.dragged;return}next()});
- knob.addEventListener('wheel',event=>{event.preventDefault();if(event.deltaY>0)next();else prev()},{passive:false});
- knob.addEventListener('keydown',event=>{if(event.key==='ArrowLeft'){event.preventDefault();prev()}if(event.key==='ArrowRight'){event.preventDefault();next()}});
- get('woodRadioVolume').addEventListener('input',event=>{const original=get('screenVolume');original.value=event.target.value;original.dispatchEvent(new Event('input',{bubbles:true}));});
- get('screenVolume').addEventListener('input',event=>{get('woodRadioVolume').value=event.target.value});
- get('woodRadioVolume').value=get('screenVolume').value;
- document.querySelectorAll('[data-wood-preset]').forEach(button=>button.addEventListener('click',()=>{const i=Number(button.dataset.woodPreset);const target=get('receiverPresets').querySelectorAll('button')[i];if(target)target.click()}));
-})();
+
 
 restoreLastStation();if(!current)return;if(wantsPlayback){stopPlayback();return}playStation(current,{preserveClosedScreen:true})});
 onAudio("playing",()=>{if(!wantsPlayback)return;rememberWave(current);rememberLastStation(current);clearTimeout(waitingTimer);waitingTimer=null;waitingTimer=null;warmedStationId=current?stationId(current):null;playing=true;setPlaybackState("playing");markListening();updatePlayer();render()});
@@ -1469,6 +1447,30 @@ function initAtmosphere(){
  document.addEventListener('keydown',e=>{if(e.key==='Escape')dismiss()});
  window.addEventListener('popstate',()=>dismiss(true));
 })();
+
+/* Bind illustrated radio controls to the existing audio engine. */
+(function initWoodenRadio(){
+ const get=id=>document.getElementById(id);
+ const next=()=>get('screenNext').click(),prev=()=>get('screenPrevious').click();
+ const label=get('woodRadioStation'),source=get('stationScreenName');
+ const syncLabel=()=>{label.textContent=source.textContent||'Выберите радиостанцию'};
+ new MutationObserver(syncLabel).observe(source,{childList:true,subtree:true,characterData:true});syncLabel();
+ const power=get('woodRadioPower'),originalPower=get('screenToggle');
+ power.addEventListener('click',()=>originalPower.click());
+ const syncPower=()=>power.setAttribute('aria-label',originalPower.getAttribute('aria-label')||'Включить или остановить радио');
+ new MutationObserver(syncPower).observe(originalPower,{attributes:true,attributeFilter:['aria-label']});syncPower();
+ get('woodRadioNext').addEventListener('click',next);get('woodRadioPrev').addEventListener('click',prev);
+ const knob=get('woodRadioKnob');let dragStart=null;
+ knob.addEventListener('pointerdown',event=>{dragStart=event.clientX});
+ knob.addEventListener('pointerup',event=>{if(dragStart===null)return;const diff=event.clientX-dragStart;dragStart=null;if(Math.abs(diff)>18){if(diff>0)next();else prev();knob.dataset.dragged='yes';}});
+ knob.addEventListener('click',()=>{if(knob.dataset.dragged==='yes'){delete knob.dataset.dragged;return}next()});
+ knob.addEventListener('wheel',event=>{event.preventDefault();if(event.deltaY>0)next();else prev()},{passive:false});
+ knob.addEventListener('keydown',event=>{if(event.key==='ArrowLeft'){event.preventDefault();prev()}if(event.key==='ArrowRight'){event.preventDefault();next()}});
+ get('woodRadioVolume').addEventListener('input',event=>{const original=get('screenVolume');original.value=event.target.value;original.dispatchEvent(new Event('input',{bubbles:true}));});
+ get('screenVolume').addEventListener('input',event=>{get('woodRadioVolume').value=event.target.value});
+ get('woodRadioVolume').value=get('screenVolume').value;
+ document.querySelectorAll('[data-wood-preset]').forEach(button=>button.addEventListener('click',()=>{const i=Number(button.dataset.woodPreset);const target=get('receiverPresets').querySelectorAll('button')[i];if(target)target.click()}));
+})()
 
 restoreLastStation();
 initAtmosphere();
