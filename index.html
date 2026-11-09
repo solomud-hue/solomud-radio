@@ -441,6 +441,53 @@ body.eq-fullscreen-open{overflow:hidden}
  .station-screen[data-receiver="retro"] .receiver-switch{top:14px}
 }
 
+
+/* Actual wooden radio display: the original controls and audio logic remain intact. */
+.wood-radio{display:none}
+.station-screen[data-receiver="retro"]{background:radial-gradient(ellipse at center,#3e2213,#0f0806 75%)}
+.station-screen[data-receiver="retro"] .station-screen-inner{
+ width:100%;max-width:1250px;min-height:100dvh;margin:auto;
+ display:flex;flex-direction:column;justify-content:center;
+ background:none;border:0;border-radius:0;box-shadow:none;padding:75px 16px 26px;
+}
+.station-screen[data-receiver="retro"] .station-screen-inner:before{display:none}
+.station-screen[data-receiver="retro"] .wood-radio{display:block;position:relative;width:100%;max-width:1120px;aspect-ratio:16/9;flex:none;margin:auto;isolation:isolate}
+.wood-radio-art{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 15px 18px #0009)}
+.station-screen[data-receiver="retro"] .receiver-switch{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:10}
+.station-screen[data-receiver="retro"] .station-screen-close{z-index:11;top:16px;right:18px}
+.station-screen[data-receiver="retro"] .station-screen-logo,
+.station-screen[data-receiver="retro"] .station-screen-country,
+.station-screen[data-receiver="retro"] .station-screen-name,
+.station-screen[data-receiver="retro"] .station-screen-meta,
+.station-screen[data-receiver="retro"] .receiver-dial,
+.station-screen[data-receiver="retro"] .receiver-meters,
+.station-screen[data-receiver="retro"] .station-screen-controls,
+.station-screen[data-receiver="retro"] .station-volume,
+.station-screen[data-receiver="retro"] .screen-eq{display:none!important}
+.wood-radio-display{position:absolute;left:18%;top:52%;width:48%;height:20%;color:#552910;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3em;padding:0 1%;font-family:Georgia,serif;text-shadow:0 1px #ffe1a9}
+.wood-radio-display strong{font-size:clamp(14px,3.2vw,35px);line-height:1.1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wood-radio-eyebrow{font:900 clamp(7px,1.1vw,13px) system-ui,sans-serif;letter-spacing:.17em;color:#8d2d10}
+.wood-radio-hint{font:600 clamp(7px,1.1vw,12px) system-ui,sans-serif}
+.wood-radio-presets{display:flex;gap:clamp(3px,.6vw,9px);margin-top:2px}
+.wood-radio-presets button{cursor:pointer;border:1px solid #a0682e;border-radius:4px;padding:clamp(1px,.2vw,3px) clamp(5px,.9vw,13px);background:linear-gradient(#ffebc3,#c79150);box-shadow:0 2px 2px #5b270855;color:#55260c;font:800 clamp(8px,1.15vw,14px) system-ui}
+.wood-radio-presets button:focus-visible,.wood-radio-knob:focus-visible,.wood-radio-power:focus-visible,.wood-radio-nav button:focus-visible{outline:3px solid #fff5bb;outline-offset:3px}
+.wood-radio-knob{position:absolute;left:77%;top:49%;width:17%;height:30%;border:0;background:transparent;border-radius:50%;cursor:ew-resize;color:#351500}
+.wood-radio-knob span{position:absolute;left:50%;bottom:-12%;transform:translateX(-50%);font-size:clamp(15px,2.5vw,28px);color:#e7b669;text-shadow:0 2px 4px #120605}
+.wood-radio-knob:active{transform:scale(.97)}
+.wood-radio-power{position:absolute;left:10%;top:81%;width:7%;height:9%;border:0;border-radius:50%;background:transparent;font-size:clamp(16px,2.8vw,33px);color:#44200d;cursor:pointer}
+.wood-radio-volume{position:absolute;left:23%;top:82%;width:19%;height:7%;display:flex;align-items:center;gap:3px;color:#f2c77f;font-size:clamp(7px,1vw,12px)}
+.wood-radio-volume input{width:100%;min-width:0;accent-color:#e0a049;cursor:pointer}
+.wood-radio-nav{position:absolute;right:9.2%;bottom:11.3%;display:flex;gap:5px}
+.wood-radio-nav button{background:#7d411a;border:1px solid #efc586;border-radius:50%;color:#ffe1a7;font-size:clamp(12px,2.2vw,25px);width:clamp(24px,3.7vw,42px);height:clamp(24px,3.7vw,42px);cursor:pointer}
+@media(max-width:650px){
+ .station-screen[data-receiver="retro"] .station-screen-inner{padding:65px 3px 15px}
+ .wood-radio-display{gap:1px}
+ .wood-radio-display strong{font-size:clamp(11px,3vw,20px)}
+ .wood-radio-eyebrow{letter-spacing:0}
+ .wood-radio-hint{display:none}
+ .wood-radio-nav button{width:22px;height:22px}
+}
+
 </style></head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><div class="logo-wrap"><img class="logo-photo" id="brandPhoto" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABcQERQRDhcUEhQaGBcbIjklIh8fIkYyNSk5UkhXVVFIUE5bZoNvW2F8Yk5QcptzfIeLkpSSWG2grJ+OqoOPko3/2wBDARgaGiIeIkMlJUONXlBejY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY3/wAARCACcAFgDASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAAECBAUDBv/EAC4QAAIBAwQABQIGAwEAAAAAAAECAAMEERIhMUEFEyJRYVJxMmKBobHBFELRkf/EABgBAAMBAQAAAAAAAAAAAAAAAAABAgME/8QAGxEBAQEAAwEBAAAAAAAAAAAAAAERAhIhMVH/2gAMAwEAAhEDEQA/AOsI4pszKKSigCijigCnKpVWmyghjqOAQM7zrKlxbgVUZXdWd98H49oULMUVJWWmA7am7PvJRkQJBBBwRxCEIGsxRxRAopKKAKKOKAKU72uKNSlkZwdX9S5KPiq5ooccNC/Di4DkAjgwkaW9FD+USUZFCEIEsxRxRGUUlEYBzqv5VMuVLAbkDmULi+IOkHHrHqX6ZoVFDU2Vs4I3xPPu6lRt6pPK4qRu06gq0w68NxKHirklKY45l4FaFqpbYKo/iZVDVdXql98nJhy/CjWRdKKvsAI44SyRhHCAWMRSwlHWwHAMsGzpknGZHaQ8Z0TEKCScAdmXGsXzsQZheIXakNSXpsH5heUGCr4gGZqagBTtqMo1BSZl0bAbYxI60UkhNRP1f8nMsSfvM7bVY7Xdw9ep6iMLsAOJf8Mt/Ko+Yw9T8fAmZSUPWRTwWAM9DjEvj76VKKSiMtJQhCML9OtobOMzuLtfplQjBikZD1dNyOsTNfw+yeuajoxJOSNWxnQxEw6nrH8aSil4ooKFXQMqBtMzuXvEzqvHPtgSj3Iqo7W211Sz9Y/megxPOU20urezAz0srimomRMmZEy0owjhGGuSj7MokHtkOSpIMakdyNSsBsJlNW4VKLIMmcjOruT3K11VFG3Z26GJaWDWYvUdzuSxMrdzs1RcYUcnucQRMln1PS0zqpIfdQZ5sET0Fm+u0pH8uJXFNdSJEyZkTNCRhGYRk1WSmp3OP1nN6QZcowImbe1jc1QofAG4ErrdV6LaUfK54E5+1W0mUqcGVr4IbOprGRjb7ztRqi4UMNuiD0Zw8YC07I7gliAJpvhMG3o+dUfHCIWP6Qr23lUqVQtnzRnGOJpWNuE8Nr1j+N1b9AJVvgBbWnv5cnPDPw6yp3CM9QthTjA7muiLTUKgAUcASv4bTFOyUjl/UZalyJoiMISgUIQgFFxQ0OF1a13GRicKfqfScjM73DYJ0DJP+xHOJ2srXz6euqo3OQcczn+LdbSoFQ01XUdyp/7FWOcJdDW4+k4AlynTSmMIMCZd1Vb/AC6uDsGxF2tOTHFktmJOKtMnb0tmQqWoq6dNyDpGAHGMCBGeJEg+8NpmFvbZcUzlPykETUoVfNpKxBDdhhgzJy68fsYea4GCTtxnqXOVibG1FKlnctVYoxzgZBluay6i+CEIRhVp27VxpIAJAJIHA6H9zSpr5dMLnYCUra6p0bQM7ZYk7D/yV61zVuDgnQh6E5bdayLde/SkNNP1t+0y3cs7MxGonJlulajRqdW52z3OF9tcsMDgYA6ihuWTFk+0AIZjBE/EiXGZLMNiYEEqeW2pG0n4ly1unqVQjEEH4lLA9p1tiEqh86cdmVLZSsasJJAr/hYH7Qm3aIxi2VJXugpJIxk47mxRootRjpAxgD42mb4YMXbfAx+81EPqqff+hOW/Wk+CrsPtmZFy61LhmXjM0r2o1OgpXbJmUW+BCGBzF1BRvECSZRJdRADOY5FT64AyJNaihdJAyOyJE8SCjU2/tGKv2lVKdRd8g8/EJxsKS172hSfOl2AOOYSol//Z" alt="Памятник"><div class="made"><span>MADE</span> <span>IN</span> <span>MOLDOVA</span></div><div class="powered">Powered by Solomud</div></div><span class="brand-word"><span class="brand-solomud">Solomud</span> <span class="brand-web">Web</span> <span class="brand-radio">Radio</span></span></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end"><button class="install-app" id="installApp" type="button" hidden><span aria-hidden="true">＋</span><span id="installAppLabel">Установить радио</span></button><div class="language-switcher" role="group" aria-label="Язык сайта"><button class="lang-btn active" type="button" data-lang="ru">РУС</button><button class="lang-btn" type="button" data-lang="en">ENG</button><button class="lang-btn" type="button" data-lang="ro">RO</button></div><div class="listener-count is-offline" id="listenerCount" aria-live="polite"><svg class="listener-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3.7"></circle><path d="M4.4 20.5c0-4.2 3.4-7.5 7.6-7.5s7.6 3.3 7.6 7.5H4.4z"></path></svg><span class="listener-copy" id="listenerCopy">Слушателей: —</span></div></div></header>
@@ -500,6 +547,14 @@ body.eq-fullscreen-open{overflow:hidden}
  <div class="station-screen-inner">
   <button class="station-screen-close" id="closeStationScreen" type="button" aria-label="Закрыть плеер" title="Закрыть">×</button>
   <div class="receiver-switch" role="group" aria-label="Вид плеера" id="receiverSwitch"><button type="button" data-receiver-mode="modern" aria-pressed="true">Современный</button><button type="button" data-receiver-mode="retro" aria-pressed="false">Ретро</button></div>
+  <div class="wood-radio" aria-label="Деревянный радиоприёмник SoloMud Radio">
+  <img src="./retro-radio.svg" class="wood-radio-art" alt="Радиола SoloMud Radio с деревянным корпусом, латунной ручкой настройки и подсвеченной шкалой">
+  <div class="wood-radio-display" aria-live="polite"><span class="wood-radio-eyebrow">● СЕЙЧАС В ЭФИРЕ</span><strong id="woodRadioStation">Выберите радиостанцию</strong><span class="wood-radio-hint">Поверни ручку для смены станции</span><div class="wood-radio-presets"><button type="button" data-wood-preset="0" aria-label="Ячейка 1">1</button><button type="button" data-wood-preset="1" aria-label="Ячейка 2">2</button><button type="button" data-wood-preset="2" aria-label="Ячейка 3">3</button><button type="button" data-wood-preset="3" aria-label="Ячейка 4">4</button><button type="button" data-wood-preset="4" aria-label="Ячейка 5">5</button></div></div>
+  <button class="wood-radio-knob" id="woodRadioKnob" type="button" aria-label="Повернуть ручку: следующая станция" title="Нажми или прокрути колёсико, чтобы сменить станцию"><span aria-hidden="true">↻</span></button>
+  <button class="wood-radio-power" id="woodRadioPower" type="button" aria-label="Включить или остановить радио">⏻</button>
+  <label class="wood-radio-volume" aria-label="Громкость"><span>◀</span><input type="range" id="woodRadioVolume" min="0" max="1" step=".01" value=".8" aria-label="Громкость ретро-радиолы"><span>▶</span></label>
+  <div class="wood-radio-nav"><button type="button" id="woodRadioPrev" aria-label="Предыдущая станция">‹</button><button type="button" id="woodRadioNext" aria-label="Следующая станция">›</button></div>
+</div>
   <img class="station-screen-logo" id="stationScreenLogo" alt="Логотип радиостанции">
   <div class="station-screen-country" id="stationScreenCountry">РАДИО ОНЛАЙН</div>
   <h2 class="station-screen-name" id="stationScreenName">Выберите радиостанцию</h2>
@@ -1070,7 +1125,32 @@ function changeStation(direction){
 }
 $("previousStation").addEventListener("click",()=>changeStation(-1));
 $("nextStation").addEventListener("click",()=>changeStation(1));
-$("toggle").addEventListener("click",()=>{if(!current)restoreLastStation();if(!current)return;if(wantsPlayback){stopPlayback();return}playStation(current,{preserveClosedScreen:true})});
+$("toggle").addEventListener("click",()=>{if(!current)
+/* Bind illustrated radio controls to the existing audio engine. */
+(function initWoodenRadio(){
+ const get=id=>document.getElementById(id);
+ const next=()=>get('screenNext').click(),prev=()=>get('screenPrevious').click();
+ const label=get('woodRadioStation'),source=get('stationScreenName');
+ const syncLabel=()=>{label.textContent=source.textContent||'Выберите радиостанцию'};
+ new MutationObserver(syncLabel).observe(source,{childList:true,subtree:true,characterData:true});syncLabel();
+ const power=get('woodRadioPower'),originalPower=get('screenToggle');
+ power.addEventListener('click',()=>originalPower.click());
+ const syncPower=()=>power.setAttribute('aria-label',originalPower.getAttribute('aria-label')||'Включить или остановить радио');
+ new MutationObserver(syncPower).observe(originalPower,{attributes:true,attributeFilter:['aria-label']});syncPower();
+ get('woodRadioNext').addEventListener('click',next);get('woodRadioPrev').addEventListener('click',prev);
+ const knob=get('woodRadioKnob');let dragStart=null;
+ knob.addEventListener('pointerdown',event=>{dragStart=event.clientX});
+ knob.addEventListener('pointerup',event=>{if(dragStart===null)return;const diff=event.clientX-dragStart;dragStart=null;if(Math.abs(diff)>18){if(diff>0)next();else prev();knob.dataset.dragged='yes';}});
+ knob.addEventListener('click',()=>{if(knob.dataset.dragged==='yes'){delete knob.dataset.dragged;return}next()});
+ knob.addEventListener('wheel',event=>{event.preventDefault();if(event.deltaY>0)next();else prev()},{passive:false});
+ knob.addEventListener('keydown',event=>{if(event.key==='ArrowLeft'){event.preventDefault();prev()}if(event.key==='ArrowRight'){event.preventDefault();next()}});
+ get('woodRadioVolume').addEventListener('input',event=>{const original=get('screenVolume');original.value=event.target.value;original.dispatchEvent(new Event('input',{bubbles:true}));});
+ get('screenVolume').addEventListener('input',event=>{get('woodRadioVolume').value=event.target.value});
+ get('woodRadioVolume').value=get('screenVolume').value;
+ document.querySelectorAll('[data-wood-preset]').forEach(button=>button.addEventListener('click',()=>{const i=Number(button.dataset.woodPreset);const target=get('receiverPresets').querySelectorAll('button')[i];if(target)target.click()}));
+})();
+
+restoreLastStation();if(!current)return;if(wantsPlayback){stopPlayback();return}playStation(current,{preserveClosedScreen:true})});
 onAudio("playing",()=>{if(!wantsPlayback)return;rememberWave(current);rememberLastStation(current);clearTimeout(waitingTimer);waitingTimer=null;waitingTimer=null;warmedStationId=current?stationId(current):null;playing=true;setPlaybackState("playing");markListening();updatePlayer();render()});
 function handleBuffering(){
  if(!wantsPlayback||switchingStream)return;
