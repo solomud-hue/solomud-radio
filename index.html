@@ -386,114 +386,6 @@ body.eq-fullscreen-open{overflow:hidden}
 #receiverSave[aria-pressed="true"],#receiverClear[aria-pressed="true"]{background:#573b20;color:#fff}
 #receiverPresetStatus{margin:6px 0 0;font-size:11px}
 
-/* SoloMud wooden radio: visual-only enhancement, isolated to retro receiver. */
-.station-screen[data-receiver="retro"]{
- background:radial-gradient(ellipse at 85% 15%,#8e51242c,transparent 45%),#100b09;
-}
-.station-screen[data-receiver="retro"] .station-screen-inner{
- width:min(96%,920px);min-height:auto;margin:auto;padding:72px clamp(15px,4vw,38px) 30px;
- border:12px ridge #9b4d1b;border-radius:42px;
- background:
- linear-gradient(125deg,#ffffff1a,transparent 19%,#00000040 76%),
- repeating-linear-gradient(4deg,#f3a44908 0 2px,#1808020a 3px 7px),
- linear-gradient(115deg,#5e260d,#a55a24 26%,#5a250e 56%,#8e4317 84%,#321508);
- box-shadow:inset 0 0 0 5px #d69a48,inset 0 0 0 11px #361609,0 26px 75px #000b;
- color:#ffebc6;
-}
-.station-screen[data-receiver="retro"] .station-screen-inner:before{
- content:"SoloMud Radio";display:block;width:min(100%,720px);margin:4px auto 15px;
- padding:34px 12px 30px;border:5px ridge #b97a36;border-radius:20px;
- background:repeating-linear-gradient(90deg,#4b2b17 0 3px,#b28a53 3px 5px,#372012 5px 8px);
- color:#f6cf8e;font:bold italic clamp(30px,6vw,57px)/1.1 Georgia,serif;
- text-shadow:2px 3px 1px #371708,0 0 16px #e8a54b88;
- box-shadow:inset 0 0 30px #1a0b07,0 7px 14px #1b0b09aa;
-}
-.station-screen[data-receiver="retro"] .receiver-switch{position:absolute;top:15px;left:50%;transform:translateX(-50%);z-index:2}
-.station-screen[data-receiver="retro"] .station-screen-close{z-index:3;right:12px;top:12px;background:#28170d;border-color:#d5a465}
-.station-screen[data-receiver="retro"] .station-screen-name{
- width:min(100%,720px);margin:10px 0 8px;border:6px ridge #ba8745;border-radius:19px;
- background:linear-gradient(#ffdf9e,#f1bc68 58%,#bd7b32);color:#53230d;
- font:800 clamp(20px,4vw,33px)/1.25 Georgia,serif;text-shadow:0 1px #fff1c1;
- box-shadow:inset 0 0 18px #8b3d16,0 6px 16px #1c0a05a6;
-}
-.station-screen[data-receiver="retro"] .receiver-dial{
- width:min(100%,720px);border:7px ridge #b78342;border-radius:20px;
- background:linear-gradient(#ffdfa4,#e7b367 65%,#b87939);
- box-shadow:inset 0 0 22px #985321,0 8px 18px #1a0907aa;
-}
-.station-screen[data-receiver="retro"] .receiver-dial-top{font-family:Georgia,serif;color:#613110}
-.station-screen[data-receiver="retro"] .station-screen-controls .mainplay{
- width:68px;height:68px;border-radius:50%;border:7px ridge #c28b47;
- background:radial-gradient(circle at 35% 30%,#fff2c2,#c98a3a 50%,#704016 85%);
- color:#3a1b0b;box-shadow:0 7px 13px #0009,inset 0 2px 3px #fff8;
-}
-.station-screen[data-receiver="retro"] .station-screen-controls .track-nav{
- border-radius:50%;background:radial-gradient(circle at 35% 30%,#fce6ae,#b47b35 65%,#6a3914);
- border:4px ridge #b98747;color:#43240c;
-}
-.station-screen[data-receiver="retro"] .station-volume{
- border:3px ridge #b88646;background:linear-gradient(#351709,#673010);
-}
-.station-screen[data-receiver="retro"] .station-screen-logo{border:2px solid #d8b57b}
-@media(max-width:600px){
- .station-screen[data-receiver="retro"] .station-screen-inner{width:100%;border-width:6px;border-radius:18px;padding:68px 12px 22px}
- .station-screen[data-receiver="retro"] .station-screen-inner:before{padding:23px 8px;font-size:clamp(27px,8vw,42px)}
- .station-screen[data-receiver="retro"] .receiver-switch{top:14px}
-}
-
-
-/* Actual wooden radio display: the original controls and audio logic remain intact. */
-.wood-radio{display:none}
-.station-screen[data-receiver="retro"]{background:radial-gradient(ellipse at center,#3e2213,#0f0806 75%)}
-.station-screen[data-receiver="retro"] .station-screen-inner{
- width:100%;max-width:1250px;min-height:100dvh;margin:auto;
- display:flex;flex-direction:column;justify-content:center;
- background:none;border:0;border-radius:0;box-shadow:none;padding:75px 16px 26px;
-}
-.station-screen[data-receiver="retro"] .station-screen-inner:before{display:none}
-.station-screen[data-receiver="retro"] .wood-radio{display:block;position:relative;width:100%;max-width:1120px;aspect-ratio:16/9;flex:none;margin:auto;isolation:isolate}
-.wood-radio-art{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 15px 18px #0009)}
-.station-screen[data-receiver="retro"] .receiver-switch{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:10}
-.station-screen[data-receiver="retro"] .station-screen-close{z-index:11;top:16px;right:18px}
-.station-screen[data-receiver="retro"] .station-screen-logo,
-.station-screen[data-receiver="retro"] .station-screen-country,
-.station-screen[data-receiver="retro"] .station-screen-name,
-.station-screen[data-receiver="retro"] .station-screen-meta,
-.station-screen[data-receiver="retro"] .receiver-dial,
-.station-screen[data-receiver="retro"] .receiver-meters,
-.station-screen[data-receiver="retro"] .station-screen-controls,
-.station-screen[data-receiver="retro"] .station-volume,
-.station-screen[data-receiver="retro"] .screen-eq{display:none!important}
-.wood-radio-display{position:absolute;left:18%;top:52%;width:48%;height:20%;color:#552910;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3em;padding:0 1%;font-family:Georgia,serif;text-shadow:0 1px #ffe1a9}
-.wood-radio-display strong{font-size:clamp(14px,3.2vw,35px);line-height:1.1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.wood-radio-eyebrow{font:900 clamp(7px,1.1vw,13px) system-ui,sans-serif;letter-spacing:.17em;color:#8d2d10}
-.wood-radio-hint{font:600 clamp(7px,1.1vw,12px) system-ui,sans-serif}
-.wood-radio-presets{display:flex;gap:clamp(3px,.6vw,9px);margin-top:2px}
-.wood-radio-presets button{cursor:pointer;border:1px solid #a0682e;border-radius:4px;padding:clamp(1px,.2vw,3px) clamp(5px,.9vw,13px);background:linear-gradient(#ffebc3,#c79150);box-shadow:0 2px 2px #5b270855;color:#55260c;font:800 clamp(8px,1.15vw,14px) system-ui}
-.wood-radio-presets button:focus-visible,.wood-radio-knob:focus-visible,.wood-radio-power:focus-visible,.wood-radio-nav button:focus-visible{outline:3px solid #fff5bb;outline-offset:3px}
-.wood-radio-knob{position:absolute;left:77%;top:49%;width:17%;height:30%;border:0;background:transparent;border-radius:50%;cursor:ew-resize;color:#351500}
-.wood-radio-knob span{position:absolute;left:50%;bottom:-12%;transform:translateX(-50%);font-size:clamp(15px,2.5vw,28px);color:#e7b669;text-shadow:0 2px 4px #120605}
-.wood-radio-knob:active{transform:scale(.97)}
-.wood-radio-power{position:absolute;left:10%;top:81%;width:7%;height:9%;border:0;border-radius:50%;background:transparent;font-size:clamp(16px,2.8vw,33px);color:#44200d;cursor:pointer}
-.wood-radio-volume{position:absolute;left:23%;top:82%;width:19%;height:7%;display:flex;align-items:center;gap:3px;color:#f2c77f;font-size:clamp(7px,1vw,12px)}
-.wood-radio-volume input{width:100%;min-width:0;accent-color:#e0a049;cursor:pointer}
-.wood-radio-nav{position:absolute;right:9.2%;bottom:11.3%;display:flex;gap:5px}
-.wood-radio-nav button{background:#7d411a;border:1px solid #efc586;border-radius:50%;color:#ffe1a7;font-size:clamp(12px,2.2vw,25px);width:clamp(24px,3.7vw,42px);height:clamp(24px,3.7vw,42px);cursor:pointer}
-@media(max-width:650px){
- .station-screen[data-receiver="retro"] .station-screen-inner{padding:65px 3px 15px}
- .wood-radio-display{gap:1px}
- .wood-radio-display strong{font-size:clamp(11px,3vw,20px)}
- .wood-radio-eyebrow{letter-spacing:0}
- .wood-radio-hint{display:none}
- .wood-radio-nav button{width:22px;height:22px}
-}
-
-
-/* Keep the wooden cabinet uncluttered; existing controls remain in the DOM. */
-.station-screen[data-receiver="retro"] .track-card,
-.station-screen[data-receiver="retro"] .share-panel,
-.station-screen[data-receiver="retro"] .station-screen-hint{display:none!important}
-
 /* Exact selected SoloMud retro-radio photograph with functional hit areas. */
 .wood-stage{display:none}
 .station-screen[data-receiver="retro"]{background:radial-gradient(ellipse at 52% 65%,#3d1c0d,#100806 70%);overflow-y:auto}
@@ -1549,10 +1441,15 @@ function initAtmosphere(){
  const get=id=>document.getElementById(id);
  const stationNames=['Hit FM Hot Hits','Radio 7','Retro FM','Europa Plus','Chillout','Deep House','Rock Classic','Jazz FM'];
  const matches=[
-  /hit\\s*fm/i,/radio\\s*7/i,/retro\\s*fm|ретро\\s*fm/i,
-  /europa\\s*plus|европа\\s*плюс/i,/chill\\s*out/i,
-  /deep\\s*house/i,/rock\\s*classic|classic\\s*rock/i,/jazz/i
- ].map(r=>new RegExp(r.source.replace(/\\\\/g,'\\'),r.flags));
+  /hit\s*fm/i,
+  /radio\s*7/i,
+  /retro\s*fm|ретро\s*fm/i,
+  /europa\s*plus|европа\s*плюс/i,
+  /chill\s*out/i,
+  /deep\s*house/i,
+  /rock\s*classic|classic\s*rock/i,
+  /jazz/i
+ ];
  const statuses=get('woodRadioStatus'),label=get('woodRadioStation'),source=get('stationScreenName');
  const buttons=Array.from(document.querySelectorAll('[data-wood-station]'));
  let selected=-1;
