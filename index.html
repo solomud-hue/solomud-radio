@@ -1125,10 +1125,7 @@ function changeStation(direction){
 }
 $("previousStation").addEventListener("click",()=>changeStation(-1));
 $("nextStation").addEventListener("click",()=>changeStation(1));
-$("toggle").addEventListener("click",()=>{if(!current)
-
-
-restoreLastStation();if(!current)return;if(wantsPlayback){stopPlayback();return}playStation(current,{preserveClosedScreen:true})});
+$("toggle").addEventListener("click",()=>{if(!current)restoreLastStation();if(!current)return;if(wantsPlayback){stopPlayback();return}playStation(current,{preserveClosedScreen:true})});
 onAudio("playing",()=>{if(!wantsPlayback)return;rememberWave(current);rememberLastStation(current);clearTimeout(waitingTimer);waitingTimer=null;waitingTimer=null;warmedStationId=current?stationId(current):null;playing=true;setPlaybackState("playing");markListening();updatePlayer();render()});
 function handleBuffering(){
  if(!wantsPlayback||switchingStream)return;
@@ -1470,7 +1467,7 @@ function initAtmosphere(){
  get('screenVolume').addEventListener('input',event=>{get('woodRadioVolume').value=event.target.value});
  get('woodRadioVolume').value=get('screenVolume').value;
  document.querySelectorAll('[data-wood-preset]').forEach(button=>button.addEventListener('click',()=>{const i=Number(button.dataset.woodPreset);const target=get('receiverPresets').querySelectorAll('button')[i];if(target)target.click()}));
-})()
+})();
 
 restoreLastStation();
 initAtmosphere();
