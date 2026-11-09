@@ -1,4 +1,4 @@
-const CACHE_NAME = "solomud-radio-shell-v1";
+const CACHE_NAME = "solomud-radio-shell-v2";
 const SHELL_FILES = ["./", "./manifest.webmanifest", "./icons/radio.svg"];
 
 self.addEventListener("install", event => {
