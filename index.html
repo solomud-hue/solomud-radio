@@ -1273,7 +1273,13 @@ function initReceiverControls(){
 function initReceiver(){
  initReceiverControls();
  document.querySelectorAll('[data-receiver-mode]').forEach(b=>b.addEventListener('click',()=>setReceiverMode(b.dataset.receiverMode)));
- let mode='modern';try{mode=localStorage.getItem('solomud-receiver')||mode}catch{}
+ let mode='retro';
+ try{
+  // Show the newly introduced wooden receiver once, even for returning listeners.
+  // Subsequent visits honour the listener's manually chosen mode.
+  if(localStorage.getItem('solomud-wooden-retro-intro-v1')==='seen')mode=localStorage.getItem('solomud-receiver')||mode;
+  else localStorage.setItem('solomud-wooden-retro-intro-v1','seen');
+ }catch{}
  setReceiverMode(mode);
 }
 
