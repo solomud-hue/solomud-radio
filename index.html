@@ -1594,6 +1594,7 @@ function initAtmosphere(){
   ro:{title:'Scala mea',slot:'Poziție pe scală',favorite:'Post din favorite',save:'Salvează',reset:'Revino la postul inițial',close:'Închide',empty:'Adaugă un post la favorite cu ★ pentru a-l pune pe scală.',hint:'Poți și să ții apăsată o poziție de pe scală.',failure:'Scala nu a putut fi salvată în acest browser.',tune:'Acordează pe'}
  };
  let selected=-1;
+ let editingSlot=-1;
  let presets=Array(buttons.length).fill(null);
  try{
   const saved=JSON.parse(localStorage.getItem(scaleKey));
@@ -1640,8 +1641,9 @@ function initAtmosphere(){
  new MutationObserver(syncCurrent).observe(source,{childList:true,subtree:true,characterData:true});syncCurrent();
  function inform(message){statuses.textContent=message;statuses.dataset.manual='yes';}
  function tune(i){
+  editingSlot=i;
   const station=findPhotoStation(i);
-  if(!station){inform('«'+(presets[i]?.name||stationNames[i])+'» пока нет в загруженном каталоге');return false}
+  if(!station){editScale(i);return false}
   updateSelected(i);delete statuses.dataset.manual;statuses.textContent='Подключение…';
   selectReceiverStation(station);return true;
  }
@@ -1679,13 +1681,15 @@ function initAtmosphere(){
   resetButton.textContent=text.reset;
   get('woodScaleClose').textContent=text.close;
   slot.replaceChildren(...buttons.map((_,i)=>new Option((i+1)+' · '+scaleName(i),i)));
-  slot.value=String(Math.max(0,index));
+  editingSlot=Math.max(0,index);
+  slot.value=String(editingSlot);
   showChoices();
   editor.showModal();
  }
  function saveScale(station){
   const next=[...presets];
-  next[Number(slot.value)]=station;
+  editingSlot=Number(slot.value);
+  next[editingSlot]=station;
   try{localStorage.setItem(scaleKey,JSON.stringify(next))}
   catch{get('woodScaleHint').textContent=copy[language].failure;return}
   presets=next;
@@ -1693,8 +1697,8 @@ function initAtmosphere(){
   syncCurrent();
   editor.close();
  }
- editButton.addEventListener('click',()=>editScale(selected));
- slot.addEventListener('change',showChoices);
+ editButton.addEventListener('click',()=>editScale(editingSlot>=0?editingSlot:selected));
+ slot.addEventListener('change',()=>{editingSlot=Number(slot.value);showChoices()});
  saveButton.addEventListener('click',()=>{
   const station=findStation(choice.value);
   if(available(station)&&favs().includes(choice.value))saveScale(station);
