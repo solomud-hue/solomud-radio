@@ -786,7 +786,7 @@ const playbackCopy={
 function setPlaybackState(state,attempt=0){playbackState=state;playbackAttempt=attempt;renderPlaybackStatus()}
 function renderPlaybackStatus(){
  const copy=playbackCopy[language]||playbackCopy.ru;
- const message=copy[playbackState]+(playbackAttempt?" ("+playbackAttempt+"/3)":"");
+ const message=copy[playbackState]+(playbackAttempt?" ("+playbackAttempt+"/"+(isHitFm2000s(current)?4:3)+")":"");
  for(const id of ["status","stationScreenHint"]){const el=$(id);if(el){el.textContent=message;el.setAttribute("role","status");el.setAttribute("aria-live","polite")}}
  for(const id of ["playerRecovery","screenRecovery"]){
   let box=$(id);if(!box){box=document.createElement("div");box.id=id;box.className="recovery-actions";
@@ -1090,7 +1090,15 @@ $("stations").addEventListener("keydown",e=>{
   if(card){e.preventDefault();const s=findStation(card.dataset.station);if(s)playStation(s)}
  }
 });
+// Keep the checked broadcaster endpoint for Hit FM 2000s HITS, even when
+// a saved favourite or Radio Browser has an outdated secondary URL.
+const HIT_FM_2000S_URL='https://radio3.dixi.md/listen/hit_fm_2000s_hits/hitfm2000hit128.aac';
+function isHitFm2000s(s){
+ return !!s&&(s.stationuuid==='e45b77ad-3e75-4b16-bdb4-75cd6aa5baff'||/^hit\s*fm\s*2000s\s*hits$/i.test(String(s.name||'').trim()));
+}
+function isHitFm2000sStream(url){return url===HIT_FM_2000S_URL}
 function streamCandidates(s){
+ if(isHitFm2000s(s))return [HIT_FM_2000S_URL];
  const out=[],stationCountry=String(s.stationCountry||s.countrycode||country).toLowerCase();
  if(stationCountry==='moldova'||stationCountry==='md'){
   if(/megapolis\s*fm/i.test(s.name||''))out.push('https://megapolisfm.md:8443/886');
@@ -1102,7 +1110,7 @@ function streamCandidates(s){
 // This endpoint does not send Access-Control-Allow-Origin. Play it directly,
 // avoiding a guaranteed failed analyser request before the audible stream.
 function needsPlainAudio(url){
- try{const u=new URL(url);return u.hostname==='efir.retrofm.md'&&u.port==='8000'}catch{return false}
+ try{const u=new URL(url);return (u.hostname==='efir.retrofm.md'&&u.port==='8000')||isHitFm2000sStream(url)}catch{return false}
 }
 
 // Open the station server connection ahead of playback; this does not start audio.
@@ -1132,7 +1140,7 @@ async function tryStreamOnce(url){
   const cancel=()=>finish(false,new Error("Cancelled stream"));cancelStreamAttempt=cancel;
   const onPlaying=()=>finish(true);
   const onError=()=>finish(false,new Error("Ошибка аудиопотока"));
-  const timer=setTimeout(()=>finish(false,new Error("Тайм-аут запуска потока")),6000);
+  const timer=setTimeout(()=>finish(false,new Error("Тайм-аут запуска потока")),isHitFm2000sStream(url)?12000:6000);
   audio.addEventListener("playing",onPlaying,{once:true});
   audio.addEventListener("error",onError,{once:true});
   try{
@@ -1171,7 +1179,7 @@ async function connectStationStreams(station,request,recovering){
  const candidates=streamCandidates(station),primary=activeStreamUrl||candidates[0];
  // Retry the current endpoint, then its backup, then the current endpoint once more.
  const backup=candidates.find(url=>url!==primary);
- const urls=primary?[primary,backup||primary,primary]:[];
+ const urls=primary?(isHitFm2000s(station)?[primary,primary,primary,primary]:[primary,backup||primary,primary]):[];
  for(let i=0;i<urls.length;i++){
   if(request!==streamRequest||!wantsPlayback)return;
   setPlaybackState(recovering||i>0?"recovering":"connecting",i+1);
@@ -1277,13 +1285,26 @@ $("previousStation").addEventListener("click",()=>changeStation(-1));
 $("nextStation").addEventListener("click",()=>changeStation(1));
 $("toggle").addEventListener("click",()=>{if(!current)restoreLastStation();if(!current)return;if(wantsPlayback){stopPlayback();return}playStation(current,{preserveClosedScreen:true})});
 onAudio("playing",()=>{if(!wantsPlayback)return;rememberWave(current);rememberLastStation(current);clearTimeout(waitingTimer);waitingTimer=null;waitingTimer=null;warmedStationId=current?stationId(current):null;playing=true;setPlaybackState("playing");markListening();updatePlayer();render()});
+let bufferStartTime=0;
+function clearBufferingOnProgress(){
+ // AAC can resume samples without emitting another "playing" event.
+ if(!waitingTimer||audio.paused||audio.currentTime<=bufferStartTime+.2)return;
+ clearTimeout(waitingTimer);waitingTimer=null;
+ if(wantsPlayback&&!switchingStream){setPlaybackState("playing");updatePlayer()}
+}
 function handleBuffering(){
  if(!wantsPlayback||switchingStream)return;
  setPlaybackState("buffering");
- // Repeated waiting/stalled events must not postpone recovery indefinitely.
+ // A short network pause should not tear down a live radio connection.
  if(waitingTimer)return;
- waitingTimer=setTimeout(()=>{waitingTimer=null;recoverCurrentStream("buffer timeout")},8000);
+ bufferStartTime=audio.currentTime;
+ waitingTimer=setTimeout(()=>{
+  waitingTimer=null;
+  if(!audio.paused&&audio.currentTime>bufferStartTime+.2){setPlaybackState("playing");updatePlayer();return}
+  recoverCurrentStream("buffer timeout");
+ },isHitFm2000s(current)?20000:8000);
 }
+onAudio("timeupdate",clearBufferingOnProgress);
 onAudio("waiting",handleBuffering);onAudio("stalled",handleBuffering);
 onAudio("pause",()=>{stopListening();if(!switchingStream&&!audio.ended){playing=false;if(wantsPlayback&&!audio.error){wantsPlayback=false;clearTimeout(waitingTimer);waitingTimer=null;waitingTimer=null;setPlaybackState("paused")}updatePlayer();render()}});
 onAudio("error",()=>{stopListening();if(wantsPlayback&&!switchingStream)recoverCurrentStream("audio error")});
