@@ -390,6 +390,21 @@ body.eq-fullscreen-open{overflow:hidden}
 #receiverPresetStatus{margin:6px 0 0;font-size:11px}
 
 /* Exact selected SoloMud retro-radio photograph with functional hit areas. */
+
+/* Sunlight moving across the gold lettering of the photographed logo. */
+.wood-logo-shine{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:screen}
+.wood-logo-shine-beam{animation:woodLogoSunlight 7s ease-in-out infinite;transform:translateX(-500px)}
+@keyframes woodLogoSunlight{
+ 0%,12%{transform:translateX(-500px);opacity:0}
+ 20%{opacity:.85}
+ 48%{transform:translateX(650px);opacity:.95}
+ 55%,64%{transform:translateX(650px);opacity:0}
+ 72%{opacity:.65}
+ 94%{transform:translateX(-500px);opacity:.85}
+ 100%{transform:translateX(-500px);opacity:0}
+}
+@media(prefers-reduced-motion:reduce){.wood-logo-shine{display:none}}
+
 .wood-stage{display:none}
 .station-screen[data-receiver="retro"]{background:radial-gradient(ellipse at 52% 65%,#3d1c0d,#100806 70%);overflow-y:auto}
 .station-screen[data-receiver="retro"] .station-screen-inner{
@@ -593,6 +608,34 @@ body.eq-fullscreen-open{overflow:hidden}
     </clipPath></defs>
    </svg>
    <img src="./retro-radio-photo.jpg" class="wood-radio-art" alt="Винтажная деревянная радиола SoloMud Radio, с тканевой решёткой и золотым логотипом; на подсвеченной шкале Hit FM Hot Hits, Radio 7, Retro FM, Europa Plus, Chillout, Deep House, Rock Classic и Jazz FM, большая золотая ручка настройки" draggable="false">
+   <svg class="wood-logo-shine" viewBox="0 0 1288 681" aria-hidden="true" focusable="false">
+    <defs>
+     <linearGradient id="woodLogoSunbeam">
+      <stop offset="0" stop-color="#fff5ce" stop-opacity="0"/>
+      <stop offset=".38" stop-color="#ffdd8a" stop-opacity=".15"/>
+      <stop offset=".5" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset=".62" stop-color="#fff2c1" stop-opacity=".2"/>
+      <stop offset="1" stop-color="#fff5ce" stop-opacity="0"/>
+     </linearGradient>
+     <filter id="woodLogoGoldMask" color-interpolation-filters="sRGB">
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+       <feFuncR type="linear" slope="5" intercept="-2.8"/>
+       <feFuncG type="linear" slope="5" intercept="-2.8"/>
+       <feFuncB type="linear" slope="5" intercept="-2.8"/>
+      </feComponentTransfer>
+     </filter>
+     <clipPath id="woodLogoOutline">
+      <path d="M208 151 L248 120 L280 124 L310 102 L330 115 L359 114 L381 91 L414 107 L451 100 L478 91 L495 94 L531 82 L555 85 L581 76 L620 85 L650 69 L671 75 L700 64 L724 72 L747 65 L765 86 L764 123 L744 143 L710 150 L674 155 L628 174 L578 185 L526 197 L473 210 L416 222 L361 237 L307 247 L263 258 L228 242 L225 218 L211 206 L204 182 Z"/>
+     </clipPath>
+     <mask id="woodLogoHighlights" maskUnits="userSpaceOnUse" x="0" y="0" width="1288" height="681" style="mask-type:luminance">
+      <image href="./retro-radio-photo.jpg" width="1288" height="681" filter="url(#woodLogoGoldMask)"/>
+     </mask>
+    </defs>
+    <g clip-path="url(#woodLogoOutline)" mask="url(#woodLogoHighlights)">
+     <path class="wood-logo-shine-beam" d="M300 30 H440 L590 280 H450 Z" fill="url(#woodLogoSunbeam)"/>
+    </g>
+   </svg>
    <img class="wood-volume-patch" src="./retro-slider-patch.svg" alt="" aria-hidden="true" draggable="false">
    <img class="wood-volume-thumb" id="woodRadioVolumeThumb" src="./retro-slider-thumb.svg" alt="" aria-hidden="true" draggable="false">
    <div class="wood-photo-stations" role="group" aria-label="Станции на шкале">
