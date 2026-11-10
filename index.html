@@ -627,6 +627,46 @@ body.eq-fullscreen-open{overflow:hidden}
 }
 @media(prefers-reduced-motion:reduce){.player#bottomPlayer .dock-live i{animation:none}.player#bottomPlayer .track-nav,.player#bottomPlayer .mainplay,.player#bottomPlayer .dock-mute{transition:none}}
 
+
+/* Golden wireless signal radiating from the star on the retro radio.
+   SVG uses the photo's 1288x681 coordinates and remains aligned on mobile. */
+.station-screen[data-receiver="retro"] .wood-antenna-broadcast{
+ position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:2;
+ pointer-events:none;user-select:none;opacity:0;transition:opacity .25s ease;
+}
+.station-screen[data-receiver="retro"].wave-playing .wood-antenna-broadcast{opacity:1}
+.station-screen[data-receiver="retro"] .wood-antenna-pulse{
+ fill:none;stroke:#ffdf99;stroke-width:4.25;stroke-linecap:round;stroke-linejoin:round;
+ filter:drop-shadow(0 0 5px #ffe5a2) drop-shadow(0 0 11px #ef9c38);
+ opacity:0;transform-box:view-box;transform-origin:1064px 130px;
+ animation:woodBroadcast 3.15s cubic-bezier(.17,.44,.32,1) infinite;
+ animation-play-state:paused;
+}
+.station-screen[data-receiver="retro"].wave-playing .wood-antenna-pulse{animation-play-state:running}
+.station-screen[data-receiver="retro"] .wood-antenna-pulse-1{animation-delay:0s}
+.station-screen[data-receiver="retro"] .wood-antenna-pulse-2{animation-delay:-1.05s}
+.station-screen[data-receiver="retro"] .wood-antenna-pulse-3{animation-delay:-2.10s}
+@keyframes woodBroadcast{
+ 0%{opacity:0;transform:scale(.88)}
+ 15%{opacity:.98}
+ 42%{opacity:.72}
+ 78%{opacity:.20}
+ 100%{opacity:0;transform:scale(2.25)}
+}
+.station-screen[data-receiver="retro"] .wood-antenna-aura{
+ opacity:.18;transform-box:view-box;transform-origin:1064px 96px;
+ animation:woodAntennaGlow 2.1s ease-in-out infinite;animation-play-state:paused;
+ mix-blend-mode:screen;
+}
+.station-screen[data-receiver="retro"].wave-playing .wood-antenna-aura{animation-play-state:running}
+@keyframes woodAntennaGlow{0%,100%{opacity:.32;transform:scale(.92)}50%{opacity:.86;transform:scale(1.13)}}
+@media(prefers-reduced-motion:reduce){
+ .station-screen[data-receiver="retro"] .wood-antenna-broadcast{transition:none}
+ .station-screen[data-receiver="retro"] .wood-antenna-pulse{animation:none;opacity:.36;transform:scale(1.18)}
+ .station-screen[data-receiver="retro"] .wood-antenna-pulse-2,.station-screen[data-receiver="retro"] .wood-antenna-pulse-3{display:none}
+ .station-screen[data-receiver="retro"] .wood-antenna-aura{animation:none;opacity:.3}
+}
+
 </style></head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><div class="logo-wrap"><img class="logo-photo" id="brandPhoto" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABcQERQRDhcUEhQaGBcbIjklIh8fIkYyNSk5UkhXVVFIUE5bZoNvW2F8Yk5QcptzfIeLkpSSWG2grJ+OqoOPko3/2wBDARgaGiIeIkMlJUONXlBejY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY3/wAARCACcAFgDASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAAECBAUDBv/EAC4QAAIBAwQABQIGAwEAAAAAAAECAAMEERIhMUEFEyJRYVJxMmKBobHBFELRkf/EABgBAAMBAQAAAAAAAAAAAAAAAAABAgME/8QAGxEBAQEAAwEBAAAAAAAAAAAAAAERAhIhMVH/2gAMAwEAAhEDEQA/AOsI4pszKKSigCijigCnKpVWmyghjqOAQM7zrKlxbgVUZXdWd98H49oULMUVJWWmA7am7PvJRkQJBBBwRxCEIGsxRxRAopKKAKKOKAKU72uKNSlkZwdX9S5KPiq5ooccNC/Di4DkAjgwkaW9FD+USUZFCEIEsxRxRGUUlEYBzqv5VMuVLAbkDmULi+IOkHHrHqX6ZoVFDU2Vs4I3xPPu6lRt6pPK4qRu06gq0w68NxKHirklKY45l4FaFqpbYKo/iZVDVdXql98nJhy/CjWRdKKvsAI44SyRhHCAWMRSwlHWwHAMsGzpknGZHaQ8Z0TEKCScAdmXGsXzsQZheIXakNSXpsH5heUGCr4gGZqagBTtqMo1BSZl0bAbYxI60UkhNRP1f8nMsSfvM7bVY7Xdw9ep6iMLsAOJf8Mt/Ko+Yw9T8fAmZSUPWRTwWAM9DjEvj76VKKSiMtJQhCML9OtobOMzuLtfplQjBikZD1dNyOsTNfw+yeuajoxJOSNWxnQxEw6nrH8aSil4ooKFXQMqBtMzuXvEzqvHPtgSj3Iqo7W211Sz9Y/megxPOU20urezAz0srimomRMmZEy0owjhGGuSj7MokHtkOSpIMakdyNSsBsJlNW4VKLIMmcjOruT3K11VFG3Z26GJaWDWYvUdzuSxMrdzs1RcYUcnucQRMln1PS0zqpIfdQZ5sET0Fm+u0pH8uJXFNdSJEyZkTNCRhGYRk1WSmp3OP1nN6QZcowImbe1jc1QofAG4ErrdV6LaUfK54E5+1W0mUqcGVr4IbOprGRjb7ztRqi4UMNuiD0Zw8YC07I7gliAJpvhMG3o+dUfHCIWP6Qr23lUqVQtnzRnGOJpWNuE8Nr1j+N1b9AJVvgBbWnv5cnPDPw6yp3CM9QthTjA7muiLTUKgAUcASv4bTFOyUjl/UZalyJoiMISgUIQgFFxQ0OF1a13GRicKfqfScjM73DYJ0DJP+xHOJ2srXz6euqo3OQcczn+LdbSoFQ01XUdyp/7FWOcJdDW4+k4AlynTSmMIMCZd1Vb/AC6uDsGxF2tOTHFktmJOKtMnb0tmQqWoq6dNyDpGAHGMCBGeJEg+8NpmFvbZcUzlPykETUoVfNpKxBDdhhgzJy68fsYea4GCTtxnqXOVibG1FKlnctVYoxzgZBluay6i+CEIRhVp27VxpIAJAJIHA6H9zSpr5dMLnYCUra6p0bQM7ZYk7D/yV61zVuDgnQh6E5bdayLde/SkNNP1t+0y3cs7MxGonJlulajRqdW52z3OF9tcsMDgYA6ihuWTFk+0AIZjBE/EiXGZLMNiYEEqeW2pG0n4ly1unqVQjEEH4lLA9p1tiEqh86cdmVLZSsasJJAr/hYH7Qm3aIxi2VJXugpJIxk47mxRootRjpAxgD42mb4YMXbfAx+81EPqqff+hOW/Wk+CrsPtmZFy61LhmXjM0r2o1OgpXbJmUW+BCGBzF1BRvECSZRJdRADOY5FT64AyJNaihdJAyOyJE8SCjU2/tGKv2lVKdRd8g8/EJxsKS172hSfOl2AOOYSol//Z" alt="Памятник"><div class="made"><span>MADE</span> <span>IN</span> <span>MOLDOVA</span></div><div class="powered">Powered by Solomud</div></div><span class="brand-word"><span class="brand-solomud">Solomud</span> <span class="brand-web">Web</span> <span class="brand-radio">Radio</span></span></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end"><button class="install-app" id="installApp" type="button" hidden><span aria-hidden="true">＋</span><span id="installAppLabel">Установить радио</span></button><div class="language-switcher" role="group" aria-label="Язык сайта"><button class="lang-btn active" type="button" data-lang="ru">РУС</button><button class="lang-btn" type="button" data-lang="en">ENG</button><button class="lang-btn" type="button" data-lang="ro">RO</button></div><div class="listener-count is-offline" id="listenerCount" aria-live="polite"><svg class="listener-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3.7"></circle><path d="M4.4 20.5c0-4.2 3.4-7.5 7.6-7.5s7.6 3.3 7.6 7.5H4.4z"></path></svg><span class="listener-copy" id="listenerCopy">Слушателей: —</span></div></div>
@@ -713,6 +753,27 @@ body.eq-fullscreen-open{overflow:hidden}
     </clipPath></defs>
    </svg>
    <img src="./retro-radio-photo.jpg" class="wood-radio-art" alt="Винтажная деревянная радиола SoloMud Radio, с тканевой решёткой и золотым логотипом; на подсвеченной шкале Hit FM Hot Hits, Radio 7, Retro FM, Europa Plus, Chillout, Deep House, Rock Classic и Jazz FM, большая золотая ручка настройки" draggable="false">
+   <!-- Broadcast arcs aligned with the golden star/antenna in the photograph (1288 x 681). -->
+   <svg class="wood-antenna-broadcast" viewBox="0 0 1288 681" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+    <defs>
+     <radialGradient id="woodAntennaAura">
+      <stop offset="0" stop-color="#fff9dc" stop-opacity=".95"/>
+      <stop offset=".22" stop-color="#ffe8a5" stop-opacity=".58"/>
+      <stop offset=".56" stop-color="#ffbd59" stop-opacity=".19"/>
+      <stop offset="1" stop-color="#ffb445" stop-opacity="0"/>
+     </radialGradient>
+    </defs>
+    <circle class="wood-antenna-aura" cx="1064" cy="96" r="35" fill="url(#woodAntennaAura)"/>
+    <g class="wood-antenna-pulse wood-antenna-pulse-1">
+     <path d="M1022 101 C996 112 996 146 1022 160 M1106 101 C1132 112 1132 146 1106 160"/>
+    </g>
+    <g class="wood-antenna-pulse wood-antenna-pulse-2">
+     <path d="M1022 101 C996 112 996 146 1022 160 M1106 101 C1132 112 1132 146 1106 160"/>
+    </g>
+    <g class="wood-antenna-pulse wood-antenna-pulse-3">
+     <path d="M1022 101 C996 112 996 146 1022 160 M1106 101 C1132 112 1132 146 1106 160"/>
+    </g>
+   </svg>
    <svg class="wood-logo-shine" viewBox="0 0 1288 681" aria-hidden="true" focusable="false">
     <defs>
      <linearGradient id="woodLogoSunbeam">
