@@ -1306,7 +1306,7 @@ function handleBuffering(){
 }
 onAudio("timeupdate",clearBufferingOnProgress);
 onAudio("waiting",handleBuffering);onAudio("stalled",handleBuffering);
-onAudio("pause",()=>{stopListening();if(!switchingStream&&!audio.ended){playing=false;if(wantsPlayback&&!audio.error){wantsPlayback=false;clearTimeout(waitingTimer);waitingTimer=null;waitingTimer=null;setPlaybackState("paused")}updatePlayer();render()}});
+onAudio("pause",()=>{stopListening();if(!switchingStream&&!audio.ended){if(wantsPlayback&&isHitFm2000s(current)){recoverCurrentStream("unexpected pause");return}playing=false;if(wantsPlayback&&!audio.error){wantsPlayback=false;clearTimeout(waitingTimer);waitingTimer=null;waitingTimer=null;setPlaybackState("paused")}updatePlayer();render()}});
 onAudio("error",()=>{stopListening();if(wantsPlayback&&!switchingStream)recoverCurrentStream("audio error")});
 onAudio("ended",()=>{stopListening();if(wantsPlayback&&!switchingStream)recoverCurrentStream("stream ended")});
 onAudio("emptied",stopListening);
