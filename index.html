@@ -426,6 +426,17 @@ body.eq-fullscreen-open{overflow:hidden}
 .station-screen[data-receiver="retro"] .wood-hotspot[data-row="3"]{top:64.4%}
 .station-screen[data-receiver="retro"] .wood-hotspot:hover{background:#ffe8aa32;box-shadow:inset 0 0 0 2px #ffe1a4}
 .station-screen[data-receiver="retro"] .wood-hotspot.is-selected{box-shadow:inset 0 0 0 2px #ffe0a8}
+/* Personal labels cover the corresponding names printed on the radio photo. */
+.station-screen[data-receiver="retro"] .wood-hotspot.is-custom{background:linear-gradient(#3b291a,#21160e);color:#ffe5ae;padding:0 4px;font:600 clamp(7px,1.5vw,16px)/1 system-ui;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wood-scale-action,.wood-scale-editor button{border:1px solid #ac8454;border-radius:8px;background:#352517;color:#ffe5ae;padding:9px 14px;cursor:pointer}
+.wood-scale-editor{width:min(420px,calc(100% - 32px));box-sizing:border-box;border:1px solid #ac8454;border-radius:16px;background:#211810;color:#ffe5ae;padding:20px}
+.wood-scale-editor::backdrop{background:#100b07bb}
+.wood-scale-editor h2{margin:0 0 12px}
+.wood-scale-editor label{display:grid;gap:6px;margin:12px 0}
+.wood-scale-editor select{width:100%;color:inherit;background:#352517;border:1px solid #ac8454;border-radius:6px;padding:8px;font:inherit}
+.wood-scale-editor p{font-size:.9rem;margin:12px 0}
+.wood-scale-editor menu{display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:14px 0 0}
+.wood-scale-editor button:disabled{opacity:.5;cursor:default}
 .station-screen[data-receiver="retro"] .wood-hotspot:focus-visible,
 .station-screen[data-receiver="retro"] .wood-radio-knob:focus-visible,
 .station-screen[data-receiver="retro"] .wood-radio-power:focus-visible,
@@ -586,6 +597,18 @@ body.eq-fullscreen-open{overflow:hidden}
    <button class="wood-radio-info" id="woodRadioInfo" type="button" aria-label="Информация о станции" title="Информация о станции"></button>
    <button class="wood-radio-favorite" id="woodRadioFavorite" type="button" aria-pressed="false" aria-label="В избранное" title="Добавить в избранное"></button>
   </div>
+  <button class="wood-scale-action" type="button" id="woodScaleEdit">Моя шкала</button>
+  <dialog class="wood-scale-editor" id="woodScaleEditor" aria-labelledby="woodScaleTitle">
+   <h2 id="woodScaleTitle">Моя шкала</h2>
+   <label><span id="woodSlotLabel">Деление</span><select id="woodScaleSlot"></select></label>
+   <label><span id="woodFavoriteLabel">Станция из избранного</span><select id="woodScaleStation"></select></label>
+   <p id="woodScaleHint" aria-live="polite"></p>
+   <menu>
+    <button type="button" id="woodScaleSave">Сохранить</button>
+    <button type="button" id="woodScaleReset">Вернуть исходную</button>
+    <button type="button" id="woodScaleClose">Закрыть</button>
+   </menu>
+  </dialog>
   <div class="wood-now" aria-live="polite">
    <span class="wood-now-eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
    <span class="wood-now-content"><strong id="woodRadioStation">Выберите радиостанцию</strong><small id="woodRadioStatus">Сейчас в эфире</small></span>
@@ -1505,10 +1528,32 @@ function initAtmosphere(){
  ];
  const statuses=get('woodRadioStatus'),label=get('woodRadioStation'),source=get('stationScreenName');
  const buttons=Array.from(document.querySelectorAll('[data-wood-station]'));
+ const scaleKey='solomud-wood-scale';
+ const editor=get('woodScaleEditor'),slot=get('woodScaleSlot'),choice=get('woodScaleStation');
+ const editButton=get('woodScaleEdit'),saveButton=get('woodScaleSave'),resetButton=get('woodScaleReset');
+ const copy={
+  ru:{title:'Моя шкала',slot:'Деление',favorite:'Станция из избранного',save:'Сохранить',reset:'Вернуть исходную',close:'Закрыть',empty:'Добавь станцию в избранное кнопкой ★, чтобы поставить её на шкалу.',hint:'Можно также зажать деление прямо на шкале.',failure:'Не удалось сохранить шкалу в этом браузере.',tune:'Настроить'},
+  en:{title:'My dial',slot:'Dial position',favorite:'Station from favorites',save:'Save',reset:'Restore original',close:'Close',empty:'Star a station to add it to your dial.',hint:'You can also press and hold a position on the dial.',failure:'This browser could not save your dial.',tune:'Tune to'},
+  ro:{title:'Scala mea',slot:'Poziție pe scală',favorite:'Post din favorite',save:'Salvează',reset:'Revino la postul inițial',close:'Închide',empty:'Adaugă un post la favorite cu ★ pentru a-l pune pe scală.',hint:'Poți și să ții apăsată o poziție de pe scală.',failure:'Scala nu a putut fi salvată în acest browser.',tune:'Acordează pe'}
+ };
  let selected=-1;
+ let presets=Array(buttons.length).fill(null);
+ try{
+  const saved=JSON.parse(localStorage.getItem(scaleKey));
+  if(Array.isArray(saved))presets=buttons.map((_,i)=>saved[i]?.name&&streamCandidates(saved[i]).length?saved[i]:null);
+ }catch{}
+ function available(station){
+  return station&&(!hideAdultContent||!isAdultStation(station))&&streamCandidates(station).length;
+ }
  function findPhotoStation(i){
+  if(i<0)return null;
+  const preset=presets[i];
+  if(preset){
+   const station=findStation(stationId(preset))||preset;
+   return available(station)?station:null;
+  }
   const known=[...all,...Object.values(savedStations())];
-  return known.find(station=>station&&station.name&&matches[i].test(station.name)&&streamCandidates(station).length)||null;
+  return known.find(station=>station?.name&&matches[i].test(station.name)&&available(station))||null;
  }
  function updateSelected(i){
   selected=i;
@@ -1523,9 +1568,14 @@ function initAtmosphere(){
  }
  function syncCurrent(){
   label.textContent=source.textContent||'Выберите радиостанцию';
-  if(current){
-   const n=matches.findIndex(regex=>regex.test(current.name||''));
-   updateSelected(n);
+  const id=current&&stationId(current);
+  const matchesCurrent=i=>{
+   const station=findPhotoStation(i);
+   return station&&stationId(station)===id;
+  };
+  if(!matchesCurrent(selected)){
+   const custom=presets.findIndex((preset,i)=>preset&&matchesCurrent(i));
+   updateSelected(custom>=0?custom:buttons.findIndex((_,i)=>matchesCurrent(i)));
   }
   updateFavorite();
   if(!statuses.dataset.manual) statuses.textContent='Сейчас в эфире';
@@ -1534,11 +1584,87 @@ function initAtmosphere(){
  function inform(message){statuses.textContent=message;statuses.dataset.manual='yes';}
  function tune(i){
   const station=findPhotoStation(i);
-  if(!station){inform('«'+stationNames[i]+'» пока нет в загруженном каталоге');return false}
+  if(!station){inform('«'+(presets[i]?.name||stationNames[i])+'» пока нет в загруженном каталоге');return false}
   updateSelected(i);delete statuses.dataset.manual;statuses.textContent='Подключение…';
   selectReceiverStation(station);return true;
  }
- buttons.forEach(b=>b.addEventListener('click',()=>tune(Number(b.dataset.woodStation))));
+ function scaleName(i){return presets[i]?.name||stationNames[i]}
+ function refreshScale(){
+  const text=copy[language];
+  editButton.textContent=text.title;
+  buttons.forEach((button,i)=>{
+   button.classList.toggle('is-custom',!!presets[i]);
+   button.textContent=presets[i]?.name||'';
+   button.title=scaleName(i);
+   button.setAttribute('aria-label',text.tune+' '+scaleName(i));
+  });
+ }
+ function showChoices(){
+  const saved=savedStations();
+  const stations=favs().map(id=>all.find(s=>stationId(s)===id)||saved[id]).filter(available);
+  const text=copy[language],index=Number(slot.value);
+  choice.replaceChildren(...stations.map(station=>new Option(
+   [countries[station.stationCountry]?.flag,station.name].filter(Boolean).join(' '),stationId(station)
+  )));
+  const preset=presets[index];
+  if(preset&&stations.some(s=>stationId(s)===stationId(preset)))choice.value=stationId(preset);
+  saveButton.disabled=!stations.length;
+  resetButton.disabled=!preset;
+  get('woodScaleHint').textContent=stations.length?text.hint:text.empty;
+ }
+ function editScale(index){
+  if(editor.open)return;
+  const text=copy[language];
+  get('woodScaleTitle').textContent=text.title;
+  get('woodSlotLabel').textContent=text.slot;
+  get('woodFavoriteLabel').textContent=text.favorite;
+  saveButton.textContent=text.save;
+  resetButton.textContent=text.reset;
+  get('woodScaleClose').textContent=text.close;
+  slot.replaceChildren(...buttons.map((_,i)=>new Option((i+1)+' · '+scaleName(i),i)));
+  slot.value=String(Math.max(0,index));
+  showChoices();
+  editor.showModal();
+ }
+ function saveScale(station){
+  const next=[...presets];
+  next[Number(slot.value)]=station;
+  try{localStorage.setItem(scaleKey,JSON.stringify(next))}
+  catch{get('woodScaleHint').textContent=copy[language].failure;return}
+  presets=next;
+  refreshScale();
+  syncCurrent();
+  editor.close();
+ }
+ editButton.addEventListener('click',()=>editScale(selected));
+ slot.addEventListener('change',showChoices);
+ saveButton.addEventListener('click',()=>{
+  const station=findStation(choice.value);
+  if(available(station)&&favs().includes(choice.value))saveScale(station);
+  else showChoices();
+ });
+ resetButton.addEventListener('click',()=>saveScale(null));
+ get('woodScaleClose').addEventListener('click',()=>editor.close());
+ new MutationObserver(refreshScale).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+ refreshScale();
+ buttons.forEach((button,i)=>{
+  let hold=null;
+  let consumed=false;
+  function cancelHold(){clearTimeout(hold);hold=null}
+  button.addEventListener('pointerdown',event=>{
+   if(event.button!==0||!event.isPrimary)return;
+   consumed=false;
+   hold=setTimeout(()=>{hold=null;consumed=true;editScale(i)},550);
+  });
+  for(const event of ['pointerup','pointerleave','pointercancel'])button.addEventListener(event,cancelHold);
+  button.addEventListener('contextmenu',event=>{
+   if(hold!==null||consumed)event.preventDefault();
+  });
+  button.addEventListener('click',event=>{
+   if(consumed&&event.detail){consumed=false;return}
+   tune(i);
+  });
+ });
  const power=get('woodRadioPower'),originalPower=get('screenToggle');
  power.addEventListener('click',()=>originalPower.click());
  function advance(dir){
