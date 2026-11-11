@@ -1,4 +1,4 @@
-const CACHE_NAME = "solomud-radio-shell-v3";
+const CACHE_NAME = "solomud-radio-shell-v4";
 const SHELL_FILES = ["./", "./manifest.webmanifest", "./icons/radio.svg"];
 
 self.addEventListener("install", event => {
@@ -16,6 +16,12 @@ self.addEventListener("fetch", event => {
   if (request.method !== "GET") return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+
+  // Live streams never belong in the offline shell cache.
+  if (url.pathname === "/api/stream") {
+    event.respondWith(fetch(request));
+    return;
+  }
 
   if (request.mode === "navigate") {
     event.respondWith(fetch(request).then(response => {
