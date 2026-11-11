@@ -1242,6 +1242,8 @@ const CUSTOM_BUFFERED_STATIONS=new Set(['solomud-dfm-moscow','solomud-pioner-fm'
 function bufferedStreamUrl(s,url){
  if(/\.m3u8(?:$|[?#])/i.test(url))return '';
  const id=String(s&&s.stationuuid||'');
+ // These broadcasters reject Cloudflare edge requests; keep their direct streams first.
+ if(id==='e45b77ad-3e75-4b16-bdb4-75cd6aa5baff'||id==='solomud-dfm-moscow')return '';
  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)&&!CUSTOM_BUFFERED_STATIONS.has(id))return '';
  try{
   const endpoint=new URL(BUFFERED_STREAM_ENDPOINT);
@@ -1303,7 +1305,7 @@ async function tryStreamOnce(url){
   const cancel=()=>finish(false,new Error("Cancelled stream"));cancelStreamAttempt=cancel;
   const onPlaying=()=>finish(true);
   const onError=()=>finish(false,new Error("Ошибка аудиопотока"));
-  const timer=setTimeout(()=>finish(false,new Error("Тайм-аут запуска потока")),isBufferedProxyStream(url)?15000:isHitFm2000sStream(url)?12000:6000);
+  const timer=setTimeout(()=>finish(false,new Error("Тайм-аут запуска потока")),isBufferedProxyStream(url)?10000:isHitFm2000sStream(url)?12000:6000);
   audio.addEventListener("playing",onPlaying,{once:true});
   audio.addEventListener("error",onError,{once:true});
   try{
