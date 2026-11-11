@@ -1237,40 +1237,15 @@ function isHitFm2000s(s){
  return !!s&&(s.stationuuid==='e45b77ad-3e75-4b16-bdb4-75cd6aa5baff'||/^hit\s*fm\s*2000s\s*hits$/i.test(String(s.name||'').trim()));
 }
 function isHitFm2000sStream(url){return url===HIT_FM_2000S_URL}
-const BUFFERED_STREAM_ENDPOINT='https://solomudradio.pages.dev/api/stream';
-const CUSTOM_BUFFERED_STATIONS=new Set(['solomud-dfm-moscow','solomud-pioner-fm']);
-function bufferedStreamUrl(s,url){
- if(/\.m3u8(?:$|[?#])/i.test(url))return '';
- const id=String(s&&s.stationuuid||'');
- // These broadcasters reject Cloudflare edge requests; keep their direct streams first.
- if(id==='e45b77ad-3e75-4b16-bdb4-75cd6aa5baff'||id==='solomud-dfm-moscow')return '';
- if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)&&!CUSTOM_BUFFERED_STATIONS.has(id))return '';
- try{
-  const endpoint=new URL(BUFFERED_STREAM_ENDPOINT);
-  endpoint.searchParams.set('station',id);
-  endpoint.searchParams.set('source',url);
-  endpoint.searchParams.set('bitrate',String(Number(s.bitrate)||128));
-  return endpoint.href;
- }catch{return ''}
-}
-function isBufferedProxyStream(url){
- try{const u=new URL(url);return u.origin===new URL(BUFFERED_STREAM_ENDPOINT).origin&&u.pathname==='/api/stream'}catch{return false}
-}
 function streamCandidates(s){
- const direct=[],stationCountry=String(s.stationCountry||s.countrycode||country).toLowerCase();
- if(isHitFm2000s(s))direct.push(HIT_FM_2000S_URL);
+ if(isHitFm2000s(s))return [HIT_FM_2000S_URL];
+ const out=[],stationCountry=String(s.stationCountry||s.countrycode||country).toLowerCase();
  if(stationCountry==='moldova'||stationCountry==='md'){
-  if(/megapolis\s*fm/i.test(s.name||''))direct.push('https://megapolisfm.md:8443/886');
-  if(/retro\s*fm|ретро\s*fm/i.test(s.name||''))direct.push('https://efir.retrofm.md:8000/retro');
+  if(/megapolis\s*fm/i.test(s.name||''))out.push('https://megapolisfm.md:8443/886');
+  if(/retro\s*fm|ретро\s*fm/i.test(s.name||''))out.push('https://efir.retrofm.md:8000/retro');
  }
- for(const value of [s.url_resolved,s.url])if(value&&!direct.includes(value))direct.push(value);
- const out=[];
- for(const value of direct){
-  const buffered=bufferedStreamUrl(s,value);
-  if(buffered)out.push(buffered);
-  out.push(value);
- }
- return [...new Set(out)];
+ for(const value of [s.url_resolved,s.url])if(value&&!out.includes(value))out.push(value);
+ return out;
 }
 // This endpoint does not send Access-Control-Allow-Origin. Play it directly,
 // avoiding a guaranteed failed analyser request before the audible stream.
@@ -1305,7 +1280,7 @@ async function tryStreamOnce(url){
   const cancel=()=>finish(false,new Error("Cancelled stream"));cancelStreamAttempt=cancel;
   const onPlaying=()=>finish(true);
   const onError=()=>finish(false,new Error("Ошибка аудиопотока"));
-  const timer=setTimeout(()=>finish(false,new Error("Тайм-аут запуска потока")),isBufferedProxyStream(url)?10000:isHitFm2000sStream(url)?12000:6000);
+  const timer=setTimeout(()=>finish(false,new Error("Тайм-аут запуска потока")),isHitFm2000sStream(url)?12000:6000);
   audio.addEventListener("playing",onPlaying,{once:true});
   audio.addEventListener("error",onError,{once:true});
   try{
