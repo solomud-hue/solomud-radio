@@ -978,7 +978,7 @@ window.onNativeRadioState=function(data){
  if(data.station&&data.station.name){current=data.station;rememberLastStation(current);$('nowName').textContent=current.name}
  if(!current)return;
  playing=data.state==='playing';wantsPlayback=playing||data.state==='buffering';switchingStream=false;
- setPlaybackState(data.state);if(playing)markListening();else stopListening();updatePlayer();render();
+ setPlaybackState(data.state);if(playing){rememberWave(current);markListening()}else stopListening();updatePlayer();render();
 };
 const audioListeners=[];function onAudio(type,handler){audioListeners.push([type,handler]);audio.addEventListener(type,handler)}
 
@@ -1113,12 +1113,12 @@ try{
  firebase.initializeApp(firebaseConfig);
  presenceDb=firebase.database();
  presenceDb.ref("listeners").on("value",snap=>{activeListenersSnapshot=snap;updateListenerCount()});
- firebase.auth().signInAnonymously().then(cred=>{presenceUid=cred.user.uid;presenceRef=presenceDb.ref("listeners/"+presenceUid);presenceReady=true;if(!audio.paused&&!audio.ended)markListening()}).catch(err=>{setListenerUnavailable();console.warn("Firebase auth:",err)});
+ firebase.auth().signInAnonymously().then(cred=>{presenceUid=cred.user.uid;presenceRef=presenceDb.ref("listeners/"+presenceUid);presenceReady=true;if(nativeRadio?playing:!audio.paused&&!audio.ended)markListening()}).catch(err=>{setListenerUnavailable();console.warn("Firebase auth:",err)});
 }catch(err){setListenerUnavailable();console.warn("Firebase init:",err)}
 function setListenerUnavailable(){const box=$("listenerCount");box.classList.remove("is-online");box.classList.add("is-offline");$("listenerCopy").textContent="👥 "+tr("Счётчик временно недоступен")}
 function updateListenerCount(){const box=$("listenerCount"),copy=$("listenerCopy");if(!activeListenersSnapshot){box.classList.remove("is-online");box.classList.add("is-offline");return}let total=activeListenersSnapshot.numChildren(),stationTotal=0;if(current){activeListenersSnapshot.forEach(child=>{if(child.val()&&child.val().stationId===stationId(current))stationTotal++})}box.classList.toggle("is-online",total>0);box.classList.toggle("is-offline",total===0);copy.replaceChildren();const label=document.createElement("span");label.textContent=tr("Сейчас слушают: ");const totalBadge=document.createElement("strong");totalBadge.className="listener-total";totalBadge.textContent=String(total);copy.append(label,totalBadge);if(current){const stationLabel=document.createElement("span");stationLabel.textContent=tr(" · эту станцию: ");const stationBadge=document.createElement("strong");stationBadge.className="listener-total listener-station-total";stationBadge.textContent=String(stationTotal);copy.append(stationLabel,stationBadge)}box.title=tr("Только активные подключения, передающие статус воспроизведения")}
 function markListening(){
- if(!presenceReady||!presenceRef||audio.paused||audio.ended)return;
+ if(!presenceReady||!presenceRef||(nativeRadio?!playing:audio.paused||audio.ended))return;
  presenceRef.onDisconnect().remove().then(()=>presenceRef.set({station:current?.name||"Radio",stationId:current?stationId(current):"",since:firebase.database.ServerValue.TIMESTAMP})).catch(err=>{setListenerUnavailable();console.warn("Presence:",err)});
 }
 function stopListening(){if(presenceRef)presenceRef.remove().catch(()=>{});}

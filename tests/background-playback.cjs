@@ -10,7 +10,7 @@ const context={console,Date,window:{SolomudNative:{postMessage:s=>calls.push(JSO
  $,current:null,streamRequest:0,eqRequest:0,cancelStreamAttempt:null,waitingTimer:null,switchingStream:false,
  wantsPlayback:false,playing:false,activeStreamUrl:null,language:'ru',audio:{muted:false,volume:.6,pause(){calls.push({type:'html-pause'})}},
  hlsPlayer:null,sleepTimerHandle:null,clearTimeout(){},setTimeout(){throw Error('Native playback must not depend on JS timers')},
- stationId:s=>s.id,rememberLastStation(){},updateListenerCount(){},openStationScreen(){},resetTrackInfo(){},
+ stationId:s=>s.id,rememberWave(){},rememberLastStation(){},updateListenerCount(){},openStationScreen(){},resetTrackInfo(){},
  setPlaybackState:s=>context.playbackState=s,updatePlayer(){},render(){},markListening(){},stopListening(){},tr:s=>s,
  streamCandidates:s=>[s.url],connectStationStreams(){throw Error('Native playback must not use WebView audio')}
 };
