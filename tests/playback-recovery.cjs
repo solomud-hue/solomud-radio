@@ -8,6 +8,7 @@ function setup(outcomes){
  function element(){return {children:[],textContent:'',hidden:true,setAttribute(){},addEventListener(){},append(...x){this.children.push(...x)},insertAdjacentElement(_,e){nodes.set(e.id,e)}}}
  for(const id of ['status','stationScreenHint'])nodes.set(id,element());
  const ctx={console,language:'ru',current:{id:'A'},playing:false,switchingStream:true,wantsPlayback:true,streamRequest:1,activeStreamUrl:'primary',playbackState:'ready',playbackAttempt:0,waitingTimer:null,
+ isHitFm2000s:()=>false,bufferStartTime:0,
  playbackCopy:{ru:{ready:'Готов',connecting:'Подключаем',recovering:'Восстанавливаем',playing:'В эфире',failed:'Не удалось',retry:'Повторить',other:'Другая'},en:{failed:'Failed',retry:'Retry',other:'Another'}},
  document:{createElement:element,querySelectorAll:()=>[{dataset:{station:'A'}},{dataset:{station:'B'}}]},$:id=>nodes.get(id),stationId:s=>s.id,
  audio:{pause(){},removeAttribute(){},load(){}},streamCandidates:()=>['primary','backup'],attempts:[],statuses:[],
@@ -15,14 +16,14 @@ function setup(outcomes){
  tryStream:async url=>{ctx.attempts.push(url);const next=outcomes.shift();if(typeof next==='function')return next(ctx);if(next!==true)throw Error('offline')}
  };
  vm.createContext(ctx);
- vm.runInContext(extract('function setPlaybackState(', 'function stopPlayback(')+extract('async function connectStationStreams(', 'function updatePlayer(')+extract('function handleBuffering()', 'onAudio("waiting",handleBuffering)'),ctx);
+ vm.runInContext(extract('function setPlaybackState(', 'function stopPlayback(')+extract('async function connectStationStreams(', 'function updatePlayer(')+extract('function handleBuffering()', 'onAudio("timeupdate",clearBufferingOnProgress)'),ctx);
  return ctx;
 }
 (async()=>{
  let c=setup([false,true]);await c.connectStationStreams(c.current,1,true);
  assert.deepEqual(c.attempts,['primary','backup']);assert.equal(c.playbackState,'playing');assert.equal(c.$('status').textContent,c.$('stationScreenHint').textContent);
  c=setup([false,false,false]);await c.connectStationStreams(c.current,1,true);
- assert.deepEqual(c.attempts,['primary','backup','primary']);assert.equal(c.playbackState,'failed');assert.equal(c.$('screenRecovery').hidden,false);assert.equal(c.$('playerRecovery').hidden,false);
+ assert.deepEqual(c.attempts,['primary','backup','primary','primary']);assert.equal(c.playbackState,'failed');assert.equal(c.$('screenRecovery').hidden,false);assert.equal(c.$('playerRecovery').hidden,false);
  c.language='en';c.renderPlaybackStatus();assert.equal(c.$('status').textContent,'Failed');assert.equal(c.$('stationScreenHint').textContent,'Failed');
  c=setup([false,true]);c.streamCandidates=()=>['primary'];await c.connectStationStreams(c.current,1,true);assert.deepEqual(c.attempts,['primary','primary']);assert.equal(c.playbackState,'playing');
  c=setup([ctx=>{ctx.streamRequest=2;ctx.playbackState='paused';throw Error('cancelled')}]);await c.connectStationStreams(c.current,1,true);assert.equal(c.attempts.length,1);assert.equal(c.playbackState,'paused');

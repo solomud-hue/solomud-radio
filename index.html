@@ -959,6 +959,7 @@ function renderPlaybackStatus(){
  }
 }
 function stopPlayback(){
+ if(nativeRadio)nativeCommand({type:"pause"});
  wantsPlayback=false;++streamRequest;++eqRequest;clearTimeout(waitingTimer);waitingTimer=null;
  if(cancelStreamAttempt)cancelStreamAttempt();switchingStream=false;
  if(hlsPlayer){hlsPlayer.destroy();hlsPlayer=null}
@@ -968,6 +969,17 @@ let pendingSharedStation=new URLSearchParams(location.search).get("station");
 let selectedGenre="all",hideAdultContent=true,sleepTimerHandle=null;let stationHealthCache=null,stationHealthLoaded=false;
 try{const savedAdultSetting=localStorage.getItem("solomud-hide-adult");if(savedAdultSetting!==null)hideAdultContent=savedAdultSetting==="true"}catch{}
 const $=id=>document.getElementById(id);let audio=$("audio");
+// The native player owns Android audio; WebView only sends explicit controls.
+const nativeRadio=!!(window.SolomudNative&&typeof window.SolomudNative.postMessage==='function');
+let nativeRequest=null;
+function nativeCommand(command){if(nativeRadio)window.SolomudNative.postMessage(JSON.stringify(command))}
+window.onNativeRadioState=function(data){
+ if(!nativeRadio||(nativeRequest&&data.request&&data.request!==nativeRequest))return;
+ if(data.station&&data.station.name){current=data.station;rememberLastStation(current);$('nowName').textContent=current.name}
+ if(!current)return;
+ playing=data.state==='playing';wantsPlayback=playing||data.state==='buffering';switchingStream=false;
+ setPlaybackState(data.state);if(playing)markListening();else stopListening();updatePlayer();render();
+};
 const audioListeners=[];function onAudio(type,handler){audioListeners.push([type,handler]);audio.addEventListener(type,handler)}
 
 const waveCopy={
@@ -1088,6 +1100,7 @@ async function loadStationHealth(){
 }
 function setSleepTimer(minutes){
  clearTimeout(sleepTimerHandle);sleepTimerHandle=null;
+ if(nativeRadio){nativeCommand({type:"sleep",minutes});return}
  if(!minutes)return;
  const copy=enhancementCopy[language]||enhancementCopy.ru;
 
@@ -1334,6 +1347,13 @@ async function playStation(s,options={}){
  if(!options.preserveClosedScreen||$("stationScreen").classList.contains("open"))openStationScreen(s);
  $("nowMeta").textContent=(s.stationCountry?countries[s.stationCountry].flag+" · ":"")+(s.bitrate?s.bitrate+" "+tr("кбит/с"):tr("Качество зависит от станции"));
  resetTrackInfo();setPlaybackState("connecting");updatePlayer();
+ if(nativeRadio){
+  nativeRequest=Date.now()+":"+request;
+  const url=streamCandidates(s).find(value=>/^https:\/\//i.test(value));
+  if(!url){wantsPlayback=false;switchingStream=false;setPlaybackState("failed");updatePlayer();return}
+  nativeCommand({type:"play",request:nativeRequest,url,station:s,volume:audio.muted?0:audio.volume});
+  return;
+ }
  await connectStationStreams(s,request,false);
 }
 async function connectStationStreams(station,request,recovering){
@@ -1363,7 +1383,19 @@ async function recoverCurrentStream(reason){
  const request=++streamRequest;setPlaybackState("recovering",1);updatePlayer();
  await connectStationStreams(current,request,true);
 }
-function updatePlayer(){ renderPlaybackStatus();refreshReceiverControls();$("stationScreen").classList.toggle("wave-playing",playing);$("bottomPlayer").classList.toggle("is-playing",playing);$("toggle").classList.toggle("is-playing",playing);$("toggle").setAttribute("aria-pressed",String(playing));const label=playing?(language==="en"?"Pause":language==="ro"?"Pauză":"Пауза"):tr("Воспроизвести");$("toggle").setAttribute("aria-label",label);$("toggle").title=label;$("screenToggle").textContent=playing?"Ⅱ":"▶";refreshDockVolume();if(!current)$("nowName").textContent=tr("Выберите радиостанцию")}
+function updatePlayer(){ updateWebMediaSession();renderPlaybackStatus();refreshReceiverControls();$("stationScreen").classList.toggle("wave-playing",playing);$("bottomPlayer").classList.toggle("is-playing",playing);$("toggle").classList.toggle("is-playing",playing);$("toggle").setAttribute("aria-pressed",String(playing));const label=playing?(language==="en"?"Pause":language==="ro"?"Pauză":"Пауза"):tr("Воспроизвести");$("toggle").setAttribute("aria-label",label);$("toggle").title=label;$("screenToggle").textContent=playing?"Ⅱ":"▶";refreshDockVolume();if(!current)$("nowName").textContent=tr("Выберите радиостанцию")}
+function updateWebMediaSession(){
+ if(nativeRadio||!('mediaSession' in navigator))return;
+ try{
+  navigator.mediaSession.playbackState=playing?'playing':'paused';
+  if(current)navigator.mediaSession.metadata=new MediaMetadata({title:current.name,artist:'Solomud Radio'});
+ }catch{}
+}
+function initWebMediaSession(){
+ if(nativeRadio||!('mediaSession' in navigator))return;
+ const actions={play:()=>{if(current&&!wantsPlayback)playStation(current,{preserveClosedScreen:true})},pause:stopPlayback,stop:stopPlayback,previoustrack:()=>changeStation(-1),nexttrack:()=>changeStation(1)};
+ for(const [action,handler] of Object.entries(actions))try{navigator.mediaSession.setActionHandler(action,handler)}catch{}
+}
 function stationShareUrl(s){
  const target=new URL(location.pathname,location.origin);
  target.searchParams.set("country",s.stationCountry||country);
@@ -1481,13 +1513,14 @@ function refreshDockVolume(){
 }
 function setVolume(value){
  const level=Math.max(0,Math.min(1,Number(value)));if(level>0)lastAudibleVolume=level;
- audio.muted=false;audio.volume=level;$("volume").value=level;$("screenVolume").value=level;
+ audio.muted=false;audio.volume=level;if(nativeRadio)nativeCommand({type:"volume",value:level});$("volume").value=level;$("screenVolume").value=level;
  $("screenVolumeValue").textContent=Math.round(level*100)+"%";refreshDockVolume();
  try{localStorage.setItem("solomud-volume",String(level))}catch{}
 }
 $("volumeMute").addEventListener("click",()=>{
  if(audio.muted||audio.volume===0){audio.muted=false;if(audio.volume===0)setVolume(lastAudibleVolume||.8);else refreshDockVolume()}
  else{audio.muted=true;refreshDockVolume()}
+ if(nativeRadio)nativeCommand({type:"volume",value:audio.muted?0:audio.volume});
 });
 $("volume").addEventListener("input",e=>setVolume(e.target.value));$("screenVolume").addEventListener("input",e=>setVolume(e.target.value));let restoredVolume=.8;try{const savedVolume=localStorage.getItem("solomud-volume");if(savedVolume!==null&&Number.isFinite(Number(savedVolume)))restoredVolume=Math.max(0,Math.min(1,Number(savedVolume)))}catch{}setVolume(restoredVolume);
 // One analyser drives every spectrum, including the compact station indicator.
@@ -1519,9 +1552,11 @@ function applyAtmosphere(id){
 }
 function updateSpectrumStatus(){
  if(!atmosphereReady)return;
- const t=atmosphereText(),message=t[!eqEnabled?9:!current?4:eqBuffering?8:audio.paused?6:eqAnalyser?5:7];if($('eqStatus').textContent!==message)$('eqStatus').textContent=message;
+ const t=atmosphereText(),message=t[!eqEnabled?9:!current?4:eqBuffering?8:(nativeRadio?!playing:audio.paused)?6:eqAnalyser?5:7];if($('eqStatus').textContent!==message)$('eqStatus').textContent=message;
 }
 function resumeSpectrumAudio(){
+ // Mobile audio must not depend on an AudioContext that can be suspended in background.
+ if(nativeRadio||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent))return;
  try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
  if(!eqContext)eqContext=new AC();if(eqContext.state==='suspended')eqContext.resume().catch(()=>{});
  }catch{}
@@ -1565,7 +1600,7 @@ function refreshReceiverLabels(){
  const copy=language==='en'?['Modern','Retro','Player style','Low / high frequencies','Audio analysis unavailable','Paused']:language==='ro'?['Modern','Retro','Aspect player','Frecvențe joase / înalte','Analiza audio nu este disponibilă','Pauză']:['Современный','Ретро','Вид плеера','Низкие / высокие частоты','Анализ звука недоступен','Пауза'];
  $('receiverSwitch').setAttribute('aria-label',copy[2]);
  document.querySelectorAll('[data-receiver-mode]').forEach((b,i)=>b.textContent=copy[i]);
- $('receiverMeterNote').textContent=audio.paused?copy[5]:!eqAnalyser?copy[4]:copy[3];
+ $('receiverMeterNote').textContent=(nativeRadio?!playing:audio.paused)?copy[5]:!eqAnalyser?copy[4]:copy[3];
 }
 function setReceiverMode(mode){
  mode=mode==='retro'?'retro':'modern';$('stationScreen').dataset.receiver=mode;
@@ -2008,6 +2043,8 @@ function initAtmosphere(){
  });
 })();
 restoreLastStation();
+initWebMediaSession();
+if(nativeRadio)nativeCommand({type:"state"});
 initAtmosphere();
 initReceiver();
 $("waveSurprise").addEventListener("click",surpriseWave);renderMyWave();
