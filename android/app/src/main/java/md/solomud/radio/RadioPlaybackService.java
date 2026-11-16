@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.util.Log;
 import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
@@ -27,9 +28,19 @@ public final class RadioPlaybackService extends MediaSessionService {
     private MediaSession session;
     private PowerManager.WakeLock retryLock;
     private int retries;
+    private static final long BUFFER_TIMEOUT_MS = 30000L;
+    private final Runnable bufferingTimeout = () -> {
+        if (player.getPlayWhenReady() && player.getPlaybackState() == Player.STATE_BUFFERING
+                && player.getPlaybackSuppressionReason() == Player.PLAYBACK_SUPPRESSION_REASON_NONE) {
+            Log.w("SolomudPlayback", "Buffer stalled; reconnecting the live stream");
+            scheduleRetry();
+        }
+    };
     private final Runnable sleep = () -> player.pause();
     private final Runnable retry = () -> {
         if (player.getPlayWhenReady()) {
+            // Stop the old loader too: prepare alone cannot unstick BUFFERING.
+            player.stop();
             player.seekToDefaultPosition();
             player.prepare();
         } else cancelRetry();
@@ -46,13 +57,23 @@ public final class RadioPlaybackService extends MediaSessionService {
         player.setHandleAudioBecomingNoisy(true);
         player.setWakeMode(C.WAKE_MODE_NETWORK);
         player.addListener(new Player.Listener() {
-            @Override public void onPlayerError(PlaybackException error) { scheduleRetry(); }
+            @Override public void onPlayerError(PlaybackException error) {
+                Log.w("SolomudPlayback", "Stream error: " + error.getErrorCodeName(), error);
+                scheduleRetry();
+            }
             @Override public void onPlaybackStateChanged(int state) {
+                handler.removeCallbacks(bufferingTimeout);
+                if (state == Player.STATE_BUFFERING && player.getPlayWhenReady())
+                    handler.postDelayed(bufferingTimeout, BUFFER_TIMEOUT_MS);
                 if (state == Player.STATE_READY) { retries = 0; cancelRetry(); }
                 if (state == Player.STATE_ENDED && player.getPlayWhenReady()) scheduleRetry();
             }
             @Override public void onPlayWhenReadyChanged(boolean ready, int reason) {
+                Log.i("SolomudPlayback", "playWhenReady=" + ready + " reason=" + reason);
+                handler.removeCallbacks(bufferingTimeout);
                 if (!ready) cancelRetry();
+                else if (player.getPlaybackState() == Player.STATE_BUFFERING)
+                    handler.postDelayed(bufferingTimeout, BUFFER_TIMEOUT_MS);
             }
             @Override public void onMediaItemTransition(MediaItem item, int reason) {
                 retries = 0; cancelRetry();
@@ -83,7 +104,11 @@ public final class RadioPlaybackService extends MediaSessionService {
     private void scheduleRetry() {
         cancelRetry();
         if (!player.getPlayWhenReady()) return;
-        if (++retries > 8) { player.pause(); return; }
+        // A network failure must not become a user pause after eight attempts.
+        // Keep a capped backoff; explicit Pause, audio-focus loss and the sleep
+        // timer still cancel pending work through onPlayWhenReadyChanged.
+        retries = Math.min(retries + 1, 5);
+        handler.removeCallbacks(bufferingTimeout);
         // Keep the CPU available during a short reconnect even if the screen is off.
         retryLock.acquire(60000);
         handler.postDelayed(retry, Math.min(30000L, 1000L << Math.min(retries, 5)));
