@@ -1,0 +1,69 @@
+name: Publish verified Solomud Radio APK 1.1.2
+on:
+  push:
+    branches:
+      - release/android-1.1.2-publish
+    paths:
+      - 'downloads/.staging/**'
+      - '.github/workflows/publish-apk-1.1.2.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify signed archive and update download link
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64,hashlib,io,subprocess,zipfile
+          from pathlib import Path
+          stage=Path("downloads/.staging")
+          parts=sorted(stage.glob("part-*.b64"))
+          if len(parts)!=28:
+              raise SystemExit("Incomplete APK parts: expected 28")
+          payload="".join(p.read_text(encoding="ascii") for p in parts)
+          data=base64.b64decode(payload,validate=True)
+          expected="281c4a3e6c9dc89f0c83586e989465586ae777e0dab34a02c0d1a5fbd98756ed"
+          if len(data)!=3695095 or hashlib.sha256(data).hexdigest()!=expected:
+              raise SystemExit("APK bytes mismatch; refusing publication")
+          gradle=Path("android/app/build.gradle").read_text()
+          if "versionCode 4" not in gradle or "versionName '1.1.2'" not in gradle:
+              raise SystemExit("Android project does not have version 1.1.2 / code 4")
+          with zipfile.ZipFile(io.BytesIO(data)) as z:
+              if z.testzip() is not None:
+                  raise SystemExit("Damaged APK ZIP")
+              sig=z.read("META-INF/SOLOMUD-.RSA")
+          p=subprocess.run(["openssl","pkcs7","-inform","DER","-print_certs"],input=sig,check=True,capture_output=True)
+          cert=subprocess.run(["openssl","x509","-outform","DER"],input=p.stdout,check=True,capture_output=True)
+          pinned=Path("android/release-certificate.sha256").read_text().strip()
+          if hashlib.sha256(cert.stdout).hexdigest()!=pinned:
+              raise SystemExit("APK certificate is not the permanent release certificate")
+          apk=Path("downloads/solomud-radio.apk")
+          apk.write_bytes(data)
+          site=Path("index.html")
+          html=site.read_text(encoding="utf-8")
+          old='href="./downloads/solomud-radio.apk?v=1.1.1" download="Solomud-Radio-1.1.1.apk" title="Android · версия 1.1.1"'
+          new='href="./downloads/solomud-radio.apk?v=1.1.2" download="Solomud-Radio-1.1.2.apk" title="Android · версия 1.1.2"'
+          if html.count(old)!=1:
+              raise SystemExit("Expected website download link not found exactly once")
+          site.write_text(html.replace(old,new),encoding="utf-8")
+          for part in parts:
+              part.unlink()
+          stage.rmdir()
+          Path(".github/workflows/publish-apk-1.1.2.yml").unlink()
+          print("Validated signed APK 1.1.2 and updated website download.")
+          PY
+      - name: Commit verified release on branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A downloads index.html .github/workflows/publish-apk-1.1.2.yml
+          git commit -m "Publish signed Solomud Radio APK 1.1.2 and update site"
+          git push origin HEAD:"$GITHUB_REF_NAME"
