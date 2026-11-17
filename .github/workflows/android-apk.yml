@@ -5,39 +5,68 @@ on:
   push:
     paths:
       - 'android/**'
+      - 'scripts/*android*'
+      - 'tests/android-release*'
       - '.github/workflows/android-apk.yml'
+
+permissions:
+  contents: read
 
 jobs:
   apk:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    defaults:
-      run:
-        working-directory: android
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-      - name: Install Android SDK
-        uses: android-actions/setup-android@v4
+      - uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools'
-      - name: Install SDK platform
+      - name: Install Android SDK
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.13'
-      - name: Build debug APK
-        run: gradle --no-daemon assembleDebug
-      - name: Publish APK artifact
+      - name: Test release safeguards
+        run: python3 tests/android-release-test.py
+      - name: Build release APK
+        working-directory: android
+        run: gradle --no-daemon assembleRelease
+      # Recovery input for local signing; never install or publish this file.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: solomud-radio-unsigned-do-not-install
+          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+          retention-days: 7
+          if-no-files-found: error
+      - name: Sign with permanent release key and verify update
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ] || [ -z "$ANDROID_KEYSTORE_PASSWORD" ]; then
+            echo '::error::Permanent signing secrets are missing. No installable APK will be published.'
+            exit 1
+          fi
+          export ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/solomud-radio-release.p12"
+          export ANDROID_BUILD_TOOLS="$ANDROID_HOME/build-tools/35.0.0"
+          trap 'rm -f "$ANDROID_KEYSTORE_PATH"' EXIT
+          umask 077
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$ANDROID_KEYSTORE_PATH"
+          bash scripts/sign_android_release.sh \
+            android/app/build/outputs/apk/release/app-release-unsigned.apk \
+            dist/Solomud-Radio.apk
+          python3 scripts/verify_android_release.py dist/Solomud-Radio.apk \
+            --previous downloads/solomud-radio.apk --allow-legacy-migration \
+            --apksigner "$ANDROID_BUILD_TOOLS/apksigner" --aapt "$ANDROID_BUILD_TOOLS/aapt"
+      - name: Publish verified installable APK
         uses: actions/upload-artifact@v4
         with:
-          name: solomud-radio-android-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: solomud-radio-release-apk
+          path: dist/Solomud-Radio.apk
           if-no-files-found: error

@@ -1,0 +1,11 @@
+**/.gradle/
+**/build/
+**/local.properties
+*.jks
+*.keystore
+*.p12
+*signing-backup*
+signing-private/
+__pycache__/
+*.pyc
+dist/

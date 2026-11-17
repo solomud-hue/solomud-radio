@@ -14,22 +14,51 @@ The browser/PWA version uses direct HTML audio on mobile and Media Session
 controls. Mobile audio analysis is disabled to avoid routing sound through a
 background-suspendable AudioContext; desktop analysis is retained.
 
-## Build and install
+## Release signing and updates (1.1.2 onward)
 
-The **Build Solomud Radio Android APK** GitHub Actions workflow builds changes
-under `android/`. Download **solomud-radio-android-debug-apk**, extract
-`app-debug.apk`, and install it on Android. Version code is 2, version is 1.1.0.
+The distributed app uses application ID `md.solomud.radio` and the permanent
+release certificate pinned in `release-certificate.sha256`. Never regenerate
+its private key. A private recovery archive is kept separately from this repo.
+Do not commit a keystore, password, or recovery archive to this public repository.
 
-An old APK does not gain a native service from a website refresh. Install the
-new APK. A home-screen PWA receives the web changes but is not this native app.
-Debug builds use a development signing key; if Android reports a signature
-mismatch, an in-place upgrade requires the original signing key. Removing the
-old app clears its local preferences. Use a stable release key for distribution.
+Configure these GitHub Actions repository secrets once:
+
+- `ANDROID_KEYSTORE_BASE64`: Base64 of the permanent PKCS12 keystore.
+- `ANDROID_KEYSTORE_PASSWORD`: its store/key password.
+
+Key alias: `solomud-radio`. The workflow builds a non-debuggable release APK,
+signs it, checks the pinned certificate and compares the package and version
+against `downloads/solomud-radio.apk`. Missing or incorrect secrets stop the
+release; there is no fallback to a generated debug key.
+
+Download only the **solomud-radio-release-apk** artifact for installation.
+The separately named unsigned artifact is for local signing/recovery only.
+For local signing, set `ANDROID_KEYSTORE_PATH`, `ANDROID_KEYSTORE_PASSWORD`
+and `ANDROID_BUILD_TOOLS`, then run:
+
+```sh
+bash scripts/sign_android_release.sh app-release-unsigned.apk Solomud-Radio.apk
+```
+
+For each future update, increase `versionCode` and `versionName` in
+`app/build.gradle`. Before publishing, verify against the APK currently offered
+on the website. Replace that download only after successful checks.
+
+### One-time migration from 1.1.1
+
+Version 1.1.1 was signed with an ephemeral GitHub runner debug key, which was
+not retained. The first permanent-key release (1.1.2 / code 4) therefore requires
+uninstalling 1.1.1 once. Local preferences may be lost in that migration.
+The verifier permits only this explicitly identified legacy signature/code
+transition; it does not silently allow arbitrary signer changes.
+Updates after 1.1.2 retain the same application ID and key and install in place.
+Normal Android installation confirmation still applies; silent installation
+and an in-app update downloader are not implemented here.
 
 ## Verification
 
 Run `node tests/playback-recovery.cjs` and `node tests/background-playback.cjs`.
-Build with Java 17, Gradle 8.13, Android SDK 35: `gradle --no-daemon assembleDebug`.
+Build with Java 17, Gradle 8.13, Android SDK 35: `gradle --no-daemon assembleRelease`.
 
 Physical-device acceptance (not covered by Node tests or an APK compile):
 
